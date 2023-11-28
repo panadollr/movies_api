@@ -1,0 +1,14 @@
+
+//GET   
+public function example()
+{
+    try {
+        $data = [];
+    if(is_null($data)){
+        return response()->json(['error' => 'Not found'], 404);
+    }
+    return response()->json($data, 200);
+    } catch (\Throwable $th) {
+        return response()->json(['error' => $th->getMessage()], 500);
+    }
+}

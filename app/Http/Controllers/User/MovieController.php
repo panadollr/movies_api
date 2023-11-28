@@ -34,15 +34,19 @@ class MovieController
 
 
     public function getTrendingMovies(){
-    //     $topTrendingMovies = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')
-    // ->select('movies.name', 'movie_details.view', 'movies.modified_time')
-    // ->whereBetween('movies.modified_time', [Carbon::now()->subDays(10), Carbon::now()])
-    // ->orderByDesc('movie_details.view')
-    // ->paginate(8);
-
-    $topTrendingMovies = Movie::take(10)->get();
-
+        try {
+            $topTrendingMovies = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')
+            ->select(['*', DB::raw('movies._id as id')])
+        ->whereBetween('movies.modified_time', [Carbon::now()->subDays(10), Carbon::now()])
+        ->orderByDesc('movie_details.view')
+        ->take(8)->get();
+        if(is_null($topTrendingMovies)){
+            return response()->json(['error' => 'Not found'], 404);
+        }
         return response()->json($topTrendingMovies, 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 500);
+        }
     }
 
 

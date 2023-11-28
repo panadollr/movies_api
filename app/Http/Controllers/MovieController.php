@@ -20,13 +20,24 @@ class MovieController
     {
     
     }
-
-    public function test(){
-        return 'test';
-    }
   
     public function movies_info()
 {
+    try {
+        $total_movies = Movie::count();
+        $total_newest_movies = Movie::whereDate("modified_time", [now()])->count();
+
+        $data = [
+            'total_movies' => $total_movies,
+            'total_newest_movies' => $total_newest_movies,
+        ];
+    if(is_null($data)){
+        return response()->json(['error' => 'Not found'], 404);
+    }
+    return response()->json($data, 200);
+    } catch (\Throwable $th) {
+        return response()->json(['error' => $th->getMessage()], 500);
+    }
     // $cacheKey = 'movies_info';
     // $cacheDuration = 120;
 
@@ -39,17 +50,6 @@ class MovieController
     //         'total_newest_movies' => $total_newest_movies,
     //     ];
     // });
-    $total_movies = Movie::count();
-        $total_newest_movies = Movie::whereDate("modified_time", [now()])->count();
-
-        $data = [
-            'total_movies' => $total_movies,
-            'total_newest_movies' => $total_newest_movies,
-        ];
-    if(!$data){
-        return response()->json('error', 404);
-    }
-    return response()->json($data, 200);
 }
 
 

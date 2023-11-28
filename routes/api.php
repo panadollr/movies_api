@@ -17,8 +17,8 @@ Route::get('new-updated-movies', [MovieController::class, 'getNewUpdatedMovies']
 Route::get('trending-movies', [MovieController::class, 'getTrendingMovies']);
 Route::get('popular-movies', [MovieController::class, 'getPopularMovies']);
 
-
-Route::get('run_scheduled_tasks', [MovieController::class, 'run_scheduled_tasks']);
+use App\Http\Controllers\User\ScheduledTasksController;
+Route::get('run-scheduled-tasks', [ScheduledTasksController::class, 'runScheduledTasks']);
 
 
 
