@@ -21,13 +21,14 @@ class MovieResource extends JsonResource
         $formattedCategory = array_map(function ($c) {
             return ['name' => $c['name']];
         }, json_decode($this->category, true));
+        $imageDomain = config('app_settings.image_domain');
 
         return [
             'id' => $this->_id,
             'name' => $this->name,
             'origin_name' => $this->origin_name,
-            'thumb_url' => $this->thumb_url,
-            'poster_url' => $this->poster_url,
+            'thumb_url' => $imageDomain. $this->thumb_url,
+            'poster_url' => $imageDomain. $this->poster_url,
             'slug' => $this->slug,
             'year' => $this->year,
             'category' => $formattedCategory,
@@ -35,7 +36,7 @@ class MovieResource extends JsonResource
             'content' => $this->content,
             'type' => $this->type,
             'status' => $this->status,
-            'sub_docquyen' => $this->sub_docquyen,
+            'sub_docquyen' => (bool) $this->sub_docquyen ,
             'time' => $this->time,
             'quality' => $this->quality,
             'lang' => $this->lang,
