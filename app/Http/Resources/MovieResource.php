@@ -5,6 +5,8 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use DateTime;
 
+use App\Models\MovieDetails;
+
 class MovieResource extends JsonResource
 {
     /**
@@ -23,12 +25,21 @@ class MovieResource extends JsonResource
         return [
             'id' => $this->_id,
             'name' => $this->name,
+            'origin_name' => $this->origin_name,
             'thumb_url' => $this->thumb_url,
+            'poster_url' => $this->poster_url,
             'slug' => $this->slug,
             'year' => $this->year,
             'category' => $formattedCategory,
             'modified_time' => $formattedModifiedTime,
             'content' => $this->content,
+            'type' => $this->type,
+            'status' => $this->status,
+            'sub_docquyen' => $this->sub_docquyen,
+            'time' => $this->time,
+            'quality' => $this->quality,
+            'lang' => $this->lang,
+            'showtimes' => $this->showtimes,
         ];
     }
 }
