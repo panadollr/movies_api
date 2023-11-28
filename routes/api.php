@@ -6,16 +6,26 @@ use Illuminate\Support\Facades\Route;
 
 //ADMIN
 use App\Http\Controllers\Admin\DashboardController;
-Route::get('general-infomation', [DashboardController::class, 'generalInformation']);
-Route::get('top-categories', [DashboardController::class, 'topCategories']);
-Route::get('top-movies', [DashboardController::class, 'topMovies']);
+Route::prefix('admin')->group(function () {
+    Route::get('general-infomation', [DashboardController::class, 'generalInformation']);
+
+    Route::prefix('movies')->group(function () {
+        Route::get('top', [DashboardController::class, 'topMovies']);
+    });
+
+    Route::prefix('categories')->group(function () {
+        Route::get('top', [DashboardController::class, 'topCategories']);
+        });
+});
 
 
 //USER
 use App\Http\Controllers\User\MovieController;
-Route::get('new-updated-movies', [MovieController::class, 'getNewUpdatedMovies']);
-Route::get('trending-movies', [MovieController::class, 'getTrendingMovies']);
-Route::get('popular-movies', [MovieController::class, 'getPopularMovies']);
+Route::prefix('movies')->group(function () {
+    Route::get('new-updated', [MovieController::class, 'getNewUpdatedMovies']);
+    Route::get('trending', [MovieController::class, 'getTrendingMovies']);
+    Route::get('popular', [MovieController::class, 'getPopularMovies']);
+});
 
 use App\Http\Controllers\User\ScheduledTasksController;
 Route::get('run-scheduled-tasks', [ScheduledTasksController::class, 'runScheduledTasks']);

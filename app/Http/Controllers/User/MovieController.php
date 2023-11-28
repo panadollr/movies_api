@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\Movie;
 use App\Models\MovieDetails;
 use App\Models\Episodes;
+use App\Http\Resources\MovieResource;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
@@ -25,11 +26,17 @@ class MovieController
     }
 
     public function getNewUpdatedMovies(){
-        // $newUpdatedMovies = Movie::select(['*', DB::raw('_id as id')])->whereDate("modified_time", [now()])
-        // ->get();
-        $newUpdatedMovies = Movie::whereDate("modified_time", [now()])
+        try {
+        $newUpdatedMovies = Movie::join('movie_details', 'movie_details._id', 'movies._id')
+        ->whereDate("modified_time", [now()])
         ->get();
-        return response()->json($newUpdatedMovies, 200);
+        if(is_null($newUpdatedMovies)){
+            return response()->json(['error' => 'Not found'], 404);
+        }
+        return response()->json(MovieResource::collection($newUpdatedMovies), 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 500);
+        }
     }
 
 
@@ -40,10 +47,10 @@ class MovieController
         ->whereBetween('movies.modified_time', [Carbon::now()->subDays(10), Carbon::now()])
         ->orderByDesc('movie_details.view')
         ->take(8)->get();
-        if(is_null($topTrendingMovies)){
+            if(is_null($topTrendingMovies)){
             return response()->json(['error' => 'Not found'], 404);
-        }
-        return response()->json($topTrendingMovies, 200);
+            }
+            return response()->json(MovieResource::collection($topTrendingMovies), 200);
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()], 500);
         }
@@ -51,12 +58,24 @@ class MovieController
 
 
     public function getPopularMovies(){
-        $popularMovies = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')
-        ->select('movies.name','movie_details.view', 'movies.modified_time')
-        ->whereBetween('movies.modified_time', [now()->subDays(30), now()])->get()
-        ->sortByDesc('view')->paginate(10);
+        try {
+            // $popularMovies = Movie::take(500)->join('movie_details', 'movie_details._id', '=', 'movies._id')
+            // ->select('movies.name', 'movie_details.view', 'movies.modified_time')
+            // ->orderByDesc('movie_details.view')
+            // ->take(8)
+            // ->get();
+            $popularMovies = MovieDetails::orderByDesc('view')
+            ->take(8)
+            ->join('movies', 'movies._id', '=', 'movie_details._id')
+            ->get();
 
-return response()->json($popularMovies, 200);
+            if(is_null($popularMovies)){
+                return response()->json(['error' => 'Not found'], 404);
+            }
+            return response()->json($popularMovies, 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 500);
+        }
     }
     
 

@@ -9,7 +9,7 @@ class Movie extends Model
 {
     protected $table = 'movies';
     public $timestamps = false;
-    protected $primaryKey = '_id';
+    // protected $primaryKey = '_id';
     protected $fillable =[
         'modified_time',
         '_id',
@@ -20,5 +20,11 @@ class Movie extends Model
         'year',
         'poster_url',
     ];
+
+    public function getFormattedModifiedTimeAttribute()
+    {
+        $dateTime = new DateTime($this->attributes['modified_time']);
+        return $dateTime->format('m/y');
+    }
 
 }
