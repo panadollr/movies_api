@@ -76,7 +76,7 @@ class MovieController
 
     public function getPopularMovies(){
         try {
-            $popularMovies = MovieDetails::orderByDesc('view')->join('movies', 'movies._id', '=', 'movie_details._id')
+            $popularMovies = Movie::orderByDesc('view')->join('movie_details', 'movie_details._id', '=', 'movies._id')
             ->select('movies.modified_time', 'movies._id', 'movies.name', 'movies.origin_name', 'movies.thumb_url',
             'movies.slug', 'movies.year', 'movies.poster_url', 'movie_details.category',
             'movie_details.content', 'movie_details.type', 'movie_details.status',
