@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\MovieDetails;
+
 class Movie extends Model
 {
     protected $table = 'movies';
@@ -21,10 +23,9 @@ class Movie extends Model
         'poster_url',
     ];
 
-    public function getFormattedModifiedTimeAttribute()
-    {
-        $dateTime = new DateTime($this->attributes['modified_time']);
-        return $dateTime->format('m/y');
-    }
+    // public function movie_details()
+    // {
+    //     return $this->hasOne(MovieDetails::class, '_id', '_id');
+    // }
 
 }

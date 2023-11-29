@@ -37,7 +37,7 @@ class CrawlMovies extends Command
 
         $this->info('Crawling movies data...');
         $this->crawl();
-        $this->info('\nMovies data crawled successfully !');
+        $this->info("\nMovies data crawled successfully !");
 
         $this->info("\nCrawling movie details data...");
         $this->crawlMovieDetails->crawl($this->client, $this->base_url);
@@ -136,25 +136,26 @@ class CrawlMovies extends Command
 }
     if (!empty($newMovies)) {
         Movie::insert($newMovies);
+        print_r('new movie has id ' .$existingMovie['_id']. ' is inserted !');
     }
 }
 
 
 protected function updateMovieAttributes($existingMovie, $result, $attributes)
 {
-    $updateRequired = false;
+    $updates = [];
+
     foreach ($attributes as $attribute) {
-        $newValue = $attribute === 'modified_time' ? $result->modified->time : $result->$attribute;
+        $newValue = ($attribute === 'modified_time') ? $result->modified->time : $result->$attribute;
+
         if ($existingMovie->$attribute != $newValue) {
-            print_r($existingMovie->$attribute);
-            $existingMovie->$attribute = $newValue;
-            $updateRequired = true;
+            $updates[$attribute] = $newValue;
         }
     }
 
-    if ($updateRequired) {
-        $existingMovie->save();
-
+    if (!empty($updates)) {
+        Movie::where('_id', $existingMovie->_id)->update($updates);
+        print_r('movie has id ' .$existingMovie->_id. ' is updated !');
     }
 }
 

@@ -19,11 +19,13 @@ class MovieResource extends JsonResource
     {
         $formattedModifiedTime = (new DateTime($this->modified_time))->format('m/Y');
         $formattedCategory = array_map(function ($c) {
-            return ['name' => $c['name']];
+            return ['name' => $c['name'], 
+                    'slug' => $c['slug']];
         }, json_decode($this->category, true));
         $imageDomain = config('app_settings.image_domain');
 
         return [
+            'modified_time' => $formattedModifiedTime,
             'id' => $this->_id,
             'name' => $this->name,
             'origin_name' => $this->origin_name,
@@ -32,7 +34,6 @@ class MovieResource extends JsonResource
             'slug' => $this->slug,
             'year' => $this->year,
             'category' => $formattedCategory,
-            'modified_time' => $formattedModifiedTime,
             'content' => $this->content,
             'type' => $this->type,
             'status' => $this->status,

@@ -22,6 +22,7 @@ Route::prefix('admin')->group(function () {
 //USER
 use App\Http\Controllers\User\MovieController;
 Route::prefix('movies')->group(function () {
+    Route::get('', [MovieController::class, 'getAllMovies']);
     Route::get('new-updated', [MovieController::class, 'getNewUpdatedMovies']);
     Route::get('trending', [MovieController::class, 'getTrendingMovies']);
     Route::get('popular', [MovieController::class, 'getPopularMovies']);
