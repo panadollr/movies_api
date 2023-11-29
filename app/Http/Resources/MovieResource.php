@@ -22,7 +22,7 @@ class MovieResource extends JsonResource
             return ['name' => $c['name'], 
                     'slug' => $c['slug']];
         }, json_decode($this->category, true));
-        $imageDomain = config('app_settings.image_domain');
+        $imageDomain = config('api_settings.image_domain');
 
         return [
             'modified_time' => $formattedModifiedTime,
