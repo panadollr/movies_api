@@ -19,11 +19,57 @@ use Illuminate\Support\Collection;
 
 class MovieController
 {
+
+    // protected $moviesJsonData;
     
-    public function __construct()
-    {
+    // public function __construct()
+    // {
+    //     $jsonFilePath = storage_path('movies.json');
+
+    //     if (file_exists($jsonFilePath)) {
+    //         $jsonContent = file_get_contents($jsonFilePath);
+        
+    //         // Decode JSON content into an associative array
+    //         $this->moviesJsonData = json_decode($jsonContent, true);
+        
+    //         // Check if decoding was successful
+    //         if ($this->moviesJsonData !== null) {
+    //             // $moviesArray now contains the data from the JSON file
+    //             return response()->json($this->moviesJsonData);
+    //         } else {
+    //             return response()->json(['error' => 'Error decoding JSON file']);
+    //         }
+    //     } else {
+    //         return response()->json(['error' => 'JSON file not found']);
+    //     }
+    // }
+
     
-    }
+    // public function addMoviesToJson()
+    // {
+    //     $movies = Movie::all();
+    //     $jsonArray = [];
+    //     foreach ($movies as $value) {
+    //         $movieData = [
+    //             'modified_time' => trim($value->modified_time, "'"),
+    //             '_id' => trim($value->_id, "'"),
+    //             'name' => trim($value->name, "'"),
+    //             'origin_name' => trim($value->origin_name, "'"),
+    //             'thumb_url' => trim($value->thumb_url, "'"),
+    //             'slug' => trim($value->slug, "'"),
+    //             'year' => trim($value->year, "'"),
+    //             'poster_url' => trim($value->poster_url, "'"),
+    //         ];
+
+    //         $jsonArray[] = $movieData;
+    //     }
+    //     $jsonContent = json_encode($jsonArray, JSON_PRETTY_PRINT);
+    //     $jsonFilePath = storage_path('movies.json');
+    //     file_put_contents($jsonFilePath, $jsonContent);
+
+    //     return response()->json(['success' => 'JSON file created successfully']);
+    // }
+
 
     public function getAllMovies(Request $request){
         $offset = $request->offset ?? 0;
@@ -76,15 +122,13 @@ class MovieController
 
     public function getPopularMovies(){
         try {
-            $popularMovies = Movie::orderByDesc('view')->join('movie_details', 'movie_details._id', '=', 'movies._id')
-            ->select('movies.modified_time', 'movies._id', 'movies.name', 'movies.origin_name', 'movies.thumb_url',
-            'movies.slug', 'movies.year', 'movies.poster_url', 'movie_details.category',
-            'movie_details.content', 'movie_details.type', 'movie_details.status',
-            'movie_details.sub_docquyen', 'movie_details.time', 'movie_details.quality',
-            'movie_details.lang', 'movie_details.showtimes')
+            $popularMovies = MovieDetails::join('movies', 'movies._id', '=', 'movie_details._id')
+            ->select('movies.*', 'movie_details.category','movie_details.content', 'movie_details.type', 
+            'movie_details.status','movie_details.sub_docquyen', 'movie_details.time', 
+            'movie_details.quality','movie_details.lang', 'movie_details.showtimes')
             ->take(8)
             ->get();
-
+          
             if(is_null($popularMovies)){
                 return response()->json(['error' => 'Not found'], 404);
             }

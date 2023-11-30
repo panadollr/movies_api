@@ -136,7 +136,7 @@ class CrawlMovies extends Command
 }
     if (!empty($newMovies)) {
         Movie::insert($newMovies);
-        print_r('new movie has id ' .$existingMovie['_id']. ' is inserted !');
+        print_r('new movie is inserted !');
     }
 }
 

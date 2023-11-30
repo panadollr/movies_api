@@ -23,9 +23,9 @@ class Movie extends Model
         'poster_url',
     ];
 
-    // public function movie_details()
-    // {
-    //     return $this->hasOne(MovieDetails::class, '_id', '_id');
-    // }
+    public function movie_details()
+    {
+        return $this->hasMany(MovieDetails::class, "_id", "_id");
+    }
 
 }

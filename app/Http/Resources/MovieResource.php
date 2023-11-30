@@ -18,10 +18,14 @@ class MovieResource extends JsonResource
     public function toArray($request)
     {
         $formattedModifiedTime = (new DateTime($this->modified_time))->format('m/Y');
+        if ($this->category !== null) {
         $formattedCategory = array_map(function ($c) {
             return ['name' => $c['name'], 
                     'slug' => $c['slug']];
         }, json_decode($this->category, true));
+        } else {
+        $formattedCategory = [];
+        }
         $imageDomain = config('api_settings.image_domain');
 
         return [

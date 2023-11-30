@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
+use DB;
 
 use App\Models\Movie;
 use App\Models\MovieDetails;
@@ -62,6 +63,7 @@ class CrawlMovieDetails extends Command
         if (!empty($batch_movie_slugs)) {
             $this->processMovieDetails($batch_movie_slugs, $client, $base_url);
         }
+        DB::statement('ALTER TABLE movie_details ORDER BY view DESC;');
 
         $endTime = microtime(true);
         $executionTime = $endTime - $startTime;
