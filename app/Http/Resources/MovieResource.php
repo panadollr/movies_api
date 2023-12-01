@@ -24,28 +24,37 @@ class MovieResource extends JsonResource
                     'slug' => $c['slug']];
         }, json_decode($this->category, true));
         } else {
-        $formattedCategory = [];
+        $formattedCategory = null;
         }
         $imageDomain = config('api_settings.image_domain');
 
-        return [
+        $data = [
             'modified_time' => $formattedModifiedTime,
             'id' => $this->_id,
             'name' => $this->name,
             'origin_name' => $this->origin_name,
-            'poster_url' => $imageDomain. $this->thumb_url,
-            'thumb_url' => $imageDomain. $this->poster_url,
+            'poster_url' => ($this->thumb_url) ? $imageDomain . $this->thumb_url : null,
+            'thumb_url' =>  ($this->poster_url) ? $imageDomain . $this->poster_url : null,
             'slug' => $this->slug,
+            'year' => $this->year,
             'year' => $this->year,
             'category' => $formattedCategory,
             'content' => $this->content,
             'type' => $this->type,
             'status' => $this->status,
-            'sub_docquyen' => (bool) $this->sub_docquyen ,
+            'sub_docquyen' => (bool) $this->sub_docquyen ? $this->sub_docquyen : null ,
             'time' => $this->time,
+            'episode_current' => $this->episode_current,
+            'episode_total' => $this->episode_total,
             'quality' => $this->quality,
             'lang' => $this->lang,
             'showtimes' => $this->showtimes,
         ];
+
+        $data = array_filter($data, function ($value) {
+            return $value !== null;
+        });
+
+        return $data;
     }
 }

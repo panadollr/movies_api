@@ -23,9 +23,12 @@ Route::prefix('admin')->group(function () {
 use App\Http\Controllers\User\MovieController;
 Route::prefix('movies')->group(function () {
     Route::get('', [MovieController::class, 'getAllMovies']);
-    Route::get('new-updated', [MovieController::class, 'getNewUpdatedMovies']);
     Route::get('trending', [MovieController::class, 'getTrendingMovies']);
+    Route::get('new-updated', [MovieController::class, 'getNewUpdatedMovies']);
+    Route::get('new-updated/series', [MovieController::class, 'getNewUpdatedSeriesMovies']);
+    Route::get('new-updated/single', [MovieController::class, 'getNewUpdatedSingleMovies']);
     Route::get('popular', [MovieController::class, 'getPopularMovies']);
+    Route::get('to-watch-today', [MovieController::class, 'getMoviesToWatchToday']);
 });
 
 use App\Http\Controllers\User\ScheduledTasksController;

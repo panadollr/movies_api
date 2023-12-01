@@ -34,6 +34,6 @@ class MovieDetails extends Model
 
     public function movies()
     {
-        return $this->hasOne(Movie::class, '_id', '_id');
+        return $this->belongsTo(Movie::class, '_id', '_id');
     }
 }
