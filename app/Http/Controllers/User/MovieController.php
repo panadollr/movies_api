@@ -128,9 +128,9 @@ class MovieController
             'movies._id',
             'movies.name',
             'movies.year',
+            'movies.thumb_url',
             'movie_details.type',
-            'movie_details.episode_current',
-            'movie_details.episode_total', 
+            'movie_details.time', 
         )
         ->whereHas('movie_details', function ($query) {
                 $query->where('type', 'series');
@@ -158,9 +158,9 @@ class MovieController
             'movies._id',
             'movies.name',
             'movies.year',
+            'movies.thumb_url',
             'movie_details.type',
-            'movie_details.episode_current',
-            'movie_details.episode_total', 
+            'movie_details.time', 
         )
         ->whereHas('movie_details', function ($query) {
                 $query->where('type', 'single');
