@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MovieDetails extends Model
@@ -37,3 +36,5 @@ class MovieDetails extends Model
         return $this->belongsTo(Movie::class, '_id', '_id');
     }
 }
+
+

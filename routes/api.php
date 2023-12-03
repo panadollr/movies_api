@@ -19,6 +19,7 @@ Route::prefix('admin')->group(function () {
 });
 
 
+
 //USER
 use App\Http\Controllers\User\MovieController;
 Route::prefix('movies')->group(function () {
@@ -29,11 +30,14 @@ Route::prefix('movies')->group(function () {
     Route::get('new-updated/single', [MovieController::class, 'getNewUpdatedSingleMovies']);
     Route::get('popular', [MovieController::class, 'getPopularMovies']);
     Route::get('to-watch-today', [MovieController::class, 'getMoviesToWatchToday']);
+    Route::get('highest-view', [MovieController::class, 'getHighestViewMovie']);
+});
+
+use App\Http\Controllers\User\BlogController;
+Route::prefix('blogs')->group(function () {
+    Route::get('', [BlogController::class, 'getBlogs']);
 });
 
 use App\Http\Controllers\User\ScheduledTasksController;
 Route::get('run-scheduled-tasks', [ScheduledTasksController::class, 'runScheduledTasks']);
-
-
-
 

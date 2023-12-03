@@ -9,23 +9,9 @@ use App\Models\MovieDetails;
 
 class MovieResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
-     */
     public function toArray($request)
     {
         $formattedModifiedTime = (new DateTime($this->modified_time))->format('m/Y');
-        if ($this->category !== null) {
-        $formattedCategory = array_map(function ($c) {
-            return ['name' => $c['name'], 
-                    'slug' => $c['slug']];
-        }, json_decode($this->category, true));
-        } else {
-        $formattedCategory = null;
-        }
         $imageDomain = config('api_settings.image_domain');
 
         $data = [
@@ -37,8 +23,7 @@ class MovieResource extends JsonResource
             'thumb_url' =>  ($this->poster_url) ? $imageDomain . $this->poster_url : null,
             'slug' => $this->slug,
             'year' => $this->year,
-            'year' => $this->year,
-            'category' => $formattedCategory,
+            'category' => $this->formattedCategory(),
             'content' => $this->content,
             'type' => $this->type,
             'status' => $this->status,
@@ -49,12 +34,21 @@ class MovieResource extends JsonResource
             'quality' => $this->quality,
             'lang' => $this->lang,
             'showtimes' => $this->showtimes,
+            'view' => $this->view,
         ];
 
-        $data = array_filter($data, function ($value) {
-            return $value !== null;
-        });
-
-        return $data;
+        return array_filter($data);
     }
+
+
+    protected function formattedCategory()
+{
+    return ($this->category !== null)
+        ? array_map(function ($c) {
+            return ['name' => $c['name'], 'slug' => $c['slug']];
+        }, json_decode($this->category, true))
+        : null;
+}
+
+
 }
