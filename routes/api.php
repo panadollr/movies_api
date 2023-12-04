@@ -31,7 +31,7 @@ Route::prefix('movies')->group(function () {
     Route::get('popular', [MovieController::class, 'getPopularMovies']);
     Route::get('air_today', [MovieController::class, 'getMoviesAirToday']);
     Route::get('highest-view', [MovieController::class, 'getHighestViewMovie']);
-    Route::post('filter', [MovieController::class, 'filter']);
+    Route::get('filter', [MovieController::class, 'filter']);
 });
 
 use App\Http\Controllers\User\BlogController;
