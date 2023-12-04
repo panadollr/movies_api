@@ -82,7 +82,7 @@ class MovieController
     }
 
 
-    public function getNewUpdatedSeriesMovies(){
+    public function getNewUpdatedSeriesMovies(Request $request){
         $limit = $request->limit ?? 24;
         try {
         $newUpdatedSeriesMovies = Movie::orderByDesc('modified_time')
@@ -131,7 +131,7 @@ class MovieController
         }
     }
 
-    public function getMoviesAirToday(){
+    public function getMoviesAirToday(Request $request){
         $limit = $request->limit ?? 24;
         try {
         $moviesAirToday = Movie::whereBetween('modified_time', [$this->week, $this->today])    
