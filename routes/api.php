@@ -23,20 +23,20 @@ Route::prefix('admin')->group(function () {
 //USER
 use App\Http\Controllers\User\MovieController;
 Route::prefix('movies')->group(function () {
-    Route::get('newest', [MovieController::class, 'getMovies']);
-    Route::get('single', [MovieController::class, 'getSingleMovies']);
-    Route::get('series', [MovieController::class, 'getSeriesMovies']);
-    Route::get('cartoon', [MovieController::class, 'getCartoonMovies']);
+    Route::get('phim-moi', [MovieController::class, 'getMovies']);
+    Route::get('phim-le', [MovieController::class, 'getSingleMovies']);
+    Route::get('phim-bo', [MovieController::class, 'getSeriesMovies']);
+    Route::get('hoat-hinh', [MovieController::class, 'getCartoonMovies']);
     Route::get('subteam', [MovieController::class, 'getSubTeamMovies']);
     Route::get('tv-shows', [MovieController::class, 'getTVShowMovies']);
-    Route::get('upcoming', [MovieController::class, 'getUpcomingMovies']);
-    Route::get('trending', [MovieController::class, 'getTrendingMovies']);
-    Route::get('new-updated', [MovieController::class, 'getNewUpdatedMovies']);
-    Route::get('new-updated/series', [MovieController::class, 'getNewUpdatedSeriesMovies']);
-    Route::get('new-updated/single', [MovieController::class, 'getNewUpdatedSingleMovies']);
-    Route::get('popular', [MovieController::class, 'getPopularMovies']);
-    Route::get('air_today', [MovieController::class, 'getMoviesAirToday']);
-    Route::get('highest-view', [MovieController::class, 'getHighestViewMovie']);
+    Route::get('phim-sap-chieu', [MovieController::class, 'getUpcomingMovies']);
+    Route::get('xu-huong', [MovieController::class, 'getTrendingMovies']);
+    Route::get('moi-cap-nhat', [MovieController::class, 'getNewUpdatedMovies']);
+    Route::get('moi-cap-nhat/phim-bo', [MovieController::class, 'getNewUpdatedSeriesMovies']);
+    Route::get('moi-cap-nhat/phim-le', [MovieController::class, 'getNewUpdatedSingleMovies']);
+    Route::get('pho-bien', [MovieController::class, 'getPopularMovies']);
+    Route::get('hom-nay-xem-gi', [MovieController::class, 'getMoviesAirToday']);
+    Route::get('luot-xem-cao-nhat', [MovieController::class, 'getHighestViewMovie']);
 });
 
 use App\Http\Controllers\User\BlogController;
