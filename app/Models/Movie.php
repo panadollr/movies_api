@@ -25,7 +25,7 @@ class Movie extends Model
 
     public function movie_details()
     {
-        return $this->hasMany(MovieDetails::class, "_id", "_id");
+        return $this->hasOne(MovieDetails::class, '_id', '_id');
     }
 
 }

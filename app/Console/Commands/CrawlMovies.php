@@ -42,7 +42,7 @@ class CrawlMovies extends Command
         $this->info("\nCrawling movie details data...");
         $this->crawlMovieDetails->crawl($this->client, $this->base_url);
         $this->info("\nMovie details data crawled successfully !");
-
+        
         $endTime = microtime(true);
         $executionTime = $endTime - $startTime;
         $totalExecutionTime += $executionTime;

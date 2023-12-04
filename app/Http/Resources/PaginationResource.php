@@ -9,7 +9,7 @@ class PaginationResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'data' => MovieResource::collection($this->resource->items()),
+            'data' =>$this->resource->items(),
             'pagination' => [
                 'totalItems' => $this->resource->total(),
                 'totalItemsPerPage' => $this->resource->perPage(),
