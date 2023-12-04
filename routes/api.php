@@ -23,7 +23,13 @@ Route::prefix('admin')->group(function () {
 //USER
 use App\Http\Controllers\User\MovieController;
 Route::prefix('movies')->group(function () {
-    Route::get('', [MovieController::class, 'getAllMovies']);
+    Route::get('newest', [MovieController::class, 'getMovies']);
+    Route::get('single', [MovieController::class, 'getSingleMovies']);
+    Route::get('series', [MovieController::class, 'getSeriesMovies']);
+    Route::get('cartoon', [MovieController::class, 'getCartoonMovies']);
+    Route::get('subteam', [MovieController::class, 'getSubTeamMovies']);
+    Route::get('tv-shows', [MovieController::class, 'getTVShowMovies']);
+    Route::get('upcoming', [MovieController::class, 'getUpcomingMovies']);
     Route::get('trending', [MovieController::class, 'getTrendingMovies']);
     Route::get('new-updated', [MovieController::class, 'getNewUpdatedMovies']);
     Route::get('new-updated/series', [MovieController::class, 'getNewUpdatedSeriesMovies']);
@@ -31,7 +37,6 @@ Route::prefix('movies')->group(function () {
     Route::get('popular', [MovieController::class, 'getPopularMovies']);
     Route::get('air_today', [MovieController::class, 'getMoviesAirToday']);
     Route::get('highest-view', [MovieController::class, 'getHighestViewMovie']);
-    Route::get('filter', [MovieController::class, 'filter']);
 });
 
 use App\Http\Controllers\User\BlogController;

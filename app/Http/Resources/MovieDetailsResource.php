@@ -3,12 +3,8 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use DateTime;
 
-use App\Models\MovieDetails;
-
-
-class MovieResource extends JsonResource
+class MovieDetailsResource extends JsonResource
 {
     public function toArray($request)
     {
@@ -25,7 +21,7 @@ class MovieResource extends JsonResource
             'poster_url' => $this->formatImageUrl($this->thumb_url, $imageDomain),
             'content' => $this->content,
             'type' => $this->type,
-            'status' => $this->status,
+            // 'status' => $this->status,
             // 'is_copyright' => $this->is_copyright,
             'sub_docquyen' => (bool) $this->sub_docquyen,
             // 'trailer_url' => $this->trailer_url,
@@ -60,4 +56,3 @@ class MovieResource extends JsonResource
             : null;
     }
 }
-

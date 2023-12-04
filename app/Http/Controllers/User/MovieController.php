@@ -20,10 +20,11 @@ use Illuminate\Support\Collection;
 class MovieController
 {
 
-    protected $selectArray = ['movies.*', 'movie_details.category',
-    'movie_details.content', 'movie_details.type', 'movie_details.status',
-    'movie_details.sub_docquyen', 'movie_details.time', 'movie_details.quality',
-    'movie_details.lang', 'movie_details.showtimes']; 
+    protected $selectedColumns = ['movies.*', 'movie_details.content',
+    'movie_details.type', 'movie_details.status', 'movie_details.sub_docquyen', 'movie_details.time',
+    'movie_details.episode_current', 'movie_details.quality', 'movie_details.lang',
+    'movie_details.showtimes', 'movie_details.category', 'movie_details.country']; 
+    protected $movies_with_movie_details_query; 
     protected $today;
     protected $week;
 
@@ -31,23 +32,89 @@ class MovieController
     {
         $this->today = Carbon::now();
         $this->week = Carbon::now()->subDays(7);
+        $this->movies_with_movie_details_query = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')
+        ->select($this->selectedColumns);
+    }
+
+    protected function getMoviesByFilter(Request $request, $query){
+        $category = $request->category;
+        $country = $request->country;
+        $year = $request->year;
+        try {
+
+        if ($category) {
+            $query->where(function ($query) use ($category) {
+                $query->whereJsonContains('movie_details.category', ['slug' => $category]);
+            });
+        }
+    
+        if ($country) {
+            $query->where(function ($query) use ($country) {
+                $query->whereJsonContains('movie_details.country', ['slug' => $country]);
+            });
+        }
+    
+        if ($year) {
+            $query->where('movies.year', '=', $year);
+        }
+    
+        $result = $query->paginate(24);
+        return response()->json(new PaginationResource(MovieResource::collection($result)), 200); 
+    } catch (\Throwable $th) {
+        return response()->json(['error' => $th->getMessage()], 500);
+    }
     }
 
 
-    public function getAllMovies(Request $request){
-        $offset = $request->offset ?? 0;
-        $limit = $request->limit ?? 24;
-        $movies = Movie::skip($offset)->paginate($limit);
+    public function getNewestMovies(Request $request){
+        $movies = $this->movies_with_movie_details_query->orderByDesc('movies.modified_time');
+       return $this->getMoviesByFilter($request, $movies);
+    }
 
-        return $movies;
+
+    protected function getMoviesByType(Request $request, $type)
+    {
+    $movies = $this->movies_with_movie_details_query->where('movie_details.type', $type);
+    return $this->getMoviesByFilter($request, $movies);
+    }
+
+
+    public function getSeriesMovies(Request $request){
+        return $this->getMoviesByType($request, 'series');
+    }
+    
+
+    public function getSingleMovies(Request $request){
+        return $this->getMoviesByType($request, 'single');
+    }
+
+
+    public function getCartoonMovies(Request $request){
+        return $this->getMoviesByType($request, 'hoathinh');
+    }
+
+
+    public function getSubTeamMovies(Request $request){
+        $subTeamMovies = $this->movies_with_movie_details_query->where('movie_details.sub_docquyen', true);
+        return $this->getMoviesByFilter($request, $subTeamMovies);
+    }
+
+
+    public function getTVShowMovies(Request $request){
+        return $this->getMoviesByType($request, 'tvshows');
+    }
+
+
+    public function getUpcomingMovies(Request $request){
+        $upcomingMovies = $this->movies_with_movie_details_query->where('movie_details.status', 'trailer');
+        return $this->getMoviesByFilter($request, $upcomingMovies);
     }
 
 
     public function getTrendingMovies(Request $request){
         $time_window = $request->time_window ?? 'week';
         try {
-            $query = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')
-            ->select($this->selectArray)->orderByDesc('view');
+            $query = $this->movies_with_movie_details_query->orderByDesc('view');
 
             if($time_window == "week"){
                 $query->whereBetween('modified_time', [$this->week, $this->today]);
@@ -68,9 +135,8 @@ class MovieController
 
     public function getNewUpdatedMovies(){
         try {
-        $newUpdatedMovies = Movie::whereDate("modified_time", today())
-        ->join('movie_details', 'movie_details._id', 'movies._id')
-        ->select($this->selectArray)
+        $newUpdatedMovies = $this->movies_with_movie_details_query
+        ->whereDate("modified_time", today())
         ->get();
         if(is_null($newUpdatedMovies)){
             return response()->json(['error' => 'Not found'], 404);
@@ -85,9 +151,8 @@ class MovieController
     public function getNewUpdatedSeriesMovies(Request $request){
         $limit = $request->limit ?? 24;
         try {
-        $newUpdatedSeriesMovies = Movie::orderByDesc('modified_time')
-        ->join('movie_details', 'movie_details._id', 'movies._id')
-        ->select($this->selectArray)
+        $newUpdatedSeriesMovies = $this->movies_with_movie_details_query
+        ->orderByDesc('modified_time')
         ->whereHas('movie_details', function ($query) {
                 $query->where('type', 'series');
             })
@@ -103,9 +168,8 @@ class MovieController
     public function getNewUpdatedSingleMovies(Request $request){
         $limit = $request->limit ?? 24;
         try {
-        $newUpdatedSingleMovies = Movie::orderByDesc('modified_time')
-        ->join('movie_details', 'movie_details._id', 'movies._id')
-        ->select($this->selectArray)
+        $newUpdatedSingleMovies = $this->movies_with_movie_details_query
+        ->orderByDesc('modified_time')
         ->whereHas('movie_details', function ($query) {
                 $query->where('type', 'single');
             })
@@ -121,8 +185,7 @@ class MovieController
     public function getPopularMovies(Request $request){
         $limit = $request->limit ?? 24;
         try {
-            $popularMovies = MovieDetails::join('movies', 'movies._id', '=', 'movie_details._id')
-            ->select($this->selectArray)
+            $popularMovies = $this->movies_with_movie_details_query
             ->paginate($limit);
           
             return response()->json(new PaginationResource(MovieResource::collection($popularMovies)), 200);  
@@ -134,9 +197,8 @@ class MovieController
     public function getMoviesAirToday(Request $request){
         $limit = $request->limit ?? 24;
         try {
-        $moviesAirToday = Movie::whereBetween('modified_time', [$this->week, $this->today])    
-        ->join('movie_details', 'movie_details._id', 'movies._id')
-        ->select($this->selectArray)
+        $moviesAirToday = $this->movies_with_movie_details_query
+        ->whereBetween('modified_time', [$this->week, $this->today])    
         ->orderBy('movie_details.view')
         ->paginate($limit);
           
@@ -149,47 +211,13 @@ class MovieController
 
     public function getHighestViewMovie(){
         try {
-            $highestViewMovie = MovieDetails::orderByDesc('view')
-            ->join('movies', 'movies._id', '=', 'movie_details._id')
-            ->select($this->selectArray)
-            ->first();
+            $highestViewMovie = $this->movies_with_movie_details_query
+            ->orderByDesc('view')->first();
            
             return response()->json(new MovieResource($highestViewMovie), 200);
             } catch (\Throwable $th) {
                 return response()->json(['error' => $th->getMessage()], 500);
             }
-    }
-
-
-    public function filter(Request $request){
-        $category = $request->category;
-        $country = $request->country;
-        $year = $request->year;
-        try {
-        $query = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')
-        ->select($this->selectArray);
-
-        if ($category) {
-            $query->where(function ($query) use ($category) {
-                $query->whereJsonContains('movie_details.category', ['slug' => $category]);
-            });
-        }
-    
-        if ($country) {
-            $query->where(function ($query) use ($country) {
-                $query->whereJsonContains('movie_details.country', ['slug' => $country]);
-            });
-        }
-    
-        if ($year) {
-            $query->where('movies.year', $year);
-        }
-    
-        $result = $query->paginate(24);
-        return response()->json(new PaginationResource(MovieResource::collection($result)), 200); 
-    } catch (\Throwable $th) {
-        return response()->json(['error' => $th->getMessage()], 500);
-    }
     }
     
    
