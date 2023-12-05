@@ -22,8 +22,8 @@ Route::prefix('admin')->group(function () {
 
 //USER
 use App\Http\Controllers\User\MovieController;
-Route::prefix('movies')->group(function () {
-    Route::get('phim-moi', [MovieController::class, 'getMovies']);
+// Route::prefix('movies')->group(function () {
+    Route::get('phim-moi', [MovieController::class, 'getNewestMovies']);
     Route::get('phim-le', [MovieController::class, 'getSingleMovies']);
     Route::get('phim-bo', [MovieController::class, 'getSeriesMovies']);
     Route::get('hoat-hinh', [MovieController::class, 'getCartoonMovies']);
@@ -37,7 +37,7 @@ Route::prefix('movies')->group(function () {
     Route::get('pho-bien', [MovieController::class, 'getPopularMovies']);
     Route::get('hom-nay-xem-gi', [MovieController::class, 'getMoviesAirToday']);
     Route::get('luot-xem-cao-nhat', [MovieController::class, 'getHighestViewMovie']);
-});
+// });
 
 use App\Http\Controllers\User\BlogController;
 Route::prefix('blogs')->group(function () {

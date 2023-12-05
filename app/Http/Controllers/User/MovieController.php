@@ -37,6 +37,7 @@ class MovieController
     }
 
     protected function getMoviesByFilter(Request $request, $query){
+        $limit = $request->limit ?? 24;
         $category = $request->category;
         $country = $request->country;
         $year = $request->year;
@@ -58,7 +59,7 @@ class MovieController
             $query->where('movies.year', '=', $year);
         }
     
-        $result = $query->paginate(24);
+        $result = $query->paginate($limit);
         return response()->json(new PaginationResource(MovieResource::collection($result)), 200); 
     } catch (\Throwable $th) {
         return response()->json(['error' => $th->getMessage()], 500);
