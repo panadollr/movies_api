@@ -37,7 +37,6 @@ use App\Http\Controllers\User\MovieController;
     Route::get('moi-cap-nhat', [MovieController::class, 'getNewUpdatedMovies']);
     Route::get('moi-cap-nhat/phim-bo', [MovieController::class, 'getNewUpdatedSeriesMovies']);
     Route::get('moi-cap-nhat/phim-le', [MovieController::class, 'getNewUpdatedSingleMovies']);
-    Route::get('pho-bien', [MovieController::class, 'getPopularMovies']);
     Route::get('hom-nay-xem-gi', [MovieController::class, 'getMoviesAirToday']);
     Route::get('luot-xem-cao-nhat', [MovieController::class, 'getHighestViewMovie']);
 // });

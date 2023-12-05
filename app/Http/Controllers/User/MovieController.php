@@ -192,20 +192,6 @@ class MovieController
     }
 
 
-    //PHIM PHỔ BIẾN
-    public function getPopularMovies(Request $request){
-        $limit = $request->limit ?? 24;
-        try {
-            $popularMovies = $this->movies_with_movie_details_query
-            ->paginate($limit);
-          
-            return response()->json(new PaginationResource(MovieResource::collection($popularMovies)), 200);  
-        } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()], 500);
-        }
-    }
-
-
     //HÔM NAY XEM GÌ
     public function getMoviesAirToday(Request $request){
         $limit = $request->limit ?? 24;
