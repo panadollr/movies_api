@@ -36,29 +36,18 @@ class MovieController
         ->select($this->selectedColumns);
     }
 
+
+    //LỌC PHIM
     protected function getMoviesByFilter(Request $request, $query){
         $limit = $request->limit ?? 24;
-        $category = $request->category;
-        $country = $request->country;
         $year = $request->year;
         try {
-
-        if ($category) {
-            $query->where(function ($query) use ($category) {
-                $query->whereJsonContains('movie_details.category', ['slug' => $category]);
-            });
-        }
-    
-        if ($country) {
-            $query->where(function ($query) use ($country) {
-                $query->whereJsonContains('movie_details.country', ['slug' => $country]);
-            });
-        }
-    
+            
+        //theo năm
         if ($year) {
             $query->where('movies.year', '=', $year);
         }
-    
+
         $result = $query->paginate($limit);
         return response()->json(new PaginationResource(MovieResource::collection($result)), 200); 
     } catch (\Throwable $th) {
@@ -66,11 +55,41 @@ class MovieController
     }
     }
 
-
+    //PHIM MỚI
     public function getNewestMovies(Request $request){
         $movies = $this->movies_with_movie_details_query->orderByDesc('movies.modified_time');
        return $this->getMoviesByFilter($request, $movies);
     }
+
+
+    //PHIM THEO THỂ LOẠI
+    public function getMoviesByCategory($category){
+        $limit = $request->limit ?? 24;
+        try {
+            $moviesByCategory = $this->movies_with_movie_details_query
+            ->whereJsonContains('movie_details.category', ['slug' => $category])
+            ->paginate($limit);
+
+            return response()->json(new PaginationResource(MovieResource::collection($moviesByCategory)), 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 500);
+        }
+    } 
+
+
+    //PHIM THEO QUỐC GIA
+    public function getMoviesByCountry($country){
+        $limit = $request->limit ?? 24;
+        try {
+            $moviesByCountry = $this->movies_with_movie_details_query
+            ->whereJsonContains('movie_details.country', ['slug' => $country])
+            ->paginate($limit);
+
+            return response()->json(new PaginationResource(MovieResource::collection($moviesByCountry)), 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 500);
+        }
+    } 
 
 
     protected function getMoviesByType(Request $request, $type)
@@ -80,38 +99,45 @@ class MovieController
     }
 
 
+    //PHIM BỘ
     public function getSeriesMovies(Request $request){
         return $this->getMoviesByType($request, 'series');
     }
-    
 
+    
+    //PHIM LẺ
     public function getSingleMovies(Request $request){
         return $this->getMoviesByType($request, 'single');
     }
 
 
+    //PHIM HOẠT HÌNH
     public function getCartoonMovies(Request $request){
         return $this->getMoviesByType($request, 'hoathinh');
     }
 
 
+    //PHIM SUBTEAM
     public function getSubTeamMovies(Request $request){
         $subTeamMovies = $this->movies_with_movie_details_query->where('movie_details.sub_docquyen', true);
         return $this->getMoviesByFilter($request, $subTeamMovies);
     }
 
 
+    //TV-SHOWS
     public function getTVShowMovies(Request $request){
         return $this->getMoviesByType($request, 'tvshows');
     }
 
 
+    //PHIM SẮP CHIẾU
     public function getUpcomingMovies(Request $request){
         $upcomingMovies = $this->movies_with_movie_details_query->where('movie_details.status', 'trailer');
         return $this->getMoviesByFilter($request, $upcomingMovies);
     }
 
 
+    //PHIM ĐANG THỊNH HÀNH
     public function getTrendingMovies(Request $request){
         $time_window = $request->time_window ?? 'week';
         try {
@@ -134,6 +160,7 @@ class MovieController
     }
 
 
+    //PHIM MỚI CẬP NHẬT
     public function getNewUpdatedMovies(){
         try {
         $newUpdatedMovies = $this->movies_with_movie_details_query
@@ -149,40 +176,36 @@ class MovieController
     }
 
 
-    public function getNewUpdatedSeriesMovies(Request $request){
+    protected function getNewUpdatedMoviesByType($request, $type){
         $limit = $request->limit ?? 24;
         try {
-        $newUpdatedSeriesMovies = $this->movies_with_movie_details_query
+        $newUpdatedMoviesByType = $this->movies_with_movie_details_query
         ->orderByDesc('modified_time')
-        ->whereHas('movie_details', function ($query) {
-                $query->where('type', 'series');
+        ->whereHas('movie_details', function ($query) use($type) {
+                $query->where('type', $type);
             })
         ->paginate($limit);
     
-        return response()->json(new PaginationResource(MovieResource::collection($newUpdatedSeriesMovies)), 200);
+        return response()->json(new PaginationResource(MovieResource::collection($newUpdatedMoviesByType)), 200);
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()], 500);
         }
     }
 
 
+    //PHIM BỘ MỚI CẬP NHẬT
+    public function getNewUpdatedSeriesMovies(Request $request){
+        return $this->getNewUpdatedMoviesByType($request, 'series');
+    }
+
+
+    //PHIM LẺ MỚI CẬP NHẬT
     public function getNewUpdatedSingleMovies(Request $request){
-        $limit = $request->limit ?? 24;
-        try {
-        $newUpdatedSingleMovies = $this->movies_with_movie_details_query
-        ->orderByDesc('modified_time')
-        ->whereHas('movie_details', function ($query) {
-                $query->where('type', 'single');
-            })
-        ->paginate($limit);
-
-        return response()->json(new PaginationResource(MovieResource::collection($newUpdatedSingleMovies)), 200);  
-        } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()], 500);
-        }
+        return $this->getNewUpdatedMoviesByType($request, 'single');
     }
 
 
+    //PHIM PHỔ BIẾN
     public function getPopularMovies(Request $request){
         $limit = $request->limit ?? 24;
         try {
@@ -195,6 +218,8 @@ class MovieController
         }
     }
 
+
+    //HÔM NAY XEM GÌ
     public function getMoviesAirToday(Request $request){
         $limit = $request->limit ?? 24;
         try {
@@ -210,6 +235,7 @@ class MovieController
     }
 
 
+    //PHIM CÓ LƯỢT XEM CAO NHẤT
     public function getHighestViewMovie(){
         try {
             $highestViewMovie = $this->movies_with_movie_details_query
