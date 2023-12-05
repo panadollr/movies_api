@@ -63,32 +63,19 @@ class MovieController
 
 
     //PHIM THEO THỂ LOẠI
-    public function getMoviesByCategory($category){
-        $limit = $request->limit ?? 24;
-        try {
-            $moviesByCategory = $this->movies_with_movie_details_query
-            ->whereJsonContains('movie_details.category', ['slug' => $category])
-            ->paginate($limit);
-
-            return response()->json(new PaginationResource(MovieResource::collection($moviesByCategory)), 200);
-        } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()], 500);
-        }
+    public function getMoviesByCategory(Request $request, $category){
+        $moviesByCategory = $this->movies_with_movie_details_query
+        ->whereJsonContains('movie_details.category', ['slug' => $category]);
+        return $this->getMoviesByFilter($request, $moviesByCategory);
     } 
 
 
     //PHIM THEO QUỐC GIA
-    public function getMoviesByCountry($country){
-        $limit = $request->limit ?? 24;
-        try {
-            $moviesByCountry = $this->movies_with_movie_details_query
+    public function getMoviesByCountry(Request $request, $country){
+        $moviesByCountry = $this->movies_with_movie_details_query
             ->whereJsonContains('movie_details.country', ['slug' => $country])
             ->paginate($limit);
-
-            return response()->json(new PaginationResource(MovieResource::collection($moviesByCountry)), 200);
-        } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()], 500);
-        }
+        return $this->getMoviesByFilter($request, $moviesByCountry);
     } 
 
 
