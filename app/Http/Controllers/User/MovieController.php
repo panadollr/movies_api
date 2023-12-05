@@ -73,8 +73,7 @@ class MovieController
     //PHIM THEO QUỐC GIA
     public function getMoviesByCountry(Request $request, $country){
         $moviesByCountry = $this->movies_with_movie_details_query
-            ->whereJsonContains('movie_details.country', ['slug' => $country])
-            ->paginate($limit);
+            ->whereJsonContains('movie_details.country', ['slug' => $country]);
         return $this->getMoviesByFilter($request, $moviesByCountry);
     } 
 
