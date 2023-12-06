@@ -39,7 +39,11 @@ use App\Http\Controllers\User\MovieController;
     Route::get('moi-cap-nhat/phim-le', [MovieController::class, 'getNewUpdatedSingleMovies']);
     Route::get('hom-nay-xem-gi', [MovieController::class, 'getMoviesAirToday']);
     Route::get('luot-xem-cao-nhat', [MovieController::class, 'getHighestViewMovie']);
+    Route::get('tim-kiem', [MovieController::class, 'searchMovie']);
 // });
+
+use App\Http\Controllers\User\MovieDetailsController;
+    Route::get('phim/{slug}', [MovieDetailsController::class, 'getMovieDetails']);
 
 use App\Http\Controllers\User\BlogController;
 Route::prefix('blogs')->group(function () {

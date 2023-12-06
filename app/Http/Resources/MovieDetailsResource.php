@@ -9,50 +9,48 @@ class MovieDetailsResource extends JsonResource
     public function toArray($request)
     {
         $imageDomain = config('api_settings.image_domain');
+        $movie = $this['movie'];
 
         return [
-            'modified_time' => (new DateTime($this->modified_time))->format('m/Y'),
-            'id' => $this->_id,
-            'name' => $this->name,
-            'origin_name' => $this->origin_name,
-            'thumb_url' => $this->formatImageUrl($this->poster_url, $imageDomain),
-            'slug' => $this->slug,
-            'year' => $this->year,
-            'poster_url' => $this->formatImageUrl($this->thumb_url, $imageDomain),
-            'content' => $this->content,
-            'type' => $this->type,
-            // 'status' => $this->status,
-            // 'is_copyright' => $this->is_copyright,
-            'sub_docquyen' => (bool) $this->sub_docquyen,
-            // 'trailer_url' => $this->trailer_url,
-            'time' => $this->time,
-            'episode_current' => $this->episode_current,
-            // 'episode_total' => $this->episode_total,
-            'quality' => $this->quality,
-            'lang' => $this->lang,
-            // 'notify' => $this->notify,
-            'showtimes' => $this->showtimes,
-            // 'view' => $this->view,
-            // 'actor' => json_decode($this->actor),
-            // 'director' => json_decode($this->director),
-            'category' => $this->formattedArray('category'),
-            'country' => $this->formattedArray('country'),
+            'movie' => [
+                'modified_time' => $movie['modified_time'],
+                'id' => $movie['_id'],
+                'name' => $movie['name'],
+                'slug' => $movie['slug'],
+                'origin_name' => $movie['origin_name'],
+                'content' => $movie['content'],
+                'type' => $movie['type'],
+                'status' => $movie['status'],
+                'thumb_url' => $imageDomain . $movie['poster_url'],
+                'poster_url' => $imageDomain . $movie['thumb_url'],
+                'is_copyright' => $movie['is_copyright'],
+                'sub_docquyen' => (bool) $movie['sub_docquyen'],
+                'trailer_url' => $movie['trailer_url'],
+                'time' => $movie['time'],
+                'episode_current' => $movie['episode_current'],
+                'episode_total' => $movie['episode_total'],
+                'quality' => $movie['quality'],
+                'lang' => $movie['lang'],
+                'notify' => $movie['notify'],
+                'showtimes' => $movie['showtimes'],
+                'year' => $movie['year'],
+                'view' => $movie['view'],
+                'actor' => json_decode($movie['actor']),
+                'director' => json_decode($movie['director']),
+                'category' => $this->formattedArray($movie, 'category'),
+                'country' => $this->formattedArray($movie, 'country'),
+            ],
+            'episodes' => $this['episodes']
         ];
     }
 
-    protected function formatImageUrl($url, $domain)
+    protected function formattedArray($movie, $propertyName)
     {
-        return $url ? $domain . $url : null;
+        $propertyValue = $movie[$propertyName];
+
+        return array_map(function ($item) {
+                return ['name' => $item['name']];
+            }, json_decode($propertyValue, true));
     }
 
-    protected function formattedArray($propertyName)
-    {
-        $propertyValue = $this->$propertyName;
-
-        return $propertyValue !== null
-            ? array_map(function ($item) {
-                return ['name' => $item['name'], 'slug' => $item['slug']];
-            }, json_decode($propertyValue, true))
-            : null;
-    }
 }

@@ -77,7 +77,7 @@ class MovieController
         return $this->getMoviesByFilter($request, $moviesByCountry);
     } 
 
-
+    
     protected function getMoviesByType(Request $request, $type)
     {
     $movies = $this->movies_with_movie_details_query->where('movie_details.type', $type);
@@ -126,56 +126,37 @@ class MovieController
     //PHIM ĐANG THỊNH HÀNH
     public function getTrendingMovies(Request $request){
         $time_window = $request->time_window ?? 'week';
-        try {
-            $query = $this->movies_with_movie_details_query->orderByDesc('view');
+        $query = $this->movies_with_movie_details_query->orderByDesc('view');
 
-            if($time_window == "week"){
+        if($time_window == "week"){
                 $query->whereBetween('modified_time', [$this->week, $this->today]);
-            }
-            
-            if($time_window == "day"){
-                $query->whereDate("modified_time", $this->today);
-            }
-
-            $topTrendingMovies = $query->paginate(8);
-
-            return response()->json(new PaginationResource(MovieResource::collection($topTrendingMovies)), 200);
-        } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()], 500);
         }
+            
+        if($time_window == "day"){
+                $query->whereDate("modified_time", $this->today);
+        }
+
+        $topTrendingMovies = $query;
+        return $this->getMoviesByFilter($request, $topTrendingMovies);
     }
 
 
     //PHIM MỚI CẬP NHẬT
-    public function getNewUpdatedMovies(){
-        try {
+    public function getNewUpdatedMovies(Request $request){
         $newUpdatedMovies = $this->movies_with_movie_details_query
-        ->whereDate("modified_time", today())
-        ->get();
-        if(is_null($newUpdatedMovies)){
-            return response()->json(['error' => 'Not found'], 404);
-        }
-        return response()->json(MovieResource::collection($newUpdatedMovies), 200);
-        } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()], 500);
-        }
+        ->whereDate("modified_time", today());
+        return $this->getMoviesByFilter($request, $newUpdatedMovies);
     }
 
-
+    
+    //PHIM MỚI CẬP NHẬT THEO LOẠI 
     protected function getNewUpdatedMoviesByType($request, $type){
-        $limit = $request->limit ?? 24;
-        try {
         $newUpdatedMoviesByType = $this->movies_with_movie_details_query
         ->orderByDesc('modified_time')
         ->whereHas('movie_details', function ($query) use($type) {
                 $query->where('type', $type);
-            })
-        ->paginate($limit);
-    
-        return response()->json(new PaginationResource(MovieResource::collection($newUpdatedMoviesByType)), 200);
-        } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()], 500);
-        }
+            });
+        return $this->getMoviesByFilter($request, $newUpdatedMoviesByType);    
     }
 
 
@@ -193,17 +174,10 @@ class MovieController
 
     //HÔM NAY XEM GÌ
     public function getMoviesAirToday(Request $request){
-        $limit = $request->limit ?? 24;
-        try {
         $moviesAirToday = $this->movies_with_movie_details_query
         ->whereBetween('modified_time', [$this->week, $this->today])    
-        ->orderBy('movie_details.view')
-        ->paginate($limit);
-          
-        return response()->json(new PaginationResource(MovieResource::collection($moviesAirToday)), 200);  
-        } catch (\Throwable $th) {
-            return response()->json(['error' => $th->getMessage()], 500);
-        }
+        ->orderBy('movie_details.view');
+        return $this->getMoviesByFilter($request, $moviesAirToday);
     }
 
 
@@ -217,6 +191,14 @@ class MovieController
             } catch (\Throwable $th) {
                 return response()->json(['error' => $th->getMessage()], 500);
             }
+    }
+
+    //TÌM KIẾM PHIM
+    public function searchMovie(Request $request){
+        $name = $request->name;
+        $searchedMovies = $this->movies_with_movie_details_query
+            ->where('movies.name', 'LIKE', '%' . $name . '%');
+        return $this->getMoviesByFilter($request, $searchedMovies);
     }
     
    
