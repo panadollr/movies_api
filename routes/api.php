@@ -48,6 +48,7 @@ use App\Http\Controllers\User\MovieDetailsController;
 use App\Http\Controllers\User\BlogController;
 Route::prefix('blogs')->group(function () {
     Route::get('', [BlogController::class, 'getBlogs']);
+    Route::get('{slug}', [BlogController::class, 'blogDetails']);
 });
 
 use App\Http\Controllers\User\ScheduledTasksController;

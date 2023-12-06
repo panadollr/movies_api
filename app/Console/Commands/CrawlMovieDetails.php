@@ -121,12 +121,11 @@ public function processMovieDetails($batch_movie_slugs, $client, $base_url) {
 
 protected function updateMovieDetailsAttributes($attributes, $arraysToJSON, $existingMovieDetails, $newMovieData)
 {
-    $updateRequired = false;
+    $updates = [];
 
     foreach ($attributes as $attribute) {
         if ($existingMovieDetails->$attribute !== $newMovieData->$attribute) {
-            $existingMovieDetails->$attribute = $newMovieData->$attribute;
-            $updateRequired = true;
+            $updates[$attribute] = $newMovieData->$attribute;
         }
     }
 
@@ -135,13 +134,12 @@ protected function updateMovieDetailsAttributes($attributes, $arraysToJSON, $exi
         $newValue = json_encode($newMovieData->$arrayAttribute);
 
         if ($existingValue !== $newValue) {
-            $existingMovieDetails->$arrayAttribute = $newValue;
-            $updateRequired = true;
+            $updates[$arrayAttribute] = $newValue;
         }
     }
 
-    if ($updateRequired) {
-        $existingMovieDetails->save();
+    if (!empty($updates)) {
+        MovieDetails::where('_id', $existingMovieDetails->_id)->update($updates);
     }
 }
 
