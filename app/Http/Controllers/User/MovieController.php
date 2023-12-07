@@ -26,11 +26,15 @@ class MovieController
     'movie_details.showtimes', 'movie_details.category', 'movie_details.country']; 
     protected $movies_with_movie_details_query; 
     protected $today;
+    protected $yesterday;
+    protected $tomorrow;
     protected $week;
 
     public function __construct()
     {
+        $this->yesterday = Carbon::yesterday();
         $this->today = Carbon::now();
+        $this->tomorrow = Carbon::tomorrow();
         $this->week = Carbon::now()->subDays(7);
         $this->movies_with_movie_details_query = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')
         ->select($this->selectedColumns);
@@ -129,11 +133,11 @@ class MovieController
         $query = $this->movies_with_movie_details_query->orderByDesc('view');
 
         if($time_window == "week"){
-                $query->whereBetween('modified_time', [$this->week, $this->today]);
+                $query->whereBetween('modified_time', [$this->week, $this->tomorrow]);
         }
             
         if($time_window == "day"){
-                $query->whereDate("modified_time", $this->today);
+                $query->whereBetween('modified_time', [$this->today, $this->tomorrow]);
         }
 
         $topTrendingMovies = $query;
@@ -152,9 +156,10 @@ class MovieController
     //PHIM MỚI CẬP NHẬT THEO LOẠI 
     protected function getNewUpdatedMoviesByType($request, $type){
         $newUpdatedMoviesByType = $this->movies_with_movie_details_query
-        ->orderByDesc('modified_time')
+        ->whereBetween('modified_time', [$this->yesterday, $this->tomorrow])
         ->whereHas('movie_details', function ($query) use($type) {
                 $query->where('type', $type);
+                $query->where('status', '!=', 'trailer');
             });
         return $this->getMoviesByFilter($request, $newUpdatedMoviesByType);    
     }
@@ -175,7 +180,7 @@ class MovieController
     //HÔM NAY XEM GÌ
     public function getMoviesAirToday(Request $request){
         $moviesAirToday = $this->movies_with_movie_details_query
-        ->whereBetween('modified_time', [$this->week, $this->today])    
+        ->whereBetween('modified_time', [$this->week, $this->tomorrow])    
         ->where('movie_details.status', '!=', 'trailer')
         ->orderBy('movie_details.view');
         return $this->getMoviesByFilter($request, $moviesAirToday);
