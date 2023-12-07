@@ -64,21 +64,21 @@ class MovieController
 
 
     //PHIM THEO THỂ LOẠI
-    protected function getMoviesByCategory(Request $request, $category){
+    public function getMoviesByCategory(Request $request, $category){
         $moviesByCategory = $this->moviesWithNoTrailer->whereJsonContains('movie_details.category', ['slug' => $category]);
         return $this->getMoviesByFilter($request, $moviesByCategory);
     } 
 
 
     //PHIM THEO QUỐC GIA
-    protected function getMoviesByCountry(Request $request, $country){
+    public function getMoviesByCountry(Request $request, $country){
         $moviesByCountry = $this->moviesWithNoTrailer->whereJsonContains('movie_details.country', ['slug' => $country]);
         return $this->getMoviesByFilter($request, $moviesByCountry);
     } 
 
     
     //PHIM THEO LOẠI
-    protected function getMoviesByType(Request $request, $type){
+    public function getMoviesByType(Request $request, $type){
         $movies = $this->moviesWithNoTrailer->where('movie_details.type', $type);
         return $this->getMoviesByFilter($request, $movies);
     }
