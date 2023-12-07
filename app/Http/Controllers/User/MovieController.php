@@ -37,8 +37,7 @@ class MovieController
         $this->today = Carbon::now();
         $this->tomorrow = Carbon::tomorrow();
         $this->week = Carbon::now()->subDays(7);
-        $this->moviesWithMovieDetailsQuery = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')
-                                            ->select($this->selectedColumns);
+        $this->moviesWithMovieDetailsQuery = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns);
         $this->moviesWithNoTrailer = $this->moviesWithMovieDetailsQuery->where('movie_details.status', '!=', 'trailer');
 
     }

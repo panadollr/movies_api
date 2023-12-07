@@ -32,7 +32,7 @@ class BlogController
     public function getBlogs(){
         $limit = $request->limit ?? 5;
         try {
-        $blog = Blog::select(['title', 'poster_url', 'movie_type', 'date'])->paginate($limit);
+        $blog = Blog::select(['id', 'title', 'slug', 'poster_url', 'movie_type', 'date'])->paginate($limit);
     
         return response()->json(new PaginationResource(BlogResource::collection($blog)), 200);
         } catch (\Throwable $th) {
