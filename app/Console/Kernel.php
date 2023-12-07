@@ -16,7 +16,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('crawl:movies:')->everyFifteenMinutes()->withoutOverlapping();
-        $schedule->command('crawl:movies')->withoutOverlapping();
     }
 
 

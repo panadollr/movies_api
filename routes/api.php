@@ -51,5 +51,5 @@ use App\Http\Controllers\User\BlogController;
     Route::get('tin-tuc-tuong-tu/{slug}', [BlogController::class, 'similarBlogs']);
 
 use App\Http\Controllers\ScheduledTasksController;
-Route::get('run-scheduled-tasks', [ScheduledTasksController::class, 'runScheduledTasks']);
+Route::get('commands/crawl:movies', [ScheduledTasksController::class, 'runCrawlMoviesCommand']);
 
