@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 
 use App\Models\Blog;
 use App\Http\Resources\BlogResource;
+use App\Http\Resources\BlogDetailResource;
 use App\Http\Resources\PaginationResource;
 
 class BlogController
@@ -31,7 +32,7 @@ class BlogController
     public function getBlogs(){
         $limit = $request->limit ?? 5;
         try {
-        $blog = Blog::paginate($limit);
+        $blog = Blog::select(['title', 'poster_url', 'movie_type', 'date'])->paginate($limit);
     
         return response()->json(new PaginationResource(BlogResource::collection($blog)), 200);
         } catch (\Throwable $th) {
@@ -39,23 +40,34 @@ class BlogController
         }
     }
 
-    public function blogDetails($slug){
+    public function blogDetail($slug){
         try {
-        $blogs = Blog::all();
-        $matchingBlog = $blogs->first(function ($blog) use ($slug) {
-            $slugV2 = Str::slug($blog->title, '-');
-            return $slug == $slugV2;
-        });
+        $blogDetail = Blog::where('slug', $slug)->first();
         
-        if ($matchingBlog) {
-            return response()->json(new BlogResource($matchingBlog), 200);
+        if (!$blogDetail) {
+            return response()->json(['error' => 'Blog này không tồn tại !'], 404);
         }
-
-        return response()->json(['error' => 'Blog này không tồn tại !'], 404);
+        return response()->json(new BlogResource($blogDetail), 200);
 
         } catch (\Throwable $th) {
         return response()->json(['error' => $th->getMessage()], 500);
     }
+    }
+
+
+    public function similarBlogs($slug){
+        $limit = $request->limit ?? 5;
+        try {
+        $blogDetail = Blog::where('slug', $slug)->first();
+        $blog = Blog::select(['id', 'title', 'slug', 'poster_url', 'movie_type', 'date'])
+        ->where('slug', '!=', $slug)
+        ->where('movie_type', $blogDetail->movie_type)
+        ->paginate($limit);
+    
+        return response()->json(new PaginationResource(BlogResource::collection($blog)), 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 500);
+        }
     }
 
 }

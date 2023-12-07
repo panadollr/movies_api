@@ -12,8 +12,9 @@ class BlogResource extends JsonResource
         $imageDomain = config('api_settings.image_domain');
 
         return [
+            'id' => $this->id,
             'title' => $this->title,
-            'slug' => Str::slug($this->title, '-'),
+            'slug' => $this->slug,
             'poster_url' => $imageDomain. $this->poster_url,
             'content' => $this->content,
             'movie_type' => $this->movie_type,

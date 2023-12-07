@@ -46,10 +46,9 @@ use App\Http\Controllers\User\MovieDetailsController;
     Route::get('phim/{slug}', [MovieDetailsController::class, 'getMovieDetails']);
 
 use App\Http\Controllers\User\BlogController;
-Route::prefix('tin-tuc')->group(function () {
-    Route::get('', [BlogController::class, 'getBlogs']);
-    Route::get('{slug}', [BlogController::class, 'blogDetails']);
-});
+    Route::get('tin-tuc', [BlogController::class, 'getBlogs']);
+    Route::get('tin-tuc/{slug}', [BlogController::class, 'blogDetail']);
+    Route::get('tin-tuc-tuong-tu/{slug}', [BlogController::class, 'similarBlogs']);
 
 use App\Http\Controllers\ScheduledTasksController;
 Route::get('run-scheduled-tasks', [ScheduledTasksController::class, 'runScheduledTasks']);
