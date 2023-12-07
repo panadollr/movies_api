@@ -46,7 +46,7 @@ use App\Http\Controllers\User\MovieDetailsController;
     Route::get('phim/{slug}', [MovieDetailsController::class, 'getMovieDetails']);
 
 use App\Http\Controllers\User\BlogController;
-Route::prefix('blogs')->group(function () {
+Route::prefix('tin-tuc')->group(function () {
     Route::get('', [BlogController::class, 'getBlogs']);
     Route::get('{slug}', [BlogController::class, 'blogDetails']);
 });
