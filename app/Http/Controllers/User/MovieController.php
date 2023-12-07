@@ -176,6 +176,7 @@ class MovieController
     public function getMoviesAirToday(Request $request){
         $moviesAirToday = $this->movies_with_movie_details_query
         ->whereBetween('modified_time', [$this->week, $this->today])    
+        ->where('movie_details.status', '!=', 'trailer')
         ->orderBy('movie_details.view');
         return $this->getMoviesByFilter($request, $moviesAirToday);
     }

@@ -51,6 +51,6 @@ Route::prefix('blogs')->group(function () {
     Route::get('{slug}', [BlogController::class, 'blogDetails']);
 });
 
-use App\Http\Controllers\User\ScheduledTasksController;
+use App\Http\Controllers\ScheduledTasksController;
 Route::get('run-scheduled-tasks', [ScheduledTasksController::class, 'runScheduledTasks']);
 

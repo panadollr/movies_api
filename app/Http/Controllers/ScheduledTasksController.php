@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class ScheduledTasksController extends Controller
+class ScheduledTasksController
 {
 
-    public function run_scheduled_tasks()
+    public function runScheduledTasks()
     {
          try {
             \Artisan::call('schedule:run');
