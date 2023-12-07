@@ -20,5 +20,16 @@ class ScheduledTasksController
     }
 }
 
+public function runCrawlMovieDetailsCommand()
+{
+    try {
+        set_time_limit(300);
+        Artisan::call('crawl:movie_details');
+        return response()->json(['message' => 'Crawl Movie Details command executed.'], 200);
+    } catch (\Exception $e) {
+        return "Error: " . $e->getMessage();
+    }
+}
+
 
 }

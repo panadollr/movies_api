@@ -20,14 +20,14 @@ class CrawlMovies extends Command
     protected $description = 'Crawl movies data';
     protected $client;
     protected $base_url;
-    protected $crawlMovieDetails;
+    // protected $crawlMovieDetails;
 
     public function __construct(Client $client)
     {
         parent::__construct();
         $this->client = $client;
         $this->base_url = 'https://ophim1.com/';
-        $this->crawlMovieDetails = new CrawlMovieDetails();
+        // $this->crawlMovieDetails = new CrawlMovieDetails();
     }
 
     public function handle()
@@ -39,9 +39,9 @@ class CrawlMovies extends Command
         $this->crawl();
         $this->info("\nMovies data crawled successfully !");
 
-        $this->info("\nCrawling movie details data...");
-        $this->crawlMovieDetails->crawl($this->client, $this->base_url);
-        $this->info("\nMovie details data crawled successfully !");
+        // $this->info("\nCrawling movie details data...");
+        // $this->crawlMovieDetails->crawl($this->client, $this->base_url);
+        // $this->info("\nMovie details data crawled successfully !");
         
         $endTime = microtime(true);
         $executionTime = $endTime - $startTime;
@@ -85,7 +85,7 @@ class CrawlMovies extends Command
 
    
     protected function crawl(){
-        $total = 10;
+        $total = 5;
         $batchSize = 5;
     
         for ($start = 1; $start <= $total; $start += $batchSize) {

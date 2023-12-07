@@ -14,7 +14,7 @@ use App\Models\MovieDetails;
 class CrawlMovieDetails extends Command
 {
   
-    protected $signature = 'movie_details:crawl';
+    protected $signature = 'crawl:movie_details';
     protected $description = 'Crawl movie details';
     // protected $base_url;
     // protected $client;
@@ -54,24 +54,126 @@ class CrawlMovieDetails extends Command
     //     $this->info("Total execution time: {$totalExecutionTime} seconds.");
     // }
 
-    public function crawl($client, $base_url)
-    {
-        $batchSize = 120;
-        $totalExecutionTime = 0;
-        $batch_movie_slugs = Movie::select('slug')->take($batchSize)->pluck('slug')->toArray();
-        $startTime = microtime(true);
-        if (!empty($batch_movie_slugs)) {
-            $this->processMovieDetails($batch_movie_slugs, $client, $base_url);
-        }
-        DB::statement('ALTER TABLE movie_details ORDER BY view DESC;');
 
+    //CRAWL THEO CrawlMovies
+    // public function crawl($client, $base_url)
+    // {
+    //     $batchSize = 120;
+    //     $totalExecutionTime = 0;
+    //     $batch_movie_slugs = Movie::select('slug')->take($batchSize)->pluck('slug')->toArray();
+    //     $startTime = microtime(true);
+    //     if (!empty($batch_movie_slugs)) {
+    //         $this->processMovieDetails($batch_movie_slugs, $client, $base_url);
+    //     }
+    //     DB::statement('ALTER TABLE movie_details ORDER BY view DESC;');
+
+    //     $endTime = microtime(true);
+    //     $executionTime = $endTime - $startTime;
+    //     $totalExecutionTime += $executionTime;
+    // }
+
+
+    // public function crawl($client, $base_url)
+    // {
+    //     $batchSize = 120;
+    //     $totalExecutionTime = 0;
+    //     $batch_movie_slugs = Movie::select('slug')->take($batchSize)->pluck('slug')->toArray();
+    //     $startTime = microtime(true);
+    //     if (!empty($batch_movie_slugs)) {
+    //         $this->processMovieDetails($batch_movie_slugs, $client, $base_url);
+    //     }
+    //     DB::statement('ALTER TABLE movie_details ORDER BY view DESC;');
+
+    //     $endTime = microtime(true);
+    //     $executionTime = $endTime - $startTime;
+    //     $totalExecutionTime += $executionTime;
+    // }
+
+
+// public function processMovieDetails($batch_movie_slugs, $client, $base_url) {
+//     $attributes = [
+//         '_id', 'content', 'type', 'status', 'is_copyright', 'sub_docquyen',
+//         'trailer_url', 'time', 'episode_current', 'episode_total',
+//         'quality', 'lang', 'notify', 'showtimes', 'view'
+//     ];
+//     $arraysToJSON = ['actor', 'director', 'category', 'country'];
+   
+//     $promises = [];
+//     foreach ($batch_movie_slugs as $slug) {
+//         $url = $base_url . "phim/$slug";
+//         $promises[] = $client->getAsync($url);
+//     }
+//     $responses = Promise\settle($promises)->wait();
+
+//     $batch_movie_details = [];
+//     foreach ($responses as $response) {
+//             if ($response['state'] === 'fulfilled') {
+//                 $statusCode = $response['value']->getStatusCode();
+//                 if($statusCode == 200){
+//                     $movie_details_data = json_decode($response['value']->getBody())->movie;
+//                     $existingMovieDetails = MovieDetails::where('_id', $movie_details_data->_id)->first();
+//                     if (!$existingMovieDetails) {
+//                         $newMovieDetails = [];
+//                         foreach ($attributes as $attribute) {
+//                             $newMovieDetails[$attribute] = $movie_details_data->$attribute;
+//                         }
+    
+//                         foreach ($arraysToJSON as $arrayAttribute) {
+//                             $newMovieDetails[$arrayAttribute] = json_encode($movie_details_data->$arrayAttribute);
+//                         }
+    
+//                         $batch_movie_details[] = $newMovieDetails;
+//                     } else {
+//                         if($existingMovieDetails->status == 'ongoing'){
+//                             $this->updateMovieDetailsAttributes($attributes, $arraysToJSON, $existingMovieDetails, $movie_details_data);
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+        
+//         if (!empty($batch_movie_details)) {
+//                 MovieDetails::insert($batch_movie_details);
+//             }
+// }
+
+
+//---------------------------------------------------------------//
+
+    protected $base_url;
+    protected $client;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->client = new Client();
+        $this->base_url = 'https://ophim1.com/';
+    }
+
+    public function handle()
+    {
+        $totalExecutionTime = 0;
+        $startTime = microtime(true);
+        $this->info('Crawling movie details data...');
+        $this->crawl();
+        $this->info('Movie details data crawled successfully.');
         $endTime = microtime(true);
         $executionTime = $endTime - $startTime;
         $totalExecutionTime += $executionTime;
+        $this->info("\nTotal execution time: {$totalExecutionTime} seconds.");
     }
 
+    public function crawl()
+    {
+        $batchSize = 120;
+        $batch_movie_slugs = Movie::take($batchSize)->pluck('slug')->toArray();
+        if (!empty($batch_movie_slugs)) {
+            $this->processMovieDetails($batch_movie_slugs);
+        }
+        DB::statement('ALTER TABLE movie_details ORDER BY view DESC;');
+    }
 
-public function processMovieDetails($batch_movie_slugs, $client, $base_url) {
+    public function processMovieDetails($batch_movie_slugs) {
     $attributes = [
         '_id', 'content', 'type', 'status', 'is_copyright', 'sub_docquyen',
         'trailer_url', 'time', 'episode_current', 'episode_total',
@@ -81,8 +183,8 @@ public function processMovieDetails($batch_movie_slugs, $client, $base_url) {
    
     $promises = [];
     foreach ($batch_movie_slugs as $slug) {
-        $url = $base_url . "phim/$slug";
-        $promises[] = $client->getAsync($url);
+        $url = $this->base_url . "phim/$slug";
+        $promises[] = $this->client->getAsync($url);
     }
     $responses = Promise\settle($promises)->wait();
 
