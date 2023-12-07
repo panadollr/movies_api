@@ -39,7 +39,6 @@ class MovieController
         $this->week = Carbon::now()->subDays(7);
         $this->moviesWithMovieDetailsQuery = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns);
         $this->moviesWithNoTrailer = $this->moviesWithMovieDetailsQuery->where('movie_details.status', '!=', 'trailer');
-
     }
 
 
@@ -135,7 +134,8 @@ class MovieController
 
     //PHIM SẮP CHIẾU
     public function getUpcomingMovies(Request $request){
-        $upcomingMovies = $this->moviesWithMovieDetailsQuery->where('movie_details.status', 'trailer');
+        $upcomingMovies = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns)
+        ->where('movie_details.status', 'trailer');
         return $this->getMoviesByFilter($request, $upcomingMovies);
     }
 
