@@ -196,7 +196,7 @@ class MovieController
 
     //TÌM KIẾM PHIM
     public function searchMovie(Request $request){
-        $name = $request->name;
+        $name = $request->keyword;
         $searchedMovies = $this->movies_with_movie_details_query
             ->where('movies.name', 'LIKE', '%' . $name . '%');
         return $this->getMoviesByFilter($request, $searchedMovies);
