@@ -9,6 +9,7 @@ use App\Models\Movie;
 use App\Models\MovieDetails;
 use App\Models\Episodes;
 use App\Http\Resources\MovieDetailsResource;
+use App\Http\Resources\MovieResource;
 use App\Http\Resources\PaginationResource;
 
 use GuzzleHttp\Client;
@@ -20,10 +21,12 @@ use Illuminate\Support\Collection;
 class MovieDetailsController
 {
     protected $client;
+    protected $movieDetailWithMovieQuery; 
 
     public function __construct(Client $client)
     {
         $this->client = $client;
+        $this->movieDetailWithMovieQuery = MovieDetails::join('movies', 'movies._id', '=', 'movie_details._id');
     }
 
     protected function getEpisodes($slug){
@@ -39,21 +42,36 @@ class MovieDetailsController
 
     public function getMovieDetails($slug){
         try {
-            $movieDetails = MovieDetails::join('movies', 'movies._id', '=', 'movie_details._id')
+            $movieDetails = $this->movieDetailWithMovieQuery
                             ->where('slug', $slug)
                             ->select('movies.*', 'movie_details.*')->first();
             if(!$movieDetails){
                 return response()->json(['error' => 'Phim không tồn tại!'], 404);
             }
             $episodes = $this->getEpisodes($slug);
+
+            $similarMovies = $this->getSimilarMovies($movieDetails);
+
             $data = [
                'movie' => $movieDetails,
-               'episodes' => $episodes ?? null
+               'episodes' => $episodes ?? null,
+               'similar_movies' => $similarMovies ?? null
             ];
-           
+            
             return response()->json(new MovieDetailsResource($data), 200);
             } catch (\Throwable $th) {
                 return response()->json(['error' => $th->getMessage()], 500);
             }
     }
+
+
+    //CÁC PHIM TƯƠNG TỰ
+    protected function getSimilarMovies($movieDetails){
+        $similarMovies = MovieDetails::join('movies', 'movies._id', '=', 'movie_details._id')
+        ->select('movies._id', 'movies.name', 'movies.origin_name', 'movies.slug', 'movies.year', 'movies.thumb_url')
+        ->where('movies.slug', '!=', $movieDetails->slug)
+        ->where('type', $movieDetails->type)->paginate(10);          
+        return new PaginationResource(MovieResource::collection($similarMovies)); 
+    }
+
 }

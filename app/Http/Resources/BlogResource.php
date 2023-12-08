@@ -16,9 +16,11 @@ class BlogResource extends JsonResource
             'title' => $this->title,
             'slug' => $this->slug,
             'poster_url' => $imageDomain. $this->poster_url,
+            'thumb_url' => $imageDomain. $this->thumb_url,
             'content' => $this->content,
             'movie_type' => $this->movie_type,
-            'date' => $this->date,
+            // 'date' => $this->date,
+            'date' => '12/2023'
         ];
     }
 }

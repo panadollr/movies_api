@@ -40,7 +40,8 @@ class MovieDetailsResource extends JsonResource
                 'category' => $this->formattedArray($movie, 'category'),
                 'country' => $this->formattedArray($movie, 'country'),
             ],
-            'episodes' => $this['episodes']
+            'episodes' => $this['episodes'],
+            'similar_movies' => $this['similar_movies']
         ];
     }
 

@@ -207,7 +207,6 @@ class MovieController
         $searchedMovies = $this->moviesWithNoTrailer
                         ->where('movies.name', 'LIKE', '%' . $name . '%');
         return $this->getMoviesByFilter($request, $searchedMovies);
-    }
-    
+    }    
    
 }
