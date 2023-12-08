@@ -85,6 +85,7 @@ class MovieController
     //PHIM MỚI CẬP NHẬT THEO LOẠI 
     protected function getNewUpdatedMoviesByType($request, $type){
         $newUpdatedMoviesByType = $this->moviesWithNoTrailer
+        ->where('year', now()->year)
         ->whereBetween('modified_time', [$this->yesterday, $this->tomorrow])
         ->whereHas('movie_details', function ($query) use($type) {
                 $query->where('type', $type);
@@ -144,6 +145,7 @@ class MovieController
     public function getTrendingMovies(Request $request){
         $time_window = $request->time_window ?? 'week';
         $query = $this->moviesWithNoTrailer
+        ->where('year', now()->year)
         ->orderByDesc('view');
 
         if($time_window == "week"){
