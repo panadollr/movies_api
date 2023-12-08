@@ -37,7 +37,8 @@ class MovieController
         $this->today = Carbon::now();
         $this->tomorrow = Carbon::tomorrow();
         $this->week = Carbon::now()->subDays(7);
-        $this->moviesWithMovieDetailsQuery = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns);
+        $this->moviesWithMovieDetailsQuery = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns)
+        ->orderByDesc('year');
         $this->moviesWithNoTrailer = $this->moviesWithMovieDetailsQuery->where('movie_details.status', '!=', 'trailer');
     }
 
@@ -85,7 +86,6 @@ class MovieController
     //PHIM MỚI CẬP NHẬT THEO LOẠI 
     protected function getNewUpdatedMoviesByType($request, $type){
         $newUpdatedMoviesByType = $this->moviesWithNoTrailer
-        ->where('year', now()->year)
         ->whereBetween('modified_time', [$this->yesterday, $this->tomorrow])
         ->whereHas('movie_details', function ($query) use($type) {
                 $query->where('type', $type);
@@ -145,7 +145,6 @@ class MovieController
     public function getTrendingMovies(Request $request){
         $time_window = $request->time_window ?? 'week';
         $query = $this->moviesWithNoTrailer
-        ->where('year', now()->year)
         ->orderByDesc('view');
 
         if($time_window == "week"){
