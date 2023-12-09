@@ -98,13 +98,7 @@ class MovieController
     }
 
     //-----//
-
-
-    // //PHIM MỚI
-    // public function getNewestMovies(Request $request){
-    //     $movies = $this->movies_with_movie_details_query->orderByDesc('movies.modified_time');
-    //    return $this->getMoviesByFilter($request, $movies);
-    // }
+    
 
     //PHIM BỘ
     public function getSeriesMovies(Request $request){

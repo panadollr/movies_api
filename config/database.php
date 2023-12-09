@@ -79,7 +79,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options'   => [
-                PDO::MYSQL_ATTR_SSL_CA => env('CA', 'F:\xampp\htdocs\movie_api\isrgrootx1.pem'),
+                PDO::MYSQL_ATTR_SSL_CA => env('CA', base_path('isrgrootx1.pem')),
             ],
         ],
 
