@@ -43,6 +43,7 @@ use App\Http\Controllers\User\MovieController;
 
 use App\Http\Controllers\User\MovieDetailsController;
     Route::get('phim/{slug}', [MovieDetailsController::class, 'getMovieDetails']);
+    Route::get('phim-tuong-tu/{slug}', [MovieDetailsController::class, 'getSimilarMovies']);
 
 use App\Http\Controllers\User\BlogController;
     Route::get('tin-tuc', [BlogController::class, 'getBlogs']);

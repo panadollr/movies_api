@@ -50,12 +50,9 @@ class MovieDetailsController
             }
             $episodes = $this->getEpisodes($slug);
 
-            $similarMovies = $this->getSimilarMovies($movieDetails);
-
             $data = [
                'movie' => $movieDetails,
-               'episodes' => $episodes ?? null,
-               'similar_movies' => $similarMovies ?? null
+               'episodes' => $episodes
             ];
             
             return response()->json(new MovieDetailsResource($data), 200);
@@ -66,11 +63,15 @@ class MovieDetailsController
 
 
     //CÁC PHIM TƯƠNG TỰ
-    protected function getSimilarMovies($movieDetails){
+    public function getSimilarMovies($slug){
+        $movieDetail = $this->movieDetailWithMovieQuery
+                            ->select('movies.slug', 'movie_details.type')
+                            ->where('slug', $slug)
+                            ->first();
         $similarMovies = MovieDetails::join('movies', 'movies._id', '=', 'movie_details._id')
-        ->select('movies._id', 'movies.name', 'movies.origin_name', 'movies.slug', 'movies.year', 'movies.thumb_url')
-        ->where('movies.slug', '!=', $movieDetails->slug)
-        ->where('type', $movieDetails->type)->paginate(10);          
+        ->select('movies._id', 'movies.name', 'movies.slug', 'movies.year', 'movies.thumb_url', 'movie_details.status')
+        ->where('movies.slug', '!=', $movieDetail->slug)->where('movie_details.status', '!=', 'trailer')
+        ->where('type', $movieDetail->type)->paginate(10);          
         return new PaginationResource(MovieResource::collection($similarMovies)); 
     }
 
