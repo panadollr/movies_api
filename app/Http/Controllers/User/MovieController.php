@@ -55,7 +55,11 @@ class MovieController
         }
 
         $result = $query->paginate($limit);
-        return response()->json(new PaginationResource(MovieResource::collection($result)), 200); 
+        if ($result->isNotEmpty()) {
+            return response()->json(new PaginationResource(MovieResource::collection($result)), 200); 
+        } else {
+            return response()->json(['error' => 'Không có dữ liệu !'], 404); 
+        }
     } catch (\Throwable $th) {
         return response()->json(['error' => $th->getMessage()], 500);
     }
@@ -78,7 +82,7 @@ class MovieController
     
     //PHIM THEO LOẠI
     public function getMoviesByType(Request $request, $type){
-        $movies = $this->moviesWithNoTrailer->where('movie_details.type', $type);
+        $movies = $this->moviesWithNoTrailer->where('movie_details.type', $type); 
         return $this->getMoviesByFilter($request, $movies);
     }
 
@@ -188,18 +192,6 @@ class MovieController
         return $this->getMoviesByFilter($request, $moviesAirToday);
     }
 
-
-    //PHIM CÓ LƯỢT XEM CAO NHẤT
-    public function getHighestViewMovie(){
-        try {
-            $highestViewMovie = $this->moviesWithNoTrailer
-            ->orderByDesc('view')->first();
-           
-            return response()->json(new MovieResource($highestViewMovie), 200);
-            } catch (\Throwable $th) {
-                return response()->json(['error' => $th->getMessage()], 500);
-            }
-    }
 
     //TÌM KIẾM PHIM
     public function searchMovie(Request $request){
