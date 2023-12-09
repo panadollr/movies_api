@@ -55,11 +55,7 @@ class MovieController
         }
 
         $result = $query->paginate($limit);
-        if ($result->isNotEmpty()) {
-            return response()->json(new PaginationResource(MovieResource::collection($result)), 200); 
-        } else {
-            return response()->json(['error' => 'Không có dữ liệu !'], 404); 
-        }
+        return response()->json(new PaginationResource(MovieResource::collection($result)), 200); 
     } catch (\Throwable $th) {
         return response()->json(['error' => $th->getMessage()], 500);
     }
@@ -98,7 +94,7 @@ class MovieController
     }
 
     //-----//
-    
+
 
     //PHIM BỘ
     public function getSeriesMovies(Request $request){
