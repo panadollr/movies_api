@@ -54,4 +54,5 @@ use App\Http\Controllers\ScheduledTasksController;
 // Route::get('commands/crawl:movies', [ScheduledTasksController::class, 'runCrawlMoviesCommand']);
 // Route::get('commands/crawl:movie_details', [ScheduledTasksController::class, 'runCrawlMovieDetailsCommand']);
 Route::get('commands/run-scheduled-commands', [ScheduledTasksController::class, 'runScheduledCommands']);
+Route::get('commands/delete-old-movies', [ScheduledTasksController::class, 'deleteOldMovies']);
 

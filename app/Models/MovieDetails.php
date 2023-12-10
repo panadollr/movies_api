@@ -8,6 +8,7 @@ class MovieDetails extends Model
 {
     protected $table = 'movie_details';
     public $timestamps = false;
+    protected $primaryKey = '_id';
     protected $fillable =[
         '_id',
         'content',

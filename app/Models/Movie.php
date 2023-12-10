@@ -11,7 +11,7 @@ class Movie extends Model
 {
     protected $table = 'movies';
     public $timestamps = false;
-    // protected $primaryKey = '_id';
+    protected $primaryKey = '_id';
     protected $fillable =[
         'modified_time',
         '_id',

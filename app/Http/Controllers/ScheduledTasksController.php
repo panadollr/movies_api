@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+
 use App\Jobs\CrawlMovieDetailsJob;
 use App\Jobs\SendMoviesCrawlJob;
+use App\Models\Movie;
+use App\Models\MovieDetails;
 
 class ScheduledTasksController
 {
@@ -45,5 +48,23 @@ class ScheduledTasksController
 //     }
 // }
 
+
+public function deleteOldMovies()
+{
+    try {
+        $oldMovies = Movie::where('year', '<', 2005)->get();
+
+        $movieIdsToDelete = $oldMovies->pluck('_id')->toArray();
+
+        $movieDetailsIdsToDelete = MovieDetails::whereIn('_id', $movieIdsToDelete)->pluck('_id')->toArray();
+
+        Movie::destroy($movieIdsToDelete);
+        MovieDetails::destroy($movieDetailsIdsToDelete);
+
+        return 'success';
+    } catch (\Throwable $th) {
+        return $th->getMessage();
+    }
+}
 
 }
