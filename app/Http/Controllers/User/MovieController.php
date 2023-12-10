@@ -16,6 +16,7 @@ use GuzzleHttp\Promise;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Session;
 
 class MovieController
 {
@@ -152,14 +153,6 @@ class MovieController
         $topTrendingMovies = $query;
         return $this->getMoviesByFilter($request, $topTrendingMovies);
     }
-
-
-    // //PHIM MỚI CẬP NHẬT
-    // public function getNewUpdatedMovies(Request $request){
-    //     $newUpdatedMovies = $this->moviesWithNoTrailer
-    //     ->whereDate("modified_time", today());
-    //     return $this->getMoviesByFilter($request, $newUpdatedMovies);
-    // }
 
     
     //PHIM BỘ MỚI CẬP NHẬT
