@@ -15,7 +15,8 @@ class MovieResource extends JsonResource
         $imageDomain = config('api_settings.image_domain');
 
         return [
-            'modified_time' => (new DateTime($this->modified_time))->format('m/Y'),
+            // 'modified_time' => (new DateTime($this->modified_time))->format('m/Y'),
+            'modified_time' => $this->modified_time,
             'id' => $this->_id,
             'name' => $this->name,
             'origin_name' => $this->origin_name,

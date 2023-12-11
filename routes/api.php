@@ -33,12 +33,11 @@ use App\Http\Controllers\User\MovieController;
     Route::get('the-loai/{category}', [MovieController::class, 'getMoviesByCategory']);
     Route::get('quoc-gia/{country}', [MovieController::class, 'getMoviesByCountry']);
     Route::get('xu-huong', [MovieController::class, 'getTrendingMovies']);
-    Route::get('moi-cap-nhat', [MovieController::class, 'getNewUpdatedMovies']);
     Route::get('moi-cap-nhat/phim-bo', [MovieController::class, 'getNewUpdatedSeriesMovies']);
     Route::get('moi-cap-nhat/phim-le', [MovieController::class, 'getNewUpdatedSingleMovies']);
     Route::get('hom-nay-xem-gi', [MovieController::class, 'getMoviesAirToday']);
     Route::get('tim-kiem', [MovieController::class, 'searchMovie']);
-    Route::get('test', [MovieController::class, 'test']);
+    Route::get('test', [MovieController::class, 'getMovies']);
 
 
 use App\Http\Controllers\User\MovieDetailsController;

@@ -69,7 +69,7 @@ class MovieDetailsController
                             ->where('slug', $slug)
                             ->first();
         $similarMovies = MovieDetails::join('movies', 'movies._id', '=', 'movie_details._id')
-        ->select('movies._id', 'movies.name', 'movies.slug', 'movies.year', 'movies.thumb_url', 'movie_details.status')
+        ->select('movies._id', 'movies.name', 'movies.slug', 'movies.year', 'movies.thumb_url', 'movie_details.status', 'movie_details.episode_current')
         ->where('movies.slug', '!=', $movieDetail->slug)->where('movie_details.status', '!=', 'trailer')
         ->where('type', $movieDetail->type)->paginate(10);          
         return new PaginationResource(MovieResource::collection($similarMovies)); 
