@@ -40,8 +40,8 @@ class MovieResource extends JsonResource
             // 'view' => $this->view,
             // 'actor' => json_decode($this->actor),
             // 'director' => json_decode($this->director),
-            'category' => $this->formattedArray('category'),
-            'country' => $this->formattedArray('country'),
+            // 'category' => $this->formattedCategoriesArray('category'),
+            // 'country' => $this->formattedArray('country'),
         ];
     }
 
@@ -60,5 +60,6 @@ class MovieResource extends JsonResource
             }, json_decode($propertyValue, true))
             : null;
     }
+
 }
 

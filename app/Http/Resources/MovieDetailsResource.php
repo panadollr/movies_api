@@ -37,8 +37,8 @@ class MovieDetailsResource extends JsonResource
                 'view' => $movie['view'],
                 'actor' => json_decode($movie['actor']),
                 'director' => json_decode($movie['director']),
-                'category' => $this->formattedArray($movie, 'category'),
-                'country' => $this->formattedArray($movie, 'country'),
+                'category' => $this->formattedCategoriesArray($movie, 'category'),
+                // 'country' => $this->formattedArray($movie, 'country'),
             ],
             'episodes' => $this['episodes'],
         ];
@@ -51,6 +51,47 @@ class MovieDetailsResource extends JsonResource
         return array_map(function ($item) {
                 return ['name' => $item['name']];
             }, json_decode($propertyValue, true));
+    }
+
+
+    protected function formattedCategoriesArray($movie, $propertyName)
+    {
+        $propertyValue = $movie[$propertyName];
+        $categories = [
+            'hanh-dong' => 'Hành Động',
+            'tinh-cam' => 'Tình Cảm',
+            'hai-huoc' => 'Hài Hước',
+            'co-trang' => 'Cổ Trang',
+            'tam-ly' => 'Tâm lý',
+            'hinh-su' => 'Hình Sự',
+            'chien-trang' => 'Chiến Trang',
+            'the-thao' => 'Thể Thao',
+            'vo-thuat' => 'Võ Thuật',
+            'vien-tuong' => 'Viễn Tưởng',
+            'phieu-luu' => 'Phiêu Lưu',
+            'khoa-hoc' => 'Khoa Học',
+            'kinh-di' => 'Kinh Dị',
+            'am-nhac' => 'Âm Nhạc',
+            'than-thoai' => 'Thần Thoại',
+            'tai-lieu' => 'Tài Liệu',
+            'gia-dinh' => 'Gia Đình',
+            'chinh-kich' => 'Chính Kịch',
+            'bi-an' => 'Bí Ẩn',
+            'hoc-duong' => 'Học Đường',
+            'hai-huoc-2' => 'Hài Hước',
+            'kinh-dien' => 'Kinh Điển',
+            'phim-18' => 'Phim 18+'
+        ];
+    
+        return $propertyValue !== null
+            ? array_map(function ($item) use ($categories) {
+                foreach ($categories as $category_slug => $category_name) {
+                    if ($item['slug'] == $category_slug) {
+                        return ['name' => $category_name, 'slug' => $item['slug']];
+                    }
+                }
+            }, json_decode($propertyValue, true))
+            : null;
     }
 
 }
