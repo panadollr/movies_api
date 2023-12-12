@@ -22,7 +22,6 @@ Route::prefix('admin')->group(function () {
 
 //USER
 use App\Http\Controllers\User\MovieController;
-    // Route::get('phim-moi', [MovieController::class, 'getNewestMovies']);
     Route::get('phim-le', [MovieController::class, 'getSingleMovies']);
     Route::get('phim-bo', [MovieController::class, 'getSeriesMovies']);
     Route::get('hoat-hinh', [MovieController::class, 'getCartoonMovies']);

@@ -41,10 +41,9 @@ class MovieDetailsResource extends JsonResource
                 // 'country' => $this->formattedArray($movie, 'country'),
             ],
             'episodes' => $this['episodes'],
-            // 'seoOnPage' => new SeoResource(['seo' => $seoOnPage]),
             'seoOnPage' => [
-                'seo_title' => $movie['origin_name'],
-                'seo_description' => $movie['content'], 
+                'seo_title' => $movie['name'] ."-". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]",
+                'seo_description' => strip_tags($movie['content']), 
                 'og_image' => $imageDomain . $movie['poster_url'],
                 'og_url' => $request->path(),
             ]
@@ -89,13 +88,16 @@ class MovieDetailsResource extends JsonResource
             'phim-18' => 'Phim 18+'
         ];
     
-        return array_map(function ($item) use ($categories) {
-                foreach ($categories as $category_slug => $category_name) {
-                    if ($item['slug'] == $category_slug) {
-                        return ['name' => $category_name];
-                    }
+        return array_values(array_filter(array_map(function ($item) use ($categories) {
+            foreach ($categories as $category_slug => $category_name) {
+                if ($item['slug'] == $category_slug) {
+                    return ['name' => $category_name];
                 }
-            }, json_decode($propertyValue, true));
+            }
+        }, json_decode($propertyValue, true)), function ($value) {
+            return $value !== null;
+        }));
+        
     }
 
 }
