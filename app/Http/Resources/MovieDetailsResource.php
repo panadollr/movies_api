@@ -78,7 +78,6 @@ class MovieDetailsResource extends JsonResource
             'chinh-kich' => 'Chính Kịch',
             'bi-an' => 'Bí Ẩn',
             'hoc-duong' => 'Học Đường',
-            'hai-huoc-2' => 'Hài Hước',
             'kinh-dien' => 'Kinh Điển',
             'phim-18' => 'Phim 18+'
         ];
@@ -87,7 +86,7 @@ class MovieDetailsResource extends JsonResource
             ? array_map(function ($item) use ($categories) {
                 foreach ($categories as $category_slug => $category_name) {
                     if ($item['slug'] == $category_slug) {
-                        return ['name' => $category_name, 'slug' => $item['slug']];
+                        return ['name' => $category_name];
                     }
                 }
             }, json_decode($propertyValue, true))

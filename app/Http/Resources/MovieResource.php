@@ -36,7 +36,7 @@ class MovieResource extends JsonResource
             'quality' => $this->quality,
             'lang' => $this->lang,
             // 'notify' => $this->notify,
-            'showtimes' => $this->showtimes,
+            // 'showtimes' => $this->showtimes,
             // 'view' => $this->view,
             // 'actor' => json_decode($this->actor),
             // 'director' => json_decode($this->director),

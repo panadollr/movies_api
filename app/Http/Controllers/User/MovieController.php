@@ -10,6 +10,7 @@ use App\Models\MovieDetails;
 use App\Models\Episodes;
 use App\Http\Resources\MovieResource;
 use App\Http\Resources\PaginationResource;
+use App\Http\Controllers\User\MovieDetailsController;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
@@ -31,8 +32,9 @@ class MovieController
     protected $yesterday;
     protected $tomorrow;
     protected $week;
+    protected $movieDetailsController;
 
-    public function __construct()
+    public function __construct(MovieDetailsController $movieDetailsController)
     {
         $this->yesterday = Carbon::yesterday();
         $this->today = Carbon::now();
@@ -42,6 +44,7 @@ class MovieController
         ->orderByDesc('movies.year');
         // $this->moviesWithMovieDetailsQuery = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->orderByDesc('movies.year');
         $this->moviesWithNoTrailer = $this->moviesWithMovieDetailsQuery->where('movie_details.status', '!=', 'trailer');
+        $this->movieDetailsController = $movieDetailsController;
     }
 
 
@@ -95,7 +98,8 @@ class MovieController
         // $selectedColumns = ['movies.*','movie_details.type','movie_details.episode_current']; 
 
         $newUpdatedMoviesByType = $this->moviesWithNoTrailer
-        ->whereBetween('modified_time', [$this->yesterday, $this->tomorrow])
+        ->whereBetween('modified_time', [$this->week, $this->tomorrow])
+        ->orderByDesc('modified_time')
         ->whereHas('movie_details', function ($query) use($type) {
                 $query->where('type', $type);
             })
@@ -139,9 +143,10 @@ class MovieController
 
     //PHIM SẮP CHIẾU
     public function getUpcomingMovies(Request $request){
-        $upcomingMovies = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns)
-        ->where('movie_details.status', 'trailer');
-        return $this->getMoviesByFilter($request, $upcomingMovies);
+        // $upcomingMovies = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns)
+        // ->where('movie_details.status', 'trailer');
+        // return $this->getMoviesByFilter($request, $upcomingMovies);
+        // return $this->movieDetailsController->getEpisodes("oi-ghet-giang-sinh-phan-2");
     }
 
 
