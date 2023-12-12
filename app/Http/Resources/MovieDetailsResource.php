@@ -82,15 +82,13 @@ class MovieDetailsResource extends JsonResource
             'phim-18' => 'Phim 18+'
         ];
     
-        return $propertyValue !== null
-            ? array_map(function ($item) use ($categories) {
+        return array_map(function ($item) use ($categories) {
                 foreach ($categories as $category_slug => $category_name) {
                     if ($item['slug'] == $category_slug) {
                         return ['name' => $category_name];
                     }
                 }
-            }, json_decode($propertyValue, true))
-            : null;
+            }, json_decode($propertyValue, true));
     }
 
 }

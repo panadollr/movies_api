@@ -85,7 +85,7 @@ class CrawlMovies extends Command
 
    
     protected function crawl(){
-        $total = 10;
+        $total = 20;
         $batchSize = 5;
     
         for ($start = 1; $start <= $total; $start += $batchSize) {
@@ -155,7 +155,6 @@ protected function updateMovieAttributes($existingMovie, $result, $attributes)
 
     if (!empty($updates)) {
         Movie::where('_id', $existingMovie->_id)->update($updates);
-        print_r('movie has id ' .$existingMovie->_id. ' is updated !');
     }
 }
 

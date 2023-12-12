@@ -10,14 +10,12 @@ use App\Models\MovieDetails;
 use App\Models\Episodes;
 use App\Http\Resources\MovieResource;
 use App\Http\Resources\PaginationResource;
-use App\Http\Controllers\User\MovieDetailsController;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Session;
 
 class MovieController
 {
@@ -34,7 +32,7 @@ class MovieController
     protected $week;
     protected $movieDetailsController;
 
-    public function __construct(MovieDetailsController $movieDetailsController)
+    public function __construct()
     {
         $this->yesterday = Carbon::yesterday();
         $this->today = Carbon::now();
@@ -43,8 +41,8 @@ class MovieController
         $this->moviesWithMovieDetailsQuery = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns)
         ->orderByDesc('movies.year');
         // $this->moviesWithMovieDetailsQuery = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->orderByDesc('movies.year');
-        $this->moviesWithNoTrailer = $this->moviesWithMovieDetailsQuery->where('movie_details.status', '!=', 'trailer');
-        $this->movieDetailsController = $movieDetailsController;
+        $this->moviesWithNoTrailer = $this->moviesWithMovieDetailsQuery->where('movie_details.status', '!=', 'trailer')
+        ->where('movie_details.episode_current', '!=', 'Trailer');
     }
 
 
@@ -54,7 +52,8 @@ class MovieController
 
 
     //LỌC PHIM
-    protected function getMoviesByFilter(Request $request, $query){
+    public function getMoviesByFilter($query){
+        $request = new Request;
         $limit = $request->limit ?? 24;
         $year = $request->year;
         try {
@@ -73,28 +72,28 @@ class MovieController
 
 
     //PHIM THEO THỂ LOẠI
-    public function getMoviesByCategory(Request $request, $category){
+    public function getMoviesByCategory($category){
         $moviesByCategory = $this->moviesWithNoTrailer->whereJsonContains('movie_details.category', ['slug' => $category]);
-        return $this->getMoviesByFilter($request, $moviesByCategory);
+        return $this->getMoviesByFilter($moviesByCategory);
     } 
 
 
     //PHIM THEO QUỐC GIA
-    public function getMoviesByCountry(Request $request, $country){
+    public function getMoviesByCountry($country){
         $moviesByCountry = $this->moviesWithNoTrailer->whereJsonContains('movie_details.country', ['slug' => $country]);
-        return $this->getMoviesByFilter($request, $moviesByCountry);
+        return $this->getMoviesByFilter($moviesByCountry);
     } 
 
     
     //PHIM THEO LOẠI
-    public function getMoviesByType(Request $request, $type){
+    public function getMoviesByType($type){
         $movies = $this->moviesWithNoTrailer->where('movie_details.type', $type); 
-        return $this->getMoviesByFilter($request, $movies);
+        return $this->getMoviesByFilter($movies);
     }
 
 
     //PHIM MỚI CẬP NHẬT THEO LOẠI 
-    protected function getNewUpdatedMoviesByType($request, $type){
+    protected function getNewUpdatedMoviesByType($type){
         // $selectedColumns = ['movies.*','movie_details.type','movie_details.episode_current']; 
 
         $newUpdatedMoviesByType = $this->moviesWithNoTrailer
@@ -104,49 +103,48 @@ class MovieController
                 $query->where('type', $type);
             })
         ;
-        return $this->getMoviesByFilter($request, $newUpdatedMoviesByType);    
+        return $this->getMoviesByFilter($newUpdatedMoviesByType);    
     }
 
     //-----//
 
 
     //PHIM BỘ
-    public function getSeriesMovies(Request $request){
-        return $this->getMoviesByType($request, 'series');
+    public function getSeriesMovies(){
+        return $this->getMoviesByType('series');
     }
 
     
     //PHIM LẺ
-    public function getSingleMovies(Request $request){
-        return $this->getMoviesByType($request, 'single');
+    public function getSingleMovies(){
+        return $this->getMoviesByType('single');
     }
 
 
     //PHIM HOẠT HÌNH
-    public function getCartoonMovies(Request $request){
-        return $this->getMoviesByType($request, 'hoathinh');
+    public function getCartoonMovies(){
+        return $this->getMoviesByType('hoathinh');
     }
 
 
     //PHIM SUBTEAM
-    public function getSubTeamMovies(Request $request){
+    public function getSubTeamMovies(){
         $subTeamMovies = $this->moviesWithNoTrailer->where('movie_details.sub_docquyen', true);
-        return $this->getMoviesByFilter($request, $subTeamMovies);
+        return $this->getMoviesByFilter($subTeamMovies);
     }
 
 
     //TV-SHOWS
-    public function getTVShowMovies(Request $request){
-        return $this->getMoviesByType($request, 'tvshows');
+    public function getTVShowMovies(){
+        return $this->getMoviesByType('tvshows');
     }
 
 
     //PHIM SẮP CHIẾU
-    public function getUpcomingMovies(Request $request){
-        // $upcomingMovies = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns)
-        // ->where('movie_details.status', 'trailer');
-        // return $this->getMoviesByFilter($request, $upcomingMovies);
-        // return $this->movieDetailsController->getEpisodes("oi-ghet-giang-sinh-phan-2");
+    public function getUpcomingMovies(){
+        $upcomingMovies = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns)
+        ->where('movie_details.status', 'trailer')->where('movie_details.episode_current', 'Trailer');
+        return $this->getMoviesByFilter($upcomingMovies);
     }
 
 
@@ -165,28 +163,27 @@ class MovieController
         }
 
         $topTrendingMovies = $query;
-        return $this->getMoviesByFilter($request, $topTrendingMovies);
+        return $this->getMoviesByFilter($topTrendingMovies);
     }
 
     
     //PHIM BỘ MỚI CẬP NHẬT
-    public function getNewUpdatedSeriesMovies(Request $request){
-        return $this->getNewUpdatedMoviesByType($request, 'series');
+    public function getNewUpdatedSeriesMovies(){
+        return $this->getNewUpdatedMoviesByType('series');
     }
 
 
     //PHIM LẺ MỚI CẬP NHẬT
-    public function getNewUpdatedSingleMovies(Request $request){
-        return $this->getNewUpdatedMoviesByType($request, 'single');
+    public function getNewUpdatedSingleMovies(){
+        return $this->getNewUpdatedMoviesByType('single');
     }
 
 
     //HÔM NAY XEM GÌ
-    public function getMoviesAirToday(Request $request){
+    public function getMoviesAirToday(){
         $moviesAirToday = $this->moviesWithNoTrailer
-        ->whereBetween('modified_time', [$this->week, $this->tomorrow])    
-        ->orderBy('movie_details.view');
-        return $this->getMoviesByFilter($request, $moviesAirToday);
+        ->whereBetween('modified_time', [$this->week, $this->tomorrow])->orderBy('movie_details.view');
+        return $this->getMoviesByFilter($moviesAirToday);
     }
 
 
@@ -194,8 +191,8 @@ class MovieController
     public function searchMovie(Request $request){
         $name = $request->keyword;
         $searchedMovies = $this->moviesWithNoTrailer
-                        ->where('movies.name', 'LIKE', '%' . $name . '%');
-        return $this->getMoviesByFilter($request, $searchedMovies);
+        ->where('name', 'like', "%$name%");
+        return $this->getMoviesByFilter($searchedMovies);
     }  
    
 }
