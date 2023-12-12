@@ -41,6 +41,13 @@ class MovieDetailsResource extends JsonResource
                 // 'country' => $this->formattedArray($movie, 'country'),
             ],
             'episodes' => $this['episodes'],
+            // 'seoOnPage' => new SeoResource(['seo' => $seoOnPage]),
+            'seoOnPage' => [
+                'seo_title' => $movie['origin_name'],
+                'seo_description' => $movie['content'], 
+                'og_image' => $imageDomain . $movie['poster_url'],
+                'og_url' => $request->path(),
+            ]
         ];
     }
 

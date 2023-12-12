@@ -50,7 +50,7 @@ class MovieDetailsController
 
             $data = [
                'movie' => $movieDetails,
-               'episodes' => $episodes
+               'episodes' => $episodes,
             ];
             
             return response()->json(new MovieDetailsResource($data), 200);

@@ -10,6 +10,7 @@ use App\Models\MovieDetails;
 use App\Models\Episodes;
 use App\Http\Resources\MovieResource;
 use App\Http\Resources\PaginationResource;
+use App\Http\Resources\SeoResource;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
@@ -46,11 +47,6 @@ class MovieController
     }
 
 
-    public function getMovies(){
-        return Movie::take(10)->get();
-    }
-
-
     //LỌC PHIM
     public function getMoviesByFilter($query, $default_limit){
         $limit = request()->input('limit', $default_limit);
@@ -63,6 +59,20 @@ class MovieController
         }
 
         $result = $query->paginate($limit);
+        
+        // $seoData = [
+        //     'seo_title' => 'Your SEO Title',
+        //     'seo_description' => 'Your SEO Description', 
+        //     'og_image' => 'Your OG Image URL',
+        //     'og_url' => 'the-loai/hai-huoc',
+        // ];
+
+        // $data = [
+        //     'data' => MovieResource::collection($result),
+        //     'seoOnPage' => $seoData
+        //  ];
+        //  return response()->json(new PaginationResource($data), 200); 
+
         return response()->json(new PaginationResource(MovieResource::collection($result)), 200); 
     } catch (\Throwable $th) {
         return response()->json(['error' => $th->getMessage()], 500);

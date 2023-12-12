@@ -8,6 +8,7 @@ class PaginationResource extends JsonResource
 {
     public function toArray($request)
     {
+        
         return [
             'data' =>$this->resource->items(),
             'pagination' => [
@@ -19,3 +20,23 @@ class PaginationResource extends JsonResource
         ];
     }
 }
+
+// class PaginationResource extends JsonResource
+// {
+//     public function toArray($request)
+//     {
+//         $data = $this['data'];
+//         $seoOnPage = $this['seoOnPage'];
+        
+//         return [
+//             'data' => $data,
+//             'pagination' => [
+//                 'totalItems' => $data->total(),
+//                 'totalItemsPerPage' => $data->perPage(),
+//                 'currentPage' => $data->currentPage(),
+//                 'totalPages' => $data->lastPage(),
+//             ],
+//             'seoOnPage' => $seoOnPage
+//         ];
+//     }
+// }
