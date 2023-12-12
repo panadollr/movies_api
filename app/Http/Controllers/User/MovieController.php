@@ -52,10 +52,9 @@ class MovieController
 
 
     //LỌC PHIM
-    public function getMoviesByFilter($query){
-        $request = new Request;
-        $limit = $request->limit ?? 24;
-        $year = $request->year;
+    public function getMoviesByFilter($query, $default_limit){
+        $limit = request()->input('limit', $default_limit);
+        $year = request()->input('year');
         try {
             
         //theo năm
@@ -74,21 +73,21 @@ class MovieController
     //PHIM THEO THỂ LOẠI
     public function getMoviesByCategory($category){
         $moviesByCategory = $this->moviesWithNoTrailer->whereJsonContains('movie_details.category', ['slug' => $category]);
-        return $this->getMoviesByFilter($moviesByCategory);
+        return $this->getMoviesByFilter($moviesByCategory, 24);
     } 
 
 
     //PHIM THEO QUỐC GIA
     public function getMoviesByCountry($country){
         $moviesByCountry = $this->moviesWithNoTrailer->whereJsonContains('movie_details.country', ['slug' => $country]);
-        return $this->getMoviesByFilter($moviesByCountry);
+        return $this->getMoviesByFilter($moviesByCountry, 24);
     } 
 
     
     //PHIM THEO LOẠI
     public function getMoviesByType($type){
         $movies = $this->moviesWithNoTrailer->where('movie_details.type', $type); 
-        return $this->getMoviesByFilter($movies);
+        return $this->getMoviesByFilter($movies, 24);
     }
 
 
@@ -103,7 +102,7 @@ class MovieController
                 $query->where('type', $type);
             })
         ;
-        return $this->getMoviesByFilter($newUpdatedMoviesByType);    
+        return $this->getMoviesByFilter($newUpdatedMoviesByType, 24);    
     }
 
     //-----//
@@ -130,7 +129,7 @@ class MovieController
     //PHIM SUBTEAM
     public function getSubTeamMovies(){
         $subTeamMovies = $this->moviesWithNoTrailer->where('movie_details.sub_docquyen', true);
-        return $this->getMoviesByFilter($subTeamMovies);
+        return $this->getMoviesByFilter($subTeamMovies, 24);
     }
 
 
@@ -144,7 +143,7 @@ class MovieController
     public function getUpcomingMovies(){
         $upcomingMovies = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns)
         ->where('movie_details.status', 'trailer')->where('movie_details.episode_current', 'Trailer');
-        return $this->getMoviesByFilter($upcomingMovies);
+        return $this->getMoviesByFilter($upcomingMovies, 24);
     }
 
 
@@ -163,7 +162,7 @@ class MovieController
         }
 
         $topTrendingMovies = $query;
-        return $this->getMoviesByFilter($topTrendingMovies);
+        return $this->getMoviesByFilter($topTrendingMovies, 24);
     }
 
     
@@ -183,7 +182,7 @@ class MovieController
     public function getMoviesAirToday(){
         $moviesAirToday = $this->moviesWithNoTrailer
         ->whereBetween('modified_time', [$this->week, $this->tomorrow])->orderBy('movie_details.view');
-        return $this->getMoviesByFilter($moviesAirToday);
+        return $this->getMoviesByFilter($moviesAirToday, 10);
     }
 
 
@@ -192,7 +191,7 @@ class MovieController
         $name = $request->keyword;
         $searchedMovies = $this->moviesWithNoTrailer
         ->where('name', 'like', "%$name%");
-        return $this->getMoviesByFilter($searchedMovies);
+        return $this->getMoviesByFilter($searchedMovies, 24);
     }  
    
 }

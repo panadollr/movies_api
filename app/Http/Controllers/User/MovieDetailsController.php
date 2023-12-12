@@ -70,7 +70,7 @@ class MovieDetailsController
         ->select('movies._id', 'movies.name', 'movies.slug', 'movies.year', 'movies.thumb_url', 'movie_details.status', 'movie_details.episode_current', 'movie_details.category')
         ->where('movies.slug', '!=', $movieDetail->slug)->where('movie_details.status', '!=', 'trailer')
         ->where('type', $movieDetail->type);           
-        return $this->movieController->getMoviesByFilter($similarMovies);
+        return $this->movieController->getMoviesByFilter($similarMovies, 10);
     }
 
 }
