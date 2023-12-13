@@ -42,7 +42,7 @@ class MovieDetailsResource extends JsonResource
             ],
             'episodes' => $this['episodes'],
             'seoOnPage' => [
-                'seo_title' => $movie['name'] ."-". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]",
+                'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]",
                 'seo_description' => strip_tags($movie['content']), 
                 'og_image' => $imageDomain . $movie['poster_url'],
                 'og_url' => $request->path(),

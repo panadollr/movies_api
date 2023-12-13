@@ -32,9 +32,14 @@ class BlogController
     public function getBlogs(){
         $limit = $request->limit ?? 5;
         try {
-        $blog = Blog::select(['id', 'title', 'slug', 'poster_url', 'movie_type', 'date'])->paginate($limit);
+        $blogs = Blog::select(['id', 'title', 'slug', 'poster_url', 'movie_type', 'date'])->paginate($limit);
+        $data = [
+            'data' => BlogResource::collection($blogs),
+            'seoOnPage' => ''
+         ];
     
-        return response()->json(new PaginationResource(BlogResource::collection($blog)), 200);
+        return response()->json($data, 200);
+        // return response()->json(new PaginationResource(BlogResource::collection($blog)), 200);
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()], 500);
         }
@@ -63,8 +68,13 @@ class BlogController
         ->where('slug', '!=', $slug)
         ->where('movie_type', $blogDetail->movie_type)
         ->paginate($limit);
+
+        $data = [
+            'data' => BlogResource::collection($blog),
+            'seoOnPage' => ''
+         ];
     
-        return response()->json(new PaginationResource(BlogResource::collection($blog)), 200);
+        return response()->json($data, 200);
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()], 500);
         }
