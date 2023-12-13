@@ -61,7 +61,7 @@ class MovieController
 
     protected function generateSeoData($title, $description, $year)
     {
-        $year = ($year ? "năm " . $year : "từ Mọi Năm");
+        $year = ($year ? "năm " . $year : "");
         $yearPlaceholder = '$year';
         $seoTitle = str_replace($yearPlaceholder, $year, $title);
         $seoDescription = str_replace($yearPlaceholder, $year, $description);

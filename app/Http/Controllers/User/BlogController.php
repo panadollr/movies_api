@@ -10,24 +10,44 @@ use App\Http\Resources\BlogResource;
 use App\Http\Resources\BlogDetailResource;
 use App\Http\Resources\PaginationResource;
 
+use DateTime;
+
 class BlogController
 {
-    // public function addSlug(Request $request){
-    //     $title = $request->title;
-    //     $poster_url = $request->poster_url;
-    //     $content = $request->content;
-    //     $movie_type = $request->movie_type;
-    //     $date = new DateTime();
-    //     try {
-    //     $newBlog = Blog::create([
-    //         'title' = $request    
-    //     ]);
+    public function addSlug(Request $request){
+        $title = $request->title;
+        $poster_url = $request->poster_url;
+        $thumb_url = $request->thumb_url;
+        $content = $request->content;
+        $movie_type = $request->movie_type;
+        $date = new DateTime();
+        try {
+         Blog::create([
+            'title' => $title,
+            'slug' => Str::slug($title, '-'),
+            'poster_url' => $poster_url,
+            'thumb_url' => $poster_url,
+            'content' => $content,
+            'movie_type' => $movie_type,
+            'date' => $date
+        ]);
     
-    //     return response()->json(new PaginationResource($blog), 200);
-    //     } catch (\Throwable $th) {
-    //         return response()->json(['error' => $th->getMessage()], 500);
-    //     }
-    // }
+        return response()->json('Thêm bài viết thành công !', 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 500);
+        }
+    }
+
+    protected function generateSeoData($title, $description)
+    {
+
+        return [
+            'seo_title' =>  $title,
+            'seo_description' => $description, 
+            'og_image' => '',
+            'og_url' => request()->path(),
+        ];
+    }
 
     public function getBlogs(){
         $limit = $request->limit ?? 5;

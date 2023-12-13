@@ -11,7 +11,9 @@ class Blog extends Model
     protected $primaryKey = 'id';
     protected $fillable =[
         'title',
+        'slug',
         'poster_url',
+        'thumb_url',
         'content',
         'movie_type',
         'date'

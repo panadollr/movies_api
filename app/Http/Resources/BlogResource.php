@@ -20,7 +20,13 @@ class BlogResource extends JsonResource
             'content' => $this->content,
             'movie_type' => $this->movie_type,
             // 'date' => $this->date,
-            'date' => '12/2023'
+            'date' => '12/2023',
+            'seoOnPage' => [
+                'seo_title' => $this->title,
+                'seo_description' => strip_tags(str_replace(["\r", "\n"], '', "$this->content")), 
+                'og_image' => $imageDomain. $this->thumb_url,
+                'og_url' => $request->path(),
+            ]
         ];
     }
 }

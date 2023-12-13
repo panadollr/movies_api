@@ -46,6 +46,7 @@ use App\Http\Controllers\User\BlogController;
     Route::get('tin-tuc', [BlogController::class, 'getBlogs']);
     Route::get('tin-tuc/{slug}', [BlogController::class, 'blogDetail']);
     Route::get('tin-tuc-tuong-tu/{slug}', [BlogController::class, 'similarBlogs']);
+    Route::get('them-tin-tuc', [BlogController::class, 'addSlug']);
 
 use App\Http\Controllers\ScheduledTasksController;
 // Route::get('commands/crawl:movies', [ScheduledTasksController::class, 'runCrawlMoviesCommand']);
