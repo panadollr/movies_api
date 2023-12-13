@@ -320,7 +320,7 @@ class MovieController
     //TÌM KIẾM PHIM
     public function searchMovie(Request $request){
         $name = $request->keyword;
-        $title = "Tìm kiếm phim: $name";
+        $title = "Phim $name | $name vietsub | Phim $name hay | Tuyển tập $name mới nhất \$year";
         $description = "Phim $name hay tuyển tập, phim $name mới nhất, tổng hợp phim $name, $name full HD, $name vietsub, xem $name online";
         $searchedMovies = $this->moviesWithNoTrailer
         ->where('name', 'like', "%$name%");
