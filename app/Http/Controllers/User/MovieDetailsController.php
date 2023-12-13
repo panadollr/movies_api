@@ -62,6 +62,9 @@ class MovieDetailsController
 
     //CÁC PHIM TƯƠNG TỰ
     public function getSimilarMovies(Request $request, $slug){
+        $name = $request->keyword;
+        $title = "Các phim tương tự";
+        $description = "";
         $movieDetail = $this->movieDetailWithMovieQuery
                             ->select('movies.slug', 'movie_details.type')
                             ->where('slug', $slug)
@@ -70,7 +73,7 @@ class MovieDetailsController
         ->select('movies._id', 'movies.name', 'movies.slug', 'movies.year', 'movies.thumb_url', 'movie_details.status', 'movie_details.episode_current', 'movie_details.category')
         ->where('movies.slug', '!=', $movieDetail->slug)->where('movie_details.status', '!=', 'trailer')
         ->where('type', $movieDetail->type);           
-        return $this->movieController->getMoviesByFilter($similarMovies, 10);
+        return $this->movieController->getMoviesByFilter($similarMovies, 10, $title, $description);
     }
 
 }
