@@ -54,17 +54,20 @@ class MovieController
     {
         $this->moviesWithMovieDetailsQuery = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns)
             ->orderByDesc('movies.year');
-        // $this->moviesWithMovieDetailsQuery = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->orderByDesc('movies.year');
         $this->moviesWithNoTrailer = $this->moviesWithMovieDetailsQuery->where('movie_details.status', '!=', 'trailer')
             ->where('movie_details.episode_current', '!=', 'Trailer');
     }
 
     protected function generateSeoData($title, $description, $year)
     {
-        $year = ($year ? "năm " . $year : "");
+        $year = $year ? "năm " . $year : "";
         $yearPlaceholder = '$year';
-        $seoTitle = str_replace($yearPlaceholder, $year, $title);
-        $seoDescription = str_replace($yearPlaceholder, $year, $description);
+
+        $title = str_replace($yearPlaceholder, $year, $title);
+        $description = str_replace($yearPlaceholder, $year, $description);
+
+        $seoTitle = trim($title);
+        $seoDescription = trim($description);
 
         return [
             'seo_title' =>  $seoTitle,
@@ -326,5 +329,11 @@ class MovieController
         ->where('name', 'like', "%$name%");
         return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
     }  
+
+    //DANH SÁCH PHIM 18+
+    public function get18sMovies(){
+        $moviesAirToday = $this->moviesWithMovieDetailsQuery->whereJsonContains('movie_details.category', ['slug' => 'phim-18'])->get();
+        return $moviesAirToday;
+    }
    
 }
