@@ -63,8 +63,8 @@ class MovieController
         $year = $year ? "năm " . $year : "";
         $yearPlaceholder = '$year';
 
-        $title = str_replace($yearPlaceholder, $year, $title);
-        $description = str_replace($yearPlaceholder, $year, $description);
+        $title = str_replace([$yearPlaceholder, '  '], [$year, ' '], $title);
+        $description = str_replace([$yearPlaceholder, '  '], [$year, ' '], $description);
 
         $seoTitle = trim($title);
         $seoDescription = trim($description);
@@ -107,10 +107,10 @@ class MovieController
     //PHIM THEO THỂ LOẠI
     public function getMoviesByCategory($category){
         $categoryName = $this->getCategoryNameBySlug($category);
-        $title = "Phim Mới $categoryName \$year | Phim hay | Xem phim nhanh | Xem phim online | Phim mới $categoryName \$year vietsub hay nhất";
-        $description = "Xem phim mới $categoryName \$year miễn phí nhanh chất lượng cao. " .
-        "Xem phim $categoryName \$year online Việt Sub, Thuyết minh, lồng tiếng chất lượng HD. " .
-        "Xem phim nhanh online chất lượng cao";
+        $title = "Phim Mới $categoryName \$year, Phim hay, Xem phim nhanh, Xem phim online, Phim mới $categoryName \$year vietsub hay nhất";
+        $description = "Xem phim mới $categoryName \$year miễn phí nhanh chất lượng cao." .
+        " Xem phim $categoryName \$year online Việt Sub, Thuyết minh, lồng tiếng chất lượng HD." .
+        " Xem phim nhanh online chất lượng cao";
         $moviesByCategory = $this->moviesWithNoTrailer->whereJsonContains('movie_details.category', ['slug' => $category]);
         return $this->getMoviesByFilter($moviesByCategory, 24, $title, $description);
     } 
@@ -150,9 +150,9 @@ class MovieController
     public function getMoviesByCountry($slug){
         $countryName = $this->getCountryNameBySlug($slug);
         // $title = "Phim $countryName \$year";
-        $title = "Phim Mới $countryName \$year | Phim hay | Xem phim nhanh | Xem phim online | Phim mới $countryName \$year vietsub hay nhất";
-        $description = "Xem phim mới $countryName \$year miễn phí nhanh chất lượng cao. " .
-        "Xem phim $countryName \$year online Việt Sub, Thuyết minh, lồng tiếng chất lượng HD. " .
+        $title = "Phim Mới $countryName \$year, Phim hay, Xem phim nhanh, Xem phim online, Phim mới $countryName \$year vietsub hay nhất";
+        $description = "Xem phim mới $countryName \$year miễn phí nhanh chất lượng cao." .
+        "Xem phim $countryName \$year online Việt Sub, Thuyết minh, lồng tiếng chất lượng HD." .
         "Xem phim nhanh online chất lượng cao";
         $moviesByCountry = $this->moviesWithNoTrailer->whereJsonContains('movie_details.country', ['slug' => $slug]);
         return $this->getMoviesByFilter($moviesByCountry, 24, $title, $description);
@@ -211,7 +211,7 @@ class MovieController
 
     //PHIM BỘ
     public function getSeriesMovies(){
-        $title = "Phim bộ \$year | Phim bộ \$year hay tuyển chọn | Phim bộ mới nhất \$year";
+        $title = "Phim bộ \$year, Phim bộ \$year hay tuyển chọn, Phim bộ mới nhất \$year";
         $description = "Phim bộ mới nhất tuyển chọn chất lượng cao, phim bộ mới nhất \$year vietsub cập nhật nhanh nhất. Phim bộ \$year vietsub nhanh nhất";
         return $this->getMoviesByType('series', $title, $description);
     }
@@ -219,7 +219,7 @@ class MovieController
     
     //PHIM LẺ
     public function getSingleMovies(){
-        $title = "Phim lẻ \$year | Phim lẻ \$year hay tuyển chọn | Phim lẻ mới nhất \$year";
+        $title = "Phim lẻ \$year, Phim lẻ \$year hay tuyển chọn, Phim lẻ mới nhất \$year";
         $description = "Phim lẻ mới nhất tuyển chọn chất lượng cao, phim lẻ mới nhất \$year vietsub cập nhật nhanh nhất. Phim lẻ \$year vietsub nhanh nhất";
         return $this->getMoviesByType('single', $title, $description);
     }
@@ -227,7 +227,7 @@ class MovieController
 
     //PHIM HOẠT HÌNH
     public function getCartoonMovies(){
-        $title = "Phim hoạt hình | Phim hoạt hình hay tuyển chọn | Phim hoạt hình mới nhất \$year";
+        $title = "Phim hoạt hình, Phim hoạt hình hay tuyển chọn, Phim hoạt hình mới nhất \$year";
         $description = "Phim hoạt hình mới nhất tuyển chọn chất lượng cao, Phim hoạt hình mới nhất \$year vietsub cập nhật nhanh nhất. Phim hoạt hình vietsub nhanh nhất";
         return $this->getMoviesByType('hoathinh', $title, $description);
     }
@@ -244,7 +244,7 @@ class MovieController
 
     //TV-SHOWS
     public function getTVShowMovies(){
-        $title = "Tv Shows | Tv Shows hay tuyển chọn | Tv Shows mới nhất \$year";
+        $title = "Tv Shows, Tv Shows hay tuyển chọn, Tv Shows mới nhất \$year";
         $description = "TV Shows mới nhất tuyển chọn chất lượng cao, TV Shows mới nhất \$year vietsub cập nhật nhanh nhất. TV Shows vietsub nhanh nhất.";
         return $this->getMoviesByType('tvshows', $title, $description);
     }
