@@ -72,7 +72,6 @@ class MovieController
         return [
             'seo_title' =>  $seoTitle,
             'seo_description' => $seoDescription, 
-            'og_image' => '',
             'og_url' => request()->path(),
         ];
     }
@@ -103,6 +102,11 @@ class MovieController
     }
     }
 
+    //LẤY TÊN THỂ LOẠI
+    protected function getCategoryNameBySlug($slug){
+        $categories = config('api_settings.categories');
+        return $categories[$slug] ?? null;
+    }
 
     //PHIM THEO THỂ LOẠI
     public function getMoviesByCategory($category){
@@ -114,37 +118,12 @@ class MovieController
         $moviesByCategory = $this->moviesWithNoTrailer->whereJsonContains('movie_details.category', ['slug' => $category]);
         return $this->getMoviesByFilter($moviesByCategory, 24, $title, $description);
     } 
-    
-    protected function getCategoryNameBySlug($slug)
-    {
-        $categories = [
-            'hanh-dong' => 'Hành Động',
-            'tinh-cam' => 'Tình Cảm',
-            'hai-huoc' => 'Hài Hước',
-            'co-trang' => 'Cổ Trang',
-            'tam-ly' => 'Tâm lý',
-            'hinh-su' => 'Hình Sự',
-            'chien-trang' => 'Chiến Trang',
-            'the-thao' => 'Thể Thao',
-            'vo-thuat' => 'Võ Thuật',
-            'vien-tuong' => 'Viễn Tưởng',
-            'phieu-luu' => 'Phiêu Lưu',
-            'khoa-hoc' => 'Khoa Học',
-            'kinh-di' => 'Kinh Dị',
-            'am-nhac' => 'Âm Nhạc',
-            'than-thoai' => 'Thần Thoại',
-            'tai-lieu' => 'Tài Liệu',
-            'gia-dinh' => 'Gia Đình',
-            'chinh-kich' => 'Chính Kịch',
-            'bi-an' => 'Bí Ẩn',
-            'hoc-duong' => 'Học Đường',
-            'kinh-dien' => 'Kinh Điển',
-            'phim-18' => 'Phim 18+'
-        ];
 
-    return $categories[$slug] ?? null;
+    //LẤY TÊN QUỐC GIA
+    protected function getCountryNameBySlug($slug){
+        $countries = config('api_settings.countries');
+        return $countries[$slug] ?? null;
     }
-
 
     //PHIM THEO QUỐC GIA
     public function getMoviesByCountry($slug){
@@ -157,50 +136,6 @@ class MovieController
         $moviesByCountry = $this->moviesWithNoTrailer->whereJsonContains('movie_details.country', ['slug' => $slug]);
         return $this->getMoviesByFilter($moviesByCountry, 24, $title, $description);
     } 
-
-    protected function getCountryNameBySlug($slug)
-    {
-        $countries = [
-            'trung-quoc' => 'Trung Quốc',
-            'han-quoc' => 'Hàn Quốc',
-            'nhat-ban' => 'Nhật Bản',
-            'thai-lan' => 'Thái Lan',
-            'au-my' => 'Âu Mỹ',
-            'dai-loan' => 'Đài Loan',
-            'hong-kong' => 'Hồng Kông',
-            'an-do' => 'Ấn Độ',
-            'anh' => 'Anh',
-            'phap' => 'Pháp',
-            'canada' => 'Canada',
-            'quoc-gia-khac' => 'Quốc Nia Khác',
-            'duc' => 'Đức',
-            'tay-ban-nha' => 'Tây Ban Nha',
-            'tho-nhi-ky' => 'Thổ Nhĩ Kỳ',
-            'ha-lan' => 'Hà Lan',
-            'indonesia' => 'Indonesia',
-            'nga' => 'Nga',
-            'mexico' => 'Mexico',
-            'ba-lan' => 'Ba Lan',
-            'uc' => 'Úc',
-            'thuy-dien' => 'Thụy Điển',
-            'malaysia' => 'Malaysia',
-            'brazil' => 'Brazil',
-            'philippines' => 'Philippines',
-            'bo-dao-nha' => 'Bồ Đào Nha',
-            'y' => 'Ý',
-            'dan-mach' => 'Đan Mạch',
-            'uae' => 'UAE',
-            'na-uy' => 'Na Uy',
-            'thuy-si' => 'Thụy Sĩ',
-            'chau-phi' => 'Châu Phi',
-            'nam-phi' => 'Nam Phi',
-            'ukraina' => 'Ukraina',
-            'arap-xe-ut' => 'Ả Rập Xê Út',
-        ];
-
-    return $countries[$slug] ?? null;
-    }
-
     
     //PHIM THEO LOẠI
     public function getMoviesByType($type, $title, $description){
@@ -284,7 +219,6 @@ class MovieController
     //PHIM MỚI CẬP NHẬT THEO LOẠI 
     protected function getNewUpdatedMoviesByType($type, $title, $description){
         // $selectedColumns = ['movies.*','movie_details.type','movie_details.episode_current']; 
-
         $newUpdatedMoviesByType = $this->moviesWithNoTrailer
         ->whereBetween('modified_time', [$this->week, $this->tomorrow])
         ->orderByDesc('modified_time')
@@ -330,10 +264,5 @@ class MovieController
         return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
     }  
 
-    //DANH SÁCH PHIM 18+
-    public function get18sMovies(){
-        $moviesAirToday = $this->moviesWithMovieDetailsQuery->whereJsonContains('movie_details.category', ['slug' => 'phim-18'])->get();
-        return $moviesAirToday;
-    }
    
 }

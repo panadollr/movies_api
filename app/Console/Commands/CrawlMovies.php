@@ -113,25 +113,27 @@ class CrawlMovies extends Command
     }
     
 
-    protected function processMovies($movies_data)
+protected function processMovies($movies_data)
 {
     $newMovies = [];
     $attributes = [
         'modified_time', '_id', 'name', 'origin_name', 'thumb_url', 'slug', 'year', 'poster_url'
     ];
 
-    for($i = 0; $i < count($movies_data); $i++){
-    foreach ($movies_data[$i] as $result) {
-        $existingMovie = Movie::where('_id', $result->_id)->first();
+    foreach ($movies_data as $resultArray) {
+        foreach ($resultArray as $result) {
+        if($result->year >= 2005){
+            $existingMovie = Movie::where('_id', $result->_id)->first();
         if (!$existingMovie) {
             $newMovie = [];
             foreach ($attributes as $attribute) {
-                $newMovie[$attribute] = $attribute === 'modified_time' ? $result->modified->time : $result->$attribute;
+                     $newMovie[$attribute] = $attribute === 'modified_time' ? $result->modified->time : $result->$attribute;
             }
             $newMovies[] = $newMovie;
         } else {
             $this->updateMovieAttributes($existingMovie, $result, $attributes);
         }
+        }     
     }
 }
     if (!empty($newMovies)) {
