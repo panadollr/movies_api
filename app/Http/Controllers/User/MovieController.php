@@ -64,7 +64,10 @@ class MovieController
         $yearPlaceholder = '$year';
 
         $title = str_replace([$yearPlaceholder, '  '], [$year, ' '], $title);
+        $title = str_replace(' ,', ',', $title);
+        $title = str_replace(',', ' |', $title);
         $description = str_replace([$yearPlaceholder, '  '], [$year, ' '], $description);
+        $description = str_replace('  ', ' ', $description);
 
         $seoTitle = trim($title);
         $seoDescription = trim($description);
