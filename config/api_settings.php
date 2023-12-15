@@ -63,6 +63,5 @@ return [
         'bi-an' => 'Bí Ẩn',
         'hoc-duong' => 'Học Đường',
         'kinh-dien' => 'Kinh Điển',
-        'phim-18' => 'Phim 18+'
     ]
 ];

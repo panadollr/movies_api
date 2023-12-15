@@ -90,18 +90,39 @@ class MovieController
                 $query->where('movies.year', '=', $year);
             }
 
-            $result = $query->paginate($limit);
+            // $result = $query->paginate($limit);
+            // $seoOnPage = $this->generateSeoData($title, $description, $year);
+            
+            // $data = [
+            //     'data' => MovieResource::collection($result),
+            //     'seoOnPage' => $seoOnPage
+            // ];
+            // return response()->json(new PaginationResource($data), 200); 
+
             $seoOnPage = $this->generateSeoData($title, $description, $year);
             
-            $data = [
-                'data' => MovieResource::collection($result),
-                'seoOnPage' => $seoOnPage
-            ];
-            return response()->json(new PaginationResource($data), 200); 
+            if ($limit === 'all') {
+                $result = $query->get();
+                $data = MovieResource::collection($result);
+                $responseData = [
+                    'data' => $data,
+                    'seoOnPage' => $seoOnPage
+                ];
+                $test = $responseData;
+            } else {
+                $result = $query->paginate($limit);
+                $data = MovieResource::collection($result);
+                $responseData = [
+                    'data' => $data,
+                    'seoOnPage' => $seoOnPage
+                ];
+                $test = new PaginationResource($responseData);
+            }
+        
+            return response()->json($test, 200); 
 
-        // return response()->json(new PaginationResource(MovieResource::collection($result)), 200); 
     } catch (\Throwable $th) {
-        return response()->json(['error' => $th->getMessage()], 500);
+        return response()->json(['error' => $th->getMessage()], 500);   
     }
     }
 
@@ -131,7 +152,6 @@ class MovieController
     //PHIM THEO QUỐC GIA
     public function getMoviesByCountry($slug){
         $countryName = $this->getCountryNameBySlug($slug);
-        // $title = "Phim $countryName \$year";
         $title = "Phim Mới $countryName \$year, Phim hay, Xem phim nhanh, Xem phim online, Phim mới $countryName \$year vietsub hay nhất";
         $description = "Xem phim mới $countryName \$year miễn phí nhanh chất lượng cao." .
         "Xem phim $countryName \$year online Việt Sub, Thuyết minh, lồng tiếng chất lượng HD." .
@@ -146,7 +166,6 @@ class MovieController
         return $this->getMoviesByFilter($movies, 24, $title, $description);
     }
 
-
     //PHIM BỘ
     public function getSeriesMovies(){
         $title = "Phim bộ \$year, Phim bộ \$year hay tuyển chọn, Phim bộ mới nhất \$year";
@@ -154,7 +173,6 @@ class MovieController
         return $this->getMoviesByType('series', $title, $description);
     }
 
-    
     //PHIM LẺ
     public function getSingleMovies(){
         $title = "Phim lẻ \$year, Phim lẻ \$year hay tuyển chọn, Phim lẻ mới nhất \$year";
@@ -162,14 +180,12 @@ class MovieController
         return $this->getMoviesByType('single', $title, $description);
     }
 
-
     //PHIM HOẠT HÌNH
     public function getCartoonMovies(){
         $title = "Phim hoạt hình, Phim hoạt hình hay tuyển chọn, Phim hoạt hình mới nhất \$year";
         $description = "Phim hoạt hình mới nhất tuyển chọn chất lượng cao, Phim hoạt hình mới nhất \$year vietsub cập nhật nhanh nhất. Phim hoạt hình vietsub nhanh nhất";
         return $this->getMoviesByType('hoathinh', $title, $description);
     }
-
 
     //PHIM SUBTEAM
     public function getSubTeamMovies(){
@@ -179,14 +195,12 @@ class MovieController
         return $this->getMoviesByFilter($subTeamMovies, 24, $title, $description);
     }
 
-
     //TV-SHOWS
     public function getTVShowMovies(){
         $title = "Tv Shows, Tv Shows hay tuyển chọn, Tv Shows mới nhất \$year";
         $description = "TV Shows mới nhất tuyển chọn chất lượng cao, TV Shows mới nhất \$year vietsub cập nhật nhanh nhất. TV Shows vietsub nhanh nhất.";
         return $this->getMoviesByType('tvshows', $title, $description);
     }
-
 
     //PHIM SẮP CHIẾU
     public function getUpcomingMovies(){
@@ -196,7 +210,6 @@ class MovieController
         ->where('movie_details.status', 'trailer')->where('movie_details.episode_current', 'Trailer');
         return $this->getMoviesByFilter($upcomingMovies, 24, $title, $description);
     }
-
 
     //PHIM ĐANG THỊNH HÀNH
     public function getTrendingMovies(Request $request){
@@ -217,7 +230,6 @@ class MovieController
         $topTrendingMovies = $query;
         return $this->getMoviesByFilter($topTrendingMovies, 24, $title, $description);
     }
-
 
     //PHIM MỚI CẬP NHẬT THEO LOẠI 
     protected function getNewUpdatedMoviesByType($type, $title, $description){
@@ -246,7 +258,6 @@ class MovieController
         return $this->getNewUpdatedMoviesByType('single', $title, $description);
     }
 
-
     //HÔM NAY XEM GÌ
     public function getMoviesAirToday(){
         $title = 'Hôm nay xem gì';
@@ -256,15 +267,17 @@ class MovieController
         return $this->getMoviesByFilter($moviesAirToday, 10, $title, $description);
     }
 
-
     //TÌM KIẾM PHIM
     public function searchMovie(Request $request){
         $name = $request->keyword;
         $title = "Phim $name | $name vietsub | Phim $name hay | Tuyển tập $name mới nhất \$year";
         $description = "Phim $name hay tuyển tập, phim $name mới nhất, tổng hợp phim $name, $name full HD, $name vietsub, xem $name online";
         $searchedMovies = $this->moviesWithNoTrailer
-        ->where('name', 'like', "%$name%");
-        return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
+        ->where(function ($query) use ($name) {
+            $query->where('name', 'ilike', "%$name%")
+            ->orWhere('description', 'like', "%$name%");
+        });
+        return $this->getMoviesByFilter($searchedMovies, 16, $title, $description);
     }  
 
    

@@ -32,7 +32,7 @@ class MovieDetailsController
     try {
         $response = $this->client->get($url);
         $episodes = json_decode($response->getBody()->getContents())->episodes;
-        return $episodes ?? null;
+        return $episodes;
     } catch (\Throwable $th) {
         return null;
     }
@@ -47,13 +47,18 @@ class MovieDetailsController
                 return response()->json(['error' => 'Phim không tồn tại!'], 404);
             }
             $episodes = $this->getEpisodes($slug);
-
-            $data = [
-               'movie' => $movieDetails,
-               'episodes' => $episodes,
-            ];
             
-            return response()->json(new MovieDetailsResource($data), 200);
+            if ($episodes !== null) {
+                $data = [
+                'movie' => $movieDetails,
+                'episodes' => $episodes,
+                ];
+                return response()->json(new MovieDetailsResource($data), 200);
+
+        } else {
+            return response()->json(['error' => 'Không thể lấy thông tin tập phim.'], 500);
+        }
+
             } catch (\Throwable $th) {
                 return response()->json(['error' => $th->getMessage()], 500);
             }

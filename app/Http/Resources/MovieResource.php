@@ -64,38 +64,17 @@ class MovieResource extends JsonResource
     protected function formattedCategoriesArray($propertyName)
     {
         $propertyValue = $this->$propertyName;
-        $categories = [
-            'hanh-dong' => 'Hành Động',
-            'tinh-cam' => 'Tình Cảm',
-            'hai-huoc' => 'Hài Hước',
-            'co-trang' => 'Cổ Trang',
-            'tam-ly' => 'Tâm lý',
-            'hinh-su' => 'Hình Sự',
-            'chien-trang' => 'Chiến Trang',
-            'the-thao' => 'Thể Thao',
-            'vo-thuat' => 'Võ Thuật',
-            'vien-tuong' => 'Viễn Tưởng',
-            'phieu-luu' => 'Phiêu Lưu',
-            'khoa-hoc' => 'Khoa Học',
-            'kinh-di' => 'Kinh Dị',
-            'am-nhac' => 'Âm Nhạc',
-            'than-thoai' => 'Thần Thoại',
-            'tai-lieu' => 'Tài Liệu',
-            'gia-dinh' => 'Gia Đình',
-            'chinh-kich' => 'Chính Kịch',
-            'bi-an' => 'Bí Ẩn',
-            'hoc-duong' => 'Học Đường',
-            'kinh-dien' => 'Kinh Điển',
-            'phim-18' => 'Phim 18+'
-        ];
+        $categories = config('api_settings.categories');
+        $propertyValue = collect(json_decode($this->$propertyName, true))->pluck('slug')->toArray();
     
-        return  array_map(function ($item) use ($categories) {
-                foreach ($categories as $category_slug => $category_name) {
-                    if ($item['slug'] == $category_slug) {
-                        return ['name' => $category_name];
-                    }
-                }
-            }, json_decode($propertyValue, true));
+        $filteredCategories = [];
+        foreach ($propertyValue as $categorySlug) {
+            if (array_key_exists($categorySlug, $categories)) {
+                    $filteredCategories[] = ['name' => $categories[$categorySlug]];
+            }
+        }
+    
+        return array_values($filteredCategories);
     }
 
 }
