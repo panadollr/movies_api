@@ -40,7 +40,6 @@ class BlogController
 
     protected function generateSeoData($title, $description)
     {
-
         return [
             'seo_title' =>  $title,
             'seo_description' => $description, 
@@ -52,7 +51,13 @@ class BlogController
     public function getBlogs(){
         $limit = $request->limit ?? 5;
         try {
-        $blogs = Blog::select(['id', 'title', 'slug', 'poster_url', 'movie_type', 'date'])->paginate($limit);
+        $query = Blog::select(['id', 'title', 'slug', 'poster_url', 'movie_type', 'date']);
+        
+        if($limit == 'all'){
+            $blogs = $query->get();
+        } else {
+            $blogs = $query->paginate($limit);
+        }
         $data = [
             'data' => BlogResource::collection($blogs),
             'seoOnPage' => ''

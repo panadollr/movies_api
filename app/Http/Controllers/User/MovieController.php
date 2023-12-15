@@ -100,27 +100,18 @@ class MovieController
             // return response()->json(new PaginationResource($data), 200); 
 
             $seoOnPage = $this->generateSeoData($title, $description, $year);
-            
-            if ($limit === 'all') {
-                $result = $query->get();
-                $data = MovieResource::collection($result);
-                $responseData = [
-                    'data' => $data,
-                    'seoOnPage' => $seoOnPage
-                ];
-                $test = $responseData;
-            } else {
-                $result = $query->paginate($limit);
-                $data = MovieResource::collection($result);
-                $responseData = [
-                    'data' => $data,
-                    'seoOnPage' => $seoOnPage
-                ];
-                $test = new PaginationResource($responseData);
-            }
-        
-            return response()->json($test, 200); 
 
+            $result = ($limit === 'all') ? $query->get() : $query->paginate($limit);
+            $data = MovieResource::collection($result);
+        
+            $responseData = [
+                'data' => $data,
+                'seoOnPage' => $seoOnPage
+            ];
+        
+            $response = ($limit === 'all') ? $responseData : new PaginationResource($responseData);
+        
+            return response()->json($response, 200); 
     } catch (\Throwable $th) {
         return response()->json(['error' => $th->getMessage()], 500);   
     }
