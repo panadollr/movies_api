@@ -62,6 +62,7 @@ class BlogController
             'data' => BlogResource::collection($blogs),
             'seoOnPage' => ''
          ];
+         $dasa ="dsad";
     
         return response()->json($data, 200);
         // return response()->json(new PaginationResource(BlogResource::collection($blog)), 200);
