@@ -106,15 +106,16 @@ class MovieController
         
             $responseData = [
                 'data' => $data,
-                'seoOnPage' => $seoOnPage
+                'seoOnPage' => $seoOnPage,
+                'count' => count($data)
             ];
         
             $response = ($limit === 'all') ? $responseData : new PaginationResource($responseData);
-        
+
             return response()->json($response, 200); 
-    } catch (\Throwable $th) {
-        return response()->json(['error' => $th->getMessage()], 500);   
-    }
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 500);   
+        }
     }
 
     //LẤY TÊN THỂ LOẠI
@@ -265,8 +266,7 @@ class MovieController
         $description = "Phim $name hay tuyển tập, phim $name mới nhất, tổng hợp phim $name, $name full HD, $name vietsub, xem $name online";
         $searchedMovies = $this->moviesWithNoTrailer
         ->where(function ($query) use ($name) {
-            $query->where('name', 'ilike', "%$name%")
-            ->orWhere('description', 'like', "%$name%");
+            $query->where('name', 'like', "%$name%");
         });
         return $this->getMoviesByFilter($searchedMovies, 16, $title, $description);
     }  
