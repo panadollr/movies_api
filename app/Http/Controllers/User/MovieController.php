@@ -101,7 +101,8 @@ class MovieController
 
             $seoOnPage = $this->generateSeoData($title, $description, $year);
 
-            $result = ($limit === 'all') ? $query->get() : $query->paginate($limit);
+            $result = ($limit === 'all') ? $query->select('movies._id', 'name', 'slug', 'thumb_url', 'year',
+            'episode_current', 'category')->get() : $query->paginate($limit);
             $data = MovieResource::collection($result);
         
             $responseData = [
