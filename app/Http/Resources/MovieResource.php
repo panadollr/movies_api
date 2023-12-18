@@ -3,29 +3,26 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use DateTime;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use GuzzleHttp\Client;
-
-
-use App\Models\MovieDetails;
 
 
 class MovieResource extends JsonResource
 {
     protected $imageDomain;
+    protected $cloudinaryDomain;
 
     public function __construct($resource)
     {
         parent::__construct($resource);
         $this->imageDomain = config('api_settings.image_domain');
+        $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/uploads/movies/";
     }
     
     public function toArray($request)
     {
 
-        return [
-            // 'modified_time' => (new DateTime($this->modified_time))->format('m/Y'),
+        return array_filter([
             'modified_time' => $this->modified_time,
             'id' => $this->_id,
             'name' => $this->name,
@@ -33,26 +30,19 @@ class MovieResource extends JsonResource
             'thumb_url' => $this->formatImageUrl($this->poster_url),
             'slug' => $this->slug,
             'year' => $this->year,
-            'poster_url' => $this->formatImageUrl($this->thumb_url),
+            // 'poster_url' => $this->formatImageUrl($this->thumb_url),
+            'poster_url' => $this->formatImageUrlv2(),
             'content' => $this->content,
             'type' => $this->type,
             'status' => $this->status,
-            // 'is_copyright' => $this->is_copyright,
             'sub_docquyen' => (bool) $this->sub_docquyen,
-            // 'trailer_url' => $this->trailer_url,
             'time' => $this->time,
             'episode_current' => $this->episode_current,
-            // 'episode_total' => $this->episode_total,
             'quality' => $this->quality,
             'lang' => $this->lang,
-            // 'notify' => $this->notify,
-            // 'showtimes' => $this->showtimes,
-            // 'view' => $this->view,
-            // 'actor' => json_decode($this->actor),
-            // 'director' => json_decode($this->director),
             'category' => $this->formattedCategoriesArray('category'),
             // 'country' => $this->formattedArray('country'),
-        ];
+        ]);
     }
 
     protected function formatImageUrl($url)
@@ -60,30 +50,16 @@ class MovieResource extends JsonResource
         return $url ? $this->imageDomain . $url : null;
     }
 
-//     protected function formatImageUrl($url, $domain)
-// {
-//     try {
-//         $imageCloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/";
-//         $publicIdImage = "uploads/movies/" . pathinfo($url, PATHINFO_FILENAME);
-//         $cloudinaryUrl = Cloudinary::getUrl($publicIdImage);
+    protected function formatImageUrlv2()
+    {
+        $slug = $this->slug;
+        if($this->year >= 2023){
+            return $this->cloudinaryDomain . $slug .'-thumb.webp';
+        } else {
+            return $this->imageDomain . $slug .'-thumb.jpg';
+        }
         
-//         if ($cloudinaryUrl) {
-//             return $cloudinaryUrl;
-//         } else {
-//             Cloudinary::upload("https://img.ophim9.cc/uploads/movies/{$url}", [
-//                 'format' => 'webp',
-//                 'public_id' => $publicIdImage,
-//             ]);
-//             return $domain . $url;
-//         }
-
-//     } catch (\Exception $e) {
-//         // Handle the exception if necessary
-//         return null;
-//     }
-// }
-
-
+    }
 
     protected function formattedArray($propertyName)
     {

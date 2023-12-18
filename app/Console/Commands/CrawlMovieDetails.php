@@ -165,7 +165,8 @@ class CrawlMovieDetails extends Command
 
     public function crawl()
     {
-        $batchSize = 250;
+        // $batchSize = 250;
+        $batchSize = 24;
         $batch_movie_slugs = Movie::take($batchSize)->pluck('slug')->toArray();
         if (!empty($batch_movie_slugs)) {
             $this->processMovieDetails($batch_movie_slugs);

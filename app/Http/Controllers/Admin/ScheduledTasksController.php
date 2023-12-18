@@ -24,29 +24,26 @@ class ScheduledTasksController
 }
 
 
-//     public function runCrawlMoviesCommand()
-// {
-//     try {
-//         set_time_limit(300);
-//         Artisan::call('crawl:movies');
-//         return response()->json(['message' => 'Crawl Movies command executed.'], 200);
-//     } catch (\Exception $e) {
-//         return "Error: " . $e->getMessage();
-//     }
-// }
+    public function runCrawlMoviesCommand()
+{
+    try {
+        Artisan::call('crawl:movies');
+        return response()->json(['message' => 'Crawl movies command executed.'], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
 
 
-// public function runCrawlMovieDetailsCommand()
-// {
-//     try {
-//         // Dispatch the job instead of directly calling the Artisan command
-//         dispatch(new SendMoviesCrawlJob());
-
-//         return response()->json(['message' => 'Crawl Movie Details command dispatched.'], 200);
-//     } catch (\Exception $e) {
-//         return "Error: " . $e->getMessage();
-//     }
-// }
+public function runCrawlMovieDetailsCommand()
+{
+    try {
+        Artisan::call('crawl:movie_details');
+        return response()->json(['message' => 'Crawl movie details command executed.'], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
 
 
 public function deleteOldMovies()

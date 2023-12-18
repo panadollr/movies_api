@@ -19,10 +19,10 @@ Route::prefix('admin')->group(function () {
 });
 
 use App\Http\Controllers\Admin\ScheduledTasksController;
-    // Route::get('commands/crawl:movies', [ScheduledTasksController::class, 'runCrawlMoviesCommand']);
-    // Route::get('commands/crawl:movie_details', [ScheduledTasksController::class, 'runCrawlMovieDetailsCommand']);
-    Route::get('commands/run-scheduled-commands', [ScheduledTasksController::class, 'runScheduledCommands']);
-    Route::get('commands/delete-old-movies', [ScheduledTasksController::class, 'deleteOldMovies']);
+    Route::get('commands/crawl:movies', [ScheduledTasksController::class, 'runCrawlMoviesCommand']);
+    Route::get('commands/crawl:movie_details', [ScheduledTasksController::class, 'runCrawlMovieDetailsCommand']);
+    // Route::get('commands/run-scheduled-commands', [ScheduledTasksController::class, 'runScheduledCommands']);
+    // Route::get('commands/delete-old-movies', [ScheduledTasksController::class, 'deleteOldMovies']);
 
 
 
@@ -43,8 +43,6 @@ use App\Http\Controllers\User\MovieController;
     Route::get('hom-nay-xem-gi', [MovieController::class, 'getMoviesAirToday']);
     Route::get('tim-kiem', [MovieController::class, 'searchMovie']);
     Route::get('phim-18', [MovieController::class, 'get18sMovies']);
-    Route::get('convert/{img}', [MovieController::class, 'convertToWebP']);
-
 
 use App\Http\Controllers\User\MovieDetailsController;
     Route::get('phim/{slug}', [MovieDetailsController::class, 'getMovieDetails']);

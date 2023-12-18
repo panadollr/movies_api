@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 
 class ApiRoutesTest extends Command
 {
-    protected $signature = 'test:api_routes';
+    protected $signature = 'test:apis';
     protected $description = 'Test all API routes in api.php file';
 
     public function handle()
@@ -45,7 +45,7 @@ class ApiRoutesTest extends Command
             'moi-cap-nhat/phim-bo',
             'moi-cap-nhat/phim-le',
             'hom-nay-xem-gi',
-            'tim-kiem',
+            'tim-kiem{keyword}',
             'phim/{movie-slug}',
             'phim-tuong-tu/{movie-slug}',
             'tin-tuc',
@@ -72,6 +72,7 @@ class ApiRoutesTest extends Command
         'country-slug' => 'nhat-ban',
         'movie-slug' => 'tapie',
         'tin-tuc-slug' => 'review-nhat-niem-quan-son-tap-9-10-nham-nhu-y-het-doi-sinh-con-ninh-vien-chau-tiec-hui-hui',
+        'keyword' => '?keyword=quỷ'
     ];
 
     foreach ($parameters as $key => $value) {

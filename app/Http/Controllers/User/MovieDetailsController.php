@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 use App\Models\MovieDetails;
-use App\Models\Episodes;
 use App\Http\Resources\MovieDetailsResource;
 use App\Http\Controllers\User\MovieController;
 
@@ -18,7 +17,8 @@ use DB;
 class MovieDetailsController
 {
     protected $client;
-    protected $movieDetailWithMovieQuery; 
+    protected $movieDetailWithMovieQuery;
+    protected $movieController;
 
     public function __construct(Client $client, MovieController $movieController)
     {
@@ -45,6 +45,7 @@ class MovieDetailsController
             if(!$movieDetails){
                 return response()->json([], 200);
             }
+            
             $episodes = $this->getEpisodes($slug);
             
                 $data = [
@@ -64,8 +65,7 @@ class MovieDetailsController
         $title = "Các phim tương tự";
         $description = "";
         $movieDetail = $this->movieDetailWithMovieQuery
-                            ->select('movies.slug', 'movie_details.type')
-                            ->where('slug', $slug)
+                            ->where('slug', $slug)->select('type')
                             ->first();
         $similarMovies =  $this->movieController->moviesWithNoTrailer
         ->where('type', $movieDetail->type)->select($this->movieController->selectedColumnsV2);           

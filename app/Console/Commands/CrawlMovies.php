@@ -7,12 +7,12 @@ use Illuminate\Console\Command;
 use App\Models\Movie;
 use App\Models\MovieDetails;
 use App\Models\Episodes;
-use App\Jobs\SendMoviesCrawlJob;
 use App\Console\Commands\CrawlMovieDetails;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
 use DB;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class CrawlMovies extends Command
 {
@@ -85,8 +85,11 @@ class CrawlMovies extends Command
 
    
     protected function crawl(){
-        $total = 20;
-        $batchSize = 5;
+        // $total = 20;
+        // $batchSize = 5;
+
+        $total = 1;
+        $batchSize = 1;
     
         for ($start = 1; $start <= $total; $start += $batchSize) {
             $end = min($start + $batchSize - 1, $total);
@@ -130,6 +133,20 @@ protected function processMovies($movies_data)
                      $newMovie[$attribute] = $attribute === 'modified_time' ? $result->modified->time : $result->$attribute;
             }
             $newMovies[] = $newMovie;
+
+            $publicIdImage = "uploads/movies/" . pathinfo($newMovie['thumb_url'], PATHINFO_FILENAME);
+            Cloudinary::upload($newMovie['thumb_url'], [
+                'format' => 'webp',
+                'public_id' => $publicIdImage,
+                'options' => [
+                    'format' => 'webp',
+                    'width' => '800',
+                    'height' => 'auto',
+                    'quality' => 'auto',
+                    'overwrite' => false,
+                ],
+            ]);
+
         } else {
             $this->updateMovieAttributes($existingMovie, $result, $attributes);
         }

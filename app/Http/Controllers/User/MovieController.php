@@ -21,7 +21,7 @@ class MovieController
     'movie_details.episode_current', 'movie_details.quality', 'movie_details.lang',
     'movie_details.showtimes', 'movie_details.category', 'movie_details.country']; 
     public $selectedColumnsV2 = ['movies._id', 'movies.name', 'movies.thumb_url', 'movies.slug', 'movies.year',
-    'movie_details.episode_current', 'movie_details.category'];
+    'movie_details.type', 'movie_details.episode_current', 'movie_details.category'];
     protected $moviesWithMovieDetailsQuery; 
     public $moviesWithNoTrailer;
     protected $today;
