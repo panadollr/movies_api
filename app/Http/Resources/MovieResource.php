@@ -16,7 +16,11 @@ class MovieResource extends JsonResource
     {
         parent::__construct($resource);
         $this->imageDomain = config('api_settings.image_domain');
-        $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_200/uploads/movies/";
+        if(request()->path() == 'xu-huong'){
+            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_300/uploads/movies/";
+        } else {
+            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/uploads/movies/";
+        }
     }
     
     public function toArray($request)
@@ -53,12 +57,9 @@ class MovieResource extends JsonResource
     protected function formatImageUrlv2()
     {
         $slug = $this->slug;
-        if($this->year >= 2023){
-            return $this->cloudinaryDomain . $slug .'-thumb.webp';
-        } else {
-            return $this->imageDomain . $slug .'-thumb.jpg';
-        }
-        
+        return ($this->year >= 2023)
+        ? $this->cloudinaryDomain . $slug . '-thumb.webp'
+        : $this->imageDomain . $slug . '-thumb.jpg';
     }
 
     protected function formattedArray($propertyName)

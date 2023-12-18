@@ -6,9 +6,18 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class MovieDetailsResource extends JsonResource
 {
+    protected $imageDomain;
+    protected $cloudinaryDomain;
+
+    public function __construct($resource)
+    {
+        parent::__construct($resource);
+        $this->imageDomain = config('api_settings.image_domain');
+        $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_350/uploads/movies/";
+    }
+
     public function toArray($request)
     {
-        $imageDomain = config('api_settings.image_domain');
         $movie = $this['movie'];
 
         return [
@@ -21,8 +30,9 @@ class MovieDetailsResource extends JsonResource
                 'content' => $movie['content'],
                 'type' => $movie['type'],
                 'status' => $movie['status'],
-                'thumb_url' => $imageDomain . $movie['poster_url'],
-                'poster_url' => $imageDomain . $movie['thumb_url'],
+                'thumb_url' => $this->imageDomain . $movie['poster_url'],
+                // 'poster_url' => $imageDomain . $movie['thumb_url'],
+                'poster_url' => $this->formatImageUrlv2($movie),
                 'is_copyright' => $movie['is_copyright'],
                 'sub_docquyen' => (bool) $movie['sub_docquyen'],
                 'trailer_url' => $movie['trailer_url'],
@@ -44,10 +54,19 @@ class MovieDetailsResource extends JsonResource
             'seoOnPage' => [
                 'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]",
                 'seo_description' => strip_tags($movie['content']), 
-                'og_image' => $imageDomain . $movie['poster_url'],
+                'og_image' => $this->imageDomain . $movie['poster_url'],
                 'og_url' => $request->path(),
             ]
         ];
+    }
+
+    protected function formatImageUrlv2($movie)
+    {
+        $slug = $movie['slug'];
+        return ($movie['year'] >= 2023)
+        ? $this->cloudinaryDomain . $slug . '-thumb.webp'
+        : $this->imageDomain . $slug . '-thumb.jpg';
+        
     }
 
     protected function formattedArray($movie, $propertyName)
