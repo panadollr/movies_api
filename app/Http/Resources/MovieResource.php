@@ -16,7 +16,7 @@ class MovieResource extends JsonResource
     {
         parent::__construct($resource);
         $this->imageDomain = config('api_settings.image_domain');
-        $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/uploads/movies/";
+        $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_200/uploads/movies/";
     }
     
     public function toArray($request)
