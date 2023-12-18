@@ -215,10 +215,7 @@ class MovieController
         $newUpdatedMoviesByType = $this->moviesWithNoTrailer
         ->whereBetween('modified_time', [$this->week, $this->tomorrow])
         ->orderByDesc('modified_time')
-        ->whereHas('movie_details', function ($query) use($type) {
-                $query->where('type', $type);
-            })
-        ;
+        ->where('type', $type);
         return $this->getMoviesByFilter($newUpdatedMoviesByType, 24, $title, $description);    
     }
 
