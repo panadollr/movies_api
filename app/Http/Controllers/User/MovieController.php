@@ -7,13 +7,11 @@ use Illuminate\Http\Request;
 use App\Models\Movie;
 use App\Http\Resources\MovieResource;
 use App\Http\Resources\PaginationResource;
-use App\Http\Resources\SeoResource;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
 use Carbon\Carbon;
 use DB;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class MovieController
 {
@@ -22,8 +20,10 @@ class MovieController
     'movie_details.type', 'movie_details.status', 'movie_details.sub_docquyen', 'movie_details.time',
     'movie_details.episode_current', 'movie_details.quality', 'movie_details.lang',
     'movie_details.showtimes', 'movie_details.category', 'movie_details.country']; 
+    public $selectedColumnsV2 = ['movies._id', 'movies.name', 'movies.thumb_url', 'movies.slug', 'movies.year',
+    'movie_details.episode_current', 'movie_details.category'];
     protected $moviesWithMovieDetailsQuery; 
-    protected $moviesWithNoTrailer;
+    public $moviesWithNoTrailer;
     protected $today;
     protected $yesterday;
     protected $tomorrow;
@@ -116,8 +116,9 @@ class MovieController
         $title = "Phim Mới $categoryName \$year, Phim hay, Xem phim nhanh, Xem phim online, Phim mới $categoryName \$year vietsub hay nhất";
         $description = "Xem phim mới $categoryName \$year miễn phí nhanh chất lượng cao." .
         " Xem phim $categoryName \$year online Việt Sub, Thuyết minh, lồng tiếng chất lượng HD." .
-        " Xem phim nhanh online chất lượng cao";
-        $moviesByCategory = $this->moviesWithNoTrailer->whereJsonContains('movie_details.category', ['slug' => $category]);
+        " Xem phim nhanh online chất lượng cao"; 
+        $moviesByCategory = $this->moviesWithNoTrailer->whereJsonContains('movie_details.category', ['slug' => $category])
+        ->select($this->selectedColumnsV2);
         return $this->getMoviesByFilter($moviesByCategory, 24, $title, $description);
     } 
 
@@ -134,13 +135,14 @@ class MovieController
         $description = "Xem phim mới $countryName \$year miễn phí nhanh chất lượng cao." .
         "Xem phim $countryName \$year online Việt Sub, Thuyết minh, lồng tiếng chất lượng HD." .
         "Xem phim nhanh online chất lượng cao";
-        $moviesByCountry = $this->moviesWithNoTrailer->whereJsonContains('movie_details.country', ['slug' => $slug]);
+        $moviesByCountry = $this->moviesWithNoTrailer->whereJsonContains('movie_details.country', ['slug' => $slug])
+        ->select($this->selectedColumnsV2);
         return $this->getMoviesByFilter($moviesByCountry, 24, $title, $description);
     } 
     
     //PHIM THEO LOẠI
     public function getMoviesByType($type, $title, $description){
-        $movies = $this->moviesWithNoTrailer->where('movie_details.type', $type); 
+        $movies = $this->moviesWithNoTrailer->where('movie_details.type', $type)->select($this->selectedColumnsV2);
         return $this->getMoviesByFilter($movies, 24, $title, $description);
     }
 
@@ -169,7 +171,8 @@ class MovieController
     public function getSubTeamMovies(){
         $title = 'Flashmov Subteam - Tuyển tập phim được dịch bởi Flashmov';
         $description = "Tổng hợp những bộ phim hot được vietsub trên Flashmov. Phim hay chọn lọc vietsub nhanh nhất \$year, cập nhật hàng ngày.";
-        $subTeamMovies = $this->moviesWithNoTrailer->where('movie_details.sub_docquyen', true);
+        $subTeamMovies = $this->moviesWithNoTrailer->where('movie_details.sub_docquyen', true)
+        ->select($this->selectedColumnsV2);
         return $this->getMoviesByFilter($subTeamMovies, 24, $title, $description);
     }
 
@@ -185,7 +188,8 @@ class MovieController
         $title = "Phim sắp chiếu \$year";
         $description = "$title mới nhất, tuyển chọn chất lượng cao, $title mới nhất, chọn lọc cập nhật nhanh nhất. $title phụ đề hay nhất.";
         $upcomingMovies = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns)
-        ->where('movie_details.status', 'trailer')->where('movie_details.episode_current', 'Trailer');
+        ->where('movie_details.status', 'trailer')->where('movie_details.episode_current', 'Trailer')
+        ->select($this->selectedColumnsV2);
         return $this->getMoviesByFilter($upcomingMovies, 24, $title, $description);
     }
 
@@ -211,11 +215,11 @@ class MovieController
 
     //PHIM MỚI CẬP NHẬT THEO LOẠI 
     protected function getNewUpdatedMoviesByType($type, $title, $description){
-        // $selectedColumns = ['movies.*','movie_details.type','movie_details.episode_current']; 
         $newUpdatedMoviesByType = $this->moviesWithNoTrailer
         ->whereBetween('modified_time', [$this->week, $this->tomorrow])
         ->orderByDesc('modified_time')
-        ->where('type', $type);
+        ->where('type', $type)
+        ->select($this->selectedColumnsV2);
         return $this->getMoviesByFilter($newUpdatedMoviesByType, 24, $title, $description);    
     }
 
@@ -238,7 +242,8 @@ class MovieController
         $title = 'Hôm nay xem gì';
         $description = "";
         $moviesAirToday = $this->moviesWithNoTrailer
-        ->whereBetween('modified_time', [$this->week, $this->tomorrow])->orderBy('movie_details.view');
+        ->whereBetween('modified_time', [$this->week, $this->tomorrow])->orderBy('movie_details.view')
+        ->select($this->selectedColumnsV2);
         return $this->getMoviesByFilter($moviesAirToday, 10, $title, $description);
     }
 
@@ -248,14 +253,14 @@ class MovieController
         $title = "Phim $name | $name vietsub | Phim $name hay | Tuyển tập $name mới nhất \$year";
         $description = "Phim $name hay tuyển tập, phim $name mới nhất, tổng hợp phim $name, $name full HD, $name vietsub, xem $name online";
         $keywords = explode(' ', $name);
-
+        
         $searchedMovies = $this->moviesWithNoTrailer->where(function ($query) use ($keywords) {
             foreach ($keywords as $key) {
                 $query->orWhere('name', 'like', "%$key%");
             }
-        });
+        })->select($this->selectedColumnsV2);
     
-        return $this->getMoviesByFilter($searchedMovies, 1, $title, $description);
+        return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
     }  
 
     // public function convertToWebP($imageUrl)

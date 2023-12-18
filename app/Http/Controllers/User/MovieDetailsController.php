@@ -41,10 +41,9 @@ class MovieDetailsController
     public function getMovieDetails($slug){
         try {
             $movieDetails = $this->movieDetailWithMovieQuery
-                            ->where('slug', $slug)
-                            ->select('movies.*', 'movie_details.*')->first();
+                            ->where('slug', $slug)->first();
             if(!$movieDetails){
-                return response()->json(['error' => 'Phim không tồn tại!'], 404);
+                return response()->json([], 200);
             }
             $episodes = $this->getEpisodes($slug);
             
@@ -61,18 +60,15 @@ class MovieDetailsController
 
 
     //CÁC PHIM TƯƠNG TỰ
-    public function getSimilarMovies(Request $request, $slug){
-        $name = $request->keyword;
+    public function getSimilarMovies($slug){
         $title = "Các phim tương tự";
         $description = "";
         $movieDetail = $this->movieDetailWithMovieQuery
                             ->select('movies.slug', 'movie_details.type')
                             ->where('slug', $slug)
                             ->first();
-        $similarMovies = MovieDetails::join('movies', 'movies._id', '=', 'movie_details._id')
-        ->select('movies._id', 'movies.name', 'movies.slug', 'movies.year', 'movies.thumb_url', 'movie_details.status', 'movie_details.episode_current', 'movie_details.category')
-        ->where('movies.slug', '!=', $movieDetail->slug)->where('movie_details.status', '!=', 'trailer')
-        ->where('type', $movieDetail->type);           
+        $similarMovies =  $this->movieController->moviesWithNoTrailer
+        ->where('type', $movieDetail->type)->select($this->movieController->selectedColumnsV2);           
         return $this->movieController->getMoviesByFilter($similarMovies, 10, $title, $description);
     }
 
