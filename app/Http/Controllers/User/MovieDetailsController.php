@@ -34,7 +34,7 @@ class MovieDetailsController
         $episodes = json_decode($response->getBody()->getContents())->episodes;
         return $episodes;
     } catch (\Throwable $th) {
-        return null;
+        // return null;
     }
     }
 
@@ -48,16 +48,11 @@ class MovieDetailsController
             }
             $episodes = $this->getEpisodes($slug);
             
-            if ($episodes !== null) {
                 $data = [
                 'movie' => $movieDetails,
                 'episodes' => $episodes,
                 ];
                 return response()->json(new MovieDetailsResource($data), 200);
-
-        } else {
-            return response()->json(['error' => 'Không thể lấy thông tin tập phim.'], 500);
-        }
 
             } catch (\Throwable $th) {
                 return response()->json(['error' => $th->getMessage()], 500);

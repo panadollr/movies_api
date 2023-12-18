@@ -30,11 +30,6 @@ class MovieDetails extends Model
         'category',
         'country'
     ];
-
-    public function movies()
-    {
-        return $this->belongsTo(Movie::class, '_id', '_id');
-    }
 }
 
 

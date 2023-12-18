@@ -4,15 +4,25 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use DateTime;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use GuzzleHttp\Client;
+
 
 use App\Models\MovieDetails;
 
 
 class MovieResource extends JsonResource
 {
+    protected $imageDomain;
+
+    public function __construct($resource)
+    {
+        parent::__construct($resource);
+        $this->imageDomain = config('api_settings.image_domain');
+    }
+    
     public function toArray($request)
     {
-        $imageDomain = config('api_settings.image_domain');
 
         return [
             // 'modified_time' => (new DateTime($this->modified_time))->format('m/Y'),
@@ -20,10 +30,10 @@ class MovieResource extends JsonResource
             'id' => $this->_id,
             'name' => $this->name,
             'origin_name' => $this->origin_name,
-            'thumb_url' => $this->formatImageUrl($this->poster_url, $imageDomain),
+            'thumb_url' => $this->formatImageUrl($this->poster_url),
             'slug' => $this->slug,
             'year' => $this->year,
-            'poster_url' => $this->formatImageUrl($this->thumb_url, $imageDomain),
+            'poster_url' => $this->formatImageUrl($this->thumb_url),
             'content' => $this->content,
             'type' => $this->type,
             'status' => $this->status,
@@ -45,10 +55,35 @@ class MovieResource extends JsonResource
         ];
     }
 
-    protected function formatImageUrl($url, $domain)
+    protected function formatImageUrl($url)
     {
-        return $url ? $domain . $url : null;
+        return $url ? $this->imageDomain . $url : null;
     }
+
+//     protected function formatImageUrl($url, $domain)
+// {
+//     try {
+//         $imageCloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/";
+//         $publicIdImage = "uploads/movies/" . pathinfo($url, PATHINFO_FILENAME);
+//         $cloudinaryUrl = Cloudinary::getUrl($publicIdImage);
+        
+//         if ($cloudinaryUrl) {
+//             return $cloudinaryUrl;
+//         } else {
+//             Cloudinary::upload("https://img.ophim9.cc/uploads/movies/{$url}", [
+//                 'format' => 'webp',
+//                 'public_id' => $publicIdImage,
+//             ]);
+//             return $domain . $url;
+//         }
+
+//     } catch (\Exception $e) {
+//         // Handle the exception if necessary
+//         return null;
+//     }
+// }
+
+
 
     protected function formattedArray($propertyName)
     {

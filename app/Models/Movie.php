@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Models\MovieDetails;
@@ -22,11 +21,6 @@ class Movie extends Model
         'year',
         'poster_url',
     ];
-
-    public function movie_details()
-    {
-        return $this->hasOne(MovieDetails::class, '_id', '_id');
-    }
 
 }
 

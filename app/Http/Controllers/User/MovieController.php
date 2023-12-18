@@ -3,11 +3,8 @@
 namespace App\Http\Controllers\User;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 use App\Models\Movie;
-use App\Models\MovieDetails;
-use App\Models\Episodes;
 use App\Http\Resources\MovieResource;
 use App\Http\Resources\PaginationResource;
 use App\Http\Resources\SeoResource;
@@ -16,8 +13,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
 use Carbon\Carbon;
 use DB;
-use Illuminate\Support\Collection;
-use Session;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class MovieController
 {
@@ -90,25 +86,14 @@ class MovieController
                 $query->where('movies.year', '=', $year);
             }
 
-            // $result = $query->paginate($limit);
-            // $seoOnPage = $this->generateSeoData($title, $description, $year);
-            
-            // $data = [
-            //     'data' => MovieResource::collection($result),
-            //     'seoOnPage' => $seoOnPage
-            // ];
-            // return response()->json(new PaginationResource($data), 200); 
-
-            $seoOnPage = $this->generateSeoData($title, $description, $year);
-
-            $result = ($limit === 'all') ? $query->select('movies._id', 'name', 'slug', 'thumb_url', 'year',
-            'episode_current', 'category')->get() : $query->paginate($limit);
+            $columns = ['movies._id', 'name', 'slug', 'thumb_url', 'year', 'episode_current', 'category'];
+            $result = ($limit === 'all') ? $query->select($columns)->get() : $query->paginate($limit);
             $data = MovieResource::collection($result);
         
             $responseData = [
                 'data' => $data,
-                'seoOnPage' => $seoOnPage,
-                'count' => count($data)
+                'seoOnPage' => $this->generateSeoData($title, $description, $year),
+                'count' => $data->count()
             ];
         
             $response = ($limit === 'all') ? $responseData : new PaginationResource($responseData);
@@ -265,12 +250,34 @@ class MovieController
         $name = $request->keyword;
         $title = "Phim $name | $name vietsub | Phim $name hay | Tuyển tập $name mới nhất \$year";
         $description = "Phim $name hay tuyển tập, phim $name mới nhất, tổng hợp phim $name, $name full HD, $name vietsub, xem $name online";
-        $searchedMovies = $this->moviesWithNoTrailer
-        ->where(function ($query) use ($name) {
-            $query->where('name', 'like', "%$name%");
+        $keywords = explode(' ', $name);
+
+        $searchedMovies = $this->moviesWithNoTrailer->where(function ($query) use ($keywords) {
+            foreach ($keywords as $key) {
+                $query->orWhere('name', 'like', "%$key%");
+            }
         });
-        return $this->getMoviesByFilter($searchedMovies, 16, $title, $description);
+    
+        return $this->getMoviesByFilter($searchedMovies, 1, $title, $description);
     }  
 
-   
+    // public function convertToWebP($imageUrl)
+    // {
+    //     // try {
+    //     //     $cloudinaryUrl = "https://res.cloudinary.com/dtilp1gei/";
+    //     //     $webpPath = "https://img.ophim9.cc/uploads/movies/dai-chien-mai-moi-poster.jpg";
+
+    //     //     $uploadResult = Cloudinary::upload($webpPath, [
+    //     //         'format' => 'webp',
+    //     //         'public_id' => "img.ophim9.cc/uploads/movies/". pathinfo($webpPath, PATHINFO_FILENAME),
+    //     //     ]);
+
+    //     //     $optimizedUrl = $uploadResult->getPublicId();
+        
+    //     //     echo "Image has been uploaded and converted. Optimized URL: $cloudinaryUrl$optimizedUrl";
+    //     // } catch (\Throwable $th) {
+    //     //     echo $th->getMessage();
+    //     // }   
+    // }
+
 }

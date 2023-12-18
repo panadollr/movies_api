@@ -43,6 +43,7 @@ use App\Http\Controllers\User\MovieController;
     Route::get('hom-nay-xem-gi', [MovieController::class, 'getMoviesAirToday']);
     Route::get('tim-kiem', [MovieController::class, 'searchMovie']);
     Route::get('phim-18', [MovieController::class, 'get18sMovies']);
+    Route::get('convert/{img}', [MovieController::class, 'convertToWebP']);
 
 
 use App\Http\Controllers\User\MovieDetailsController;
