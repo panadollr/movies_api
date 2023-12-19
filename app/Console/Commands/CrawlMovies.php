@@ -142,7 +142,7 @@ protected function processMovies($movies_data)
                 'public_id' => $publicIdImage,
                 'options' => [
                     'format' => 'webp',
-                    'width' => '800',
+                    'width' => '600',
                     'height' => 'auto',
                     'quality' => 'auto',
                     'overwrite' => false,
