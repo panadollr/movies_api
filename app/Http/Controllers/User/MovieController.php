@@ -254,32 +254,17 @@ class MovieController
         $description = "Phim $name hay tuyển tập, phim $name mới nhất, tổng hợp phim $name, $name full HD, $name vietsub, xem $name online";
         $keywords = explode(' ', $name);
         
-        $searchedMovies = $this->moviesWithNoTrailer->where(function ($query) use ($keywords) {
-            foreach ($keywords as $key) {
-                $query->orWhere('name', 'like', "%$key%");
-            }
-        })->select($this->selectedColumnsV2);
+        $searchedMovies = $this->moviesWithNoTrailer
+    ->where(function ($query) use ($name, $keywords) {
+        $query->where('name', 'like', "%$name%");
+
+        foreach ($keywords as $key) {
+            $query->orWhere('name', 'like', "%$key%");
+        }
+    });
     
         return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
     }  
 
-    // public function convertToWebP($imageUrl)
-    // {
-    //     // try {
-    //     //     $cloudinaryUrl = "https://res.cloudinary.com/dtilp1gei/";
-    //     //     $webpPath = "https://img.ophim9.cc/uploads/movies/dai-chien-mai-moi-poster.jpg";
-
-    //     //     $uploadResult = Cloudinary::upload($webpPath, [
-    //     //         'format' => 'webp',
-    //     //         'public_id' => "img.ophim9.cc/uploads/movies/". pathinfo($webpPath, PATHINFO_FILENAME),
-    //     //     ]);
-
-    //     //     $optimizedUrl = $uploadResult->getPublicId();
-        
-    //     //     echo "Image has been uploaded and converted. Optimized URL: $cloudinaryUrl$optimizedUrl";
-    //     // } catch (\Throwable $th) {
-    //     //     echo $th->getMessage();
-    //     // }   
-    // }
 
 }

@@ -39,6 +39,9 @@ class MovieDetailsController
     }
 
     public function getMovieDetails($slug){
+        $cacheKey = 'movie_details_' . $slug;
+        
+        return Cache::remember($cacheKey, 1800, function () use ($slug) {
         try {
             $movieDetails = $this->movieDetailWithMovieQuery
                             ->where('slug', $slug)->first();
@@ -61,8 +64,8 @@ class MovieDetailsController
             } catch (\Throwable $th) {
                 return response()->json(['error' => $th->getMessage()], 500);
             }
+        });
     }
-
 
     //CÁC PHIM TƯƠNG TỰ
     public function getSimilarMovies($slug){
