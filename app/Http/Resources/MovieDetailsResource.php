@@ -17,48 +17,50 @@ class MovieDetailsResource extends JsonResource
     }
 
     public function toArray($request)
-    {
-        $movie = $this['movie'];
+{
+    $movie = $this['movie'];
 
-        return [
-            'movie' => [
-                'modified_time' => $movie['modified_time'],
-                'id' => $movie['_id'],
-                'name' => $movie['name'],
-                'slug' => $movie['slug'],
-                'origin_name' => $movie['origin_name'],
-                'content' => $movie['content'],
-                'type' => $movie['type'],
-                'status' => $movie['status'],
-                'thumb_url' => $this->imageDomain . $movie['poster_url'],
+    $movieArray = !empty($movie) ? [
+        'modified_time' => $movie['modified_time'],
+        'id' => $movie['_id'],
+        'name' => $movie['name'],
+        'slug' => $movie['slug'],
+        'origin_name' => $movie['origin_name'],
+        'content' => $movie['content'],
+        'type' => $movie['type'],
+        'status' => $movie['status'],
+        'thumb_url' => $this->imageDomain . $movie['poster_url'],
                 // 'poster_url' => $imageDomain . $movie['thumb_url'],
-                'poster_url' => $this->formatImageUrlv2($movie),
-                'is_copyright' => $movie['is_copyright'],
-                'sub_docquyen' => (bool) $movie['sub_docquyen'],
-                'trailer_url' => $movie['trailer_url'],
-                'time' => $movie['time'],
-                'episode_current' => $movie['episode_current'],
-                'episode_total' => $movie['episode_total'],
-                'quality' => $movie['quality'],
-                'lang' => $movie['lang'],
-                'notify' => $movie['notify'],
-                'showtimes' => $movie['showtimes'],
-                'year' => $movie['year'],
-                'view' => $movie['view'],
-                'actor' => json_decode($movie['actor']),
-                'director' => json_decode($movie['director']),
-                'category' => $this->formattedCategoriesArray($movie, 'category'),
-                // 'country' => $this->formattedArray($movie, 'country'),
-            ],
-            'episodes' => $this['episodes'],
-            'seoOnPage' => [
-                'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]",
-                'seo_description' => strip_tags($movie['content']), 
-                'og_image' => $this->imageDomain . $movie['poster_url'],
-                'og_url' => $request->path(),
-            ]
-        ];
-    }
+        'poster_url' => $this->formatImageUrlv2($movie),
+        'is_copyright' => $movie['is_copyright'],
+        'sub_docquyen' => (bool) $movie['sub_docquyen'],
+        'trailer_url' => $movie['trailer_url'],
+        'time' => $movie['time'],
+        'episode_current' => $movie['episode_current'],
+        'episode_total' => $movie['episode_total'],
+        'quality' => $movie['quality'],
+        'lang' => $movie['lang'],
+        'notify' => $movie['notify'],
+        'showtimes' => $movie['showtimes'],
+        'year' => $movie['year'],
+        'view' => $movie['view'],
+        'actor' => json_decode($movie['actor']),
+        'director' => json_decode($movie['director']),
+        'category' => $this->formattedCategoriesArray($movie, 'category'),
+    ] : [];
+
+    return [
+        'movie' => $movieArray,
+        'episodes' => $this['episodes'] ?? [],
+        'seoOnPage' => !empty($movie) ? [
+            'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]",
+            'seo_description' => strip_tags($movie['content']), 
+            // 'og_image' => $this->imageDomain . $movie['poster_url'],
+            'og_image' => $this->formatImageUrlv2($movie),
+            'og_url' => $request->path(),
+        ] : [],
+    ];
+}
 
     protected function formatImageUrlv2($movie)
     {

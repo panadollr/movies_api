@@ -43,7 +43,11 @@ class MovieDetailsController
             $movieDetails = $this->movieDetailWithMovieQuery
                             ->where('slug', $slug)->first();
             if(!$movieDetails){
-                return response()->json([], 200);
+                $data = [
+                    'movie' => [],
+                    'episodes' => [],
+                    ];
+                return response()->json(new MovieDetailsResource($data), 200);
             }
             
             $episodes = $this->getEpisodes($slug);
