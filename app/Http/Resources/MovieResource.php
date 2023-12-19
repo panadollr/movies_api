@@ -41,7 +41,7 @@ class MovieResource extends JsonResource
             'status' => $this->status,
             'sub_docquyen' => (bool) $this->sub_docquyen,
             'time' => $this->time,
-            'episode_current' => $this->episode_current,
+            'episode_current' => $this->episode_current === 'Tập 0'? 'Trailer' : $this->episode_current,
             'quality' => $this->quality,
             'lang' => $this->lang,
             'category' => $this->formattedCategoriesArray('category'),
@@ -57,7 +57,7 @@ class MovieResource extends JsonResource
     protected function formatImageUrlv2()
     {
         $slug = $this->slug;
-        return ($this->year >= 2023)
+        return ($this->year >= 2022)
         ? $this->cloudinaryDomain . $slug . '-thumb.webp'
         : $this->imageDomain . $slug . '-thumb.jpg';
     }

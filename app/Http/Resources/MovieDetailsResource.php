@@ -36,7 +36,7 @@ class MovieDetailsResource extends JsonResource
         'sub_docquyen' => (bool) $movie['sub_docquyen'],
         'trailer_url' => $movie['trailer_url'],
         'time' => $movie['time'],
-        'episode_current' => $movie['episode_current'],
+        'episode_current' => $movie['episode_current'] === 'Tập 0'? 'Trailer' : $movie['episode_current'],
         'episode_total' => $movie['episode_total'],
         'quality' => $movie['quality'],
         'lang' => $movie['lang'],
@@ -65,7 +65,7 @@ class MovieDetailsResource extends JsonResource
     protected function formatImageUrlv2($movie)
     {
         $slug = $movie['slug'];
-        return ($movie['year'] >= 2023)
+        return ($movie['year'] >= 2022)
         ? $this->cloudinaryDomain . $slug . '-thumb.webp'
         : $this->imageDomain . $slug . '-thumb.jpg';
         

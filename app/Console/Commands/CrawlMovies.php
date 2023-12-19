@@ -112,7 +112,7 @@ class CrawlMovies extends Command
             }
                 $this->processMovies($batch_movies);
         }
-        DB::statement('ALTER TABLE movies ORDER BY modified_time DESC;');
+        // DB::statement('ALTER TABLE movies ORDER BY modified_time DESC;');
     }
     
 
@@ -133,8 +133,10 @@ protected function processMovies($movies_data)
                      $newMovie[$attribute] = $attribute === 'modified_time' ? $result->modified->time : $result->$attribute;
             }
             $newMovies[] = $newMovie;
-
-            $publicIdImage = "uploads/movies/" . pathinfo($newMovie['thumb_url'], PATHINFO_FILENAME);
+            
+            $response = $this->client->get($newMovie['thumb_url']);
+            if($response->getStatusCode() == 200){
+                 $publicIdImage = "uploads/movies/" . pathinfo($newMovie['thumb_url'], PATHINFO_FILENAME);
             Cloudinary::upload($newMovie['thumb_url'], [
                 'format' => 'webp',
                 'public_id' => $publicIdImage,
@@ -146,6 +148,8 @@ protected function processMovies($movies_data)
                     'overwrite' => false,
                 ],
             ]);
+            }
+           
 
         } else {
             $this->updateMovieAttributes($existingMovie, $result, $attributes);
