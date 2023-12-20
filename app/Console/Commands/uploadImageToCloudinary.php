@@ -22,15 +22,15 @@ class UploadImageToCloudinary extends Command
 
     public function convertToWebP()
     {
-        $batch_movie_thumb_url = Movie::orderByDesc('year')->take(2000)->pluck('thumb_url')->toArray();
-        $batch_movie_thumb_url = Movie::where('year', '=', 2022)->pluck('thumb_url')->toArray();
+        // $batch_movie_thumb_url = Movie::orderByDesc('year')->take(2000)->pluck('thumb_url')->toArray();
+        $batch_movie_thumb_url = Movie::where('year', '>=', 2022)->pluck('thumb_url')->toArray();
 
-        // $allMovies = Movie::all();
+        // // $allMovies = Movie::all();
         foreach ($batch_movie_thumb_url as $thumb_url) {
-            $publicIdImage = "uploads/movies/" . pathinfo($thumb_url, PATHINFO_FILENAME);
-            // $cloudinaryUrl = Cloudinary::getUrl($publicIdImage);
+        //     $publicIdImage = "uploads/movies/" . pathinfo($thumb_url, PATHINFO_FILENAME);
+        //     // $cloudinaryUrl = Cloudinary::getUrl($publicIdImage);
         
-            // if (!$cloudinaryUrl) {
+        //     // if (!$cloudinaryUrl) {
                 $posterUrl = "https://img.ophim9.cc/uploads/movies/{$thumb_url}";
                 try {    
                     $publicIdImage = "uploads/movies/" . pathinfo($thumb_url, PATHINFO_FILENAME);
@@ -40,11 +40,12 @@ class UploadImageToCloudinary extends Command
                             'public_id' => $publicIdImage,
                             'options' => [
                                 'format' => 'webp',
-                                'width' => '500',
-                                'height' => '500',
                                 'quality' => 'auto',
                                 'overwrite' => false,
                             ],
+                                'transformation' => [
+                                    'width' => 500,
+                                ],
                         ]);
 
                 } catch (\Exception $e) {

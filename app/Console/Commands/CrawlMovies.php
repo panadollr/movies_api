@@ -85,11 +85,11 @@ class CrawlMovies extends Command
 
    
     protected function crawl(){
-        // $total = 20;
-        // $batchSize = 5;
+        $total = 20;
+        $batchSize = 5;
 
-        $total = 1;
-        $batchSize = 1;
+        // $total = 1;
+        // $batchSize = 1;
     
         for ($start = 1; $start <= $total; $start += $batchSize) {
             $end = min($start + $batchSize - 1, $total);
@@ -134,9 +134,8 @@ protected function processMovies($movies_data)
             }
             $newMovies[] = $newMovie;
             
-            $response = $this->client->get($newMovie['thumb_url']);
-            if($response->getStatusCode() == 200){
-                 $publicIdImage = "uploads/movies/" . pathinfo($newMovie['thumb_url'], PATHINFO_FILENAME);
+            try {
+                $publicIdImage = "uploads/movies/" . pathinfo($newMovie['thumb_url'], PATHINFO_FILENAME);
             Cloudinary::upload($newMovie['thumb_url'], [
                 'format' => 'webp',
                 'public_id' => $publicIdImage,
@@ -148,8 +147,10 @@ protected function processMovies($movies_data)
                     'overwrite' => false,
                 ],
             ]);
+            } catch (\Throwable $th) {
+                //throw $th;
             }
-           
+                 
 
         } else {
             $this->updateMovieAttributes($existingMovie, $result, $attributes);
