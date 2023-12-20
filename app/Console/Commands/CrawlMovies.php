@@ -85,11 +85,11 @@ class CrawlMovies extends Command
 
    
     protected function crawl(){
-        $total = 20;
-        $batchSize = 5;
+        // $total = 20;
+        // $batchSize = 5;
 
-        // $total = 1;
-        // $batchSize = 1;
+        $total = 1;
+        $batchSize = 1;
     
         for ($start = 1; $start <= $total; $start += $batchSize) {
             $end = min($start + $batchSize - 1, $total);
