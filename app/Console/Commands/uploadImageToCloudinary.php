@@ -23,7 +23,7 @@ class UploadImageToCloudinary extends Command
     public function convertToWebP()
     {
         // $batch_movie_thumb_url = Movie::orderByDesc('year')->take(2000)->pluck('thumb_url')->toArray();
-        $batch_movie_thumb_url = Movie::where('year', '>=', 2022)->pluck('thumb_url')->toArray();
+        $batch_movie_thumb_url = Movie::pluck('thumb_url')->toArray();
 
         // // $allMovies = Movie::all();
         foreach ($batch_movie_thumb_url as $thumb_url) {
@@ -44,7 +44,7 @@ class UploadImageToCloudinary extends Command
                                 'overwrite' => false,
                             ],
                                 'transformation' => [
-                                    'width' => 250,
+                                    'width' => 280,
                                 ],
                         ]);
 
