@@ -56,7 +56,7 @@ class MovieDetailsResource extends JsonResource
             'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]",
             'seo_description' => strip_tags($movie['content']), 
             // 'og_image' => $this->imageDomain . $movie['poster_url'],
-            'og_image' => $this->formatImageUrlv2($movie),
+            'og_image' => $this->formatSeoImage($movie),
             'og_url' => $request->path(),
         ] : [],
     ];
@@ -67,8 +67,13 @@ class MovieDetailsResource extends JsonResource
         $slug = $movie['slug'];
         return ($movie['year'] >= 2022)
         ? $this->cloudinaryDomain . $slug . '-thumb.webp'
-        : $this->imageDomain . $slug . '-thumb.jpg';
-        
+        : $this->imageDomain . $slug . '-thumb.jpg'; 
+    }
+
+    protected function formatSeoImage($movie)
+    {
+        $slug = $movie['slug'];
+        return $this->imageDomain . $slug . '-poster.jpg';
     }
 
     protected function formattedArray($movie, $propertyName)

@@ -188,7 +188,8 @@ class MovieController
         $title = "Phim sắp chiếu \$year";
         $description = "$title mới nhất, tuyển chọn chất lượng cao, $title mới nhất, chọn lọc cập nhật nhanh nhất. $title phụ đề hay nhất.";
         $upcomingMovies = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns)
-        ->where('movie_details.status', 'trailer')->where('movie_details.episode_current', 'Trailer')
+        ->where('movie_details.episode_current', 'Trailer')
+        ->where('movie_details.trailer_url', '!=', '')
         ->select($this->selectedColumnsV2);
         return $this->getMoviesByFilter($upcomingMovies, 24, $title, $description);
     }

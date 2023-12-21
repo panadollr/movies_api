@@ -165,7 +165,7 @@ class CrawlMovieDetails extends Command
 
     public function crawl()
     {
-        $batchSize = 48;
+        $batchSize = 24;
         $batch_movie_slugs = Movie::orderByDesc('modified_time')->take($batchSize)->pluck('slug')->toArray();
         if (!empty($batch_movie_slugs)) {
             $this->processMovieDetails($batch_movie_slugs);
@@ -206,9 +206,7 @@ class CrawlMovieDetails extends Command
     
                         $batch_movie_details[] = $newMovieDetails;
                     } else {
-                        if($existingMovieDetails->status == 'ongoing'){
                             $this->updateMovieDetailsAttributes($attributes, $arraysToJSON, $existingMovieDetails, $movie_details_data);
-                        }
                     }
                 }
             }
