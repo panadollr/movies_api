@@ -17,9 +17,9 @@ class MovieResource extends JsonResource
         parent::__construct($resource);
         $this->imageDomain = config('api_settings.image_domain');
         if(request()->path() == 'xu-huong'){
-            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/uploads/movies/";
+            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_600/uploads/movies/";
         } else {
-            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_300/uploads/movies/";
+            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/uploads/movies/";
         }
     }
     
