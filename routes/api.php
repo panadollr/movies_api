@@ -43,6 +43,7 @@ use App\Http\Controllers\User\MovieController;
     Route::get('hom-nay-xem-gi', [MovieController::class, 'getMoviesAirToday']);
     Route::get('tim-kiem', [MovieController::class, 'searchMovie']);
     Route::get('phim-18', [MovieController::class, 'get18sMovies']);
+    Route::middleware('cors')->get('phim-le-2', [MovieController::class, 'getSingleMovies']);
 
 use App\Http\Controllers\User\MovieDetailsController;
     Route::get('phim/{slug}', [MovieDetailsController::class, 'getMovieDetails']);

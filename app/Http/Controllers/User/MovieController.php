@@ -252,7 +252,7 @@ class MovieController
         $name = $request->keyword;
         $title = "Phim $name | $name vietsub | Phim $name hay | Tuyển tập $name mới nhất \$year";
         $description = "Phim $name hay tuyển tập, phim $name mới nhất, tổng hợp phim $name, $name full HD, $name vietsub, xem $name online";
-        // $keywords = explode(' ', $name);
+        $keywords = explode(' ', $name);
         
     //     $searchedMovies = $this->moviesWithNoTrailer
     // ->where(function ($query) use ($name) {
@@ -262,15 +262,12 @@ class MovieController
     // });
 
     $searchedMovies = $this->moviesWithNoTrailer
-    ->where(function ($query) use ($name) {
-        $query->where('name', 'like', "%{$name}%")
-              ->orWhere('origin_name', 'like', "%{$name}%")
-              ->orWhere('content', 'like', "%{$name}%");
-    });
+        ->where('name', $name)
+        ->orWhere('name', 'like', "%$name%");
 
-    
         return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
     }  
+    
 
 
 }

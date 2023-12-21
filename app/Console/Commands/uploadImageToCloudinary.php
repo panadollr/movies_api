@@ -44,7 +44,7 @@ class UploadImageToCloudinary extends Command
                                 'overwrite' => false,
                             ],
                                 'transformation' => [
-                                    'width' => 500,
+                                    'width' => 250,
                                 ],
                         ]);
 

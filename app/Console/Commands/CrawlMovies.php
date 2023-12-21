@@ -125,7 +125,7 @@ protected function processMovies($movies_data)
 
     foreach ($movies_data as $resultArray) {
         foreach ($resultArray as $result) {
-        if($result->year >= 2005){
+        if($result->year >= 2007){
             $existingMovie = Movie::where('_id', $result->_id)->first();
         if (!$existingMovie) {
             $newMovie = [];
