@@ -272,26 +272,41 @@ class MovieController
     } 
     
     public function getPoster($slug)
-    {
-        try {
-            $width = request()->input('w', 280);
-            $imageName = $slug . '-thumb.jpg';
-            $imageUrl = config('api_settings.image_domain') . $imageName;
-            $client = new Client();
-            $response = $client->get($imageUrl);
-            
-            $imageContents = $response->getBody()->getContents();
-    
-            return response()->stream(
-                function () use ($imageContents) {
-                    echo $imageContents;
-                },
-                200,
-                ['Content-Type' => 'image/webp']
-            );
-        } catch (\Throwable $th) {
-            return response()->json(['msg' => 'Error processing image', 'error' => $th->getMessage()], 500);
-        }
+{
+    try {
+        $width = request()->input('w', 280);
+        $imageName = $slug . '-thumb.jpg';
+        $imageUrl = config('api_settings.image_domain') . $imageName;
+        $client = new Client();
+        $response = $client->get($imageUrl);
+        
+        // Download the image
+        // $image = Image::make($imageUrl);
+        $image = Image::make($response->getBody()->detach());
+
+        // Resize the image to a specific width (e.g., 300px)
+        $image->resize($width, null, function ($constraint) {
+            $constraint->aspectRatio();
+        });
+
+        // Convert the image to WebP format
+        $webpImage = $image->encode('webp', 90);
+
+        // Convert the WebP image to a stream
+        $stream = $image->stream();
+
+        $response = response()->stream(
+            function () use ($stream) {
+                echo $stream;
+            },
+            200,
+            ['Content-Type' => 'image/webp']
+        );
+
+        return $response;
+    } catch (\Throwable $th) {
+        return response()->json(['msg' => 'Error processing image', 'error' => $th->getMessage()], 500);
     }
+}
 
 }
