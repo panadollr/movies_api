@@ -13,7 +13,7 @@ use GuzzleHttp\Promise;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Facades\Cache;
-use Intervention\Image\Facades\Image;
+// use Intervention\Image\Facades\Image;
 
 class MovieController
 {
