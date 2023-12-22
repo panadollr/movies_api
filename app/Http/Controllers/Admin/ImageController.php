@@ -13,33 +13,35 @@ class ImageController
    
 public function getThumb($slug)
 {
-    try {
-    $imageName = $slug . '-poster.jpg';
-    $imageUrl = config('api_settings.image_domain') . $imageName;
-    $client = new Client();
+    // try {
+    // $imageName = $slug . '-poster.jpg';
+    // $imageUrl = config('api_settings.image_domain') . $imageName;
+    // $client = new Client();
 
-    $response = $client->get($imageUrl);
+    // $response = $client->get($imageUrl);
 
-        // Process the image
-        $image = Image::make($response->getBody()->detach());
-        $webpImage = $image->encode('webp', 90);
-        $stream = $webpImage->stream();
+    //     // Process the image
+    //     $image = Image::make($response->getBody()->detach());
+    //     $webpImage = $image->encode('webp', 90);
+    //     $stream = $webpImage->stream();
 
-        // Return the stream as a response
-        return response()->stream(
-            function () use ($stream) {
-                echo $stream;
-            },
-            200,
-            [
-                'Content-Type' => 'image/webp',
-                'Cache-Control' => 'public, max-age=86400',
-            ]
-        );
+    //     // Return the stream as a response
+    //     return response()->stream(
+    //         function () use ($stream) {
+    //             echo $stream;
+    //         },
+    //         200,
+    //         [
+    //             'Content-Type' => 'image/webp',
+    //             'Cache-Control' => 'public, max-age=86400',
+    //         ]
+    //     );
   
-    } catch (\Throwable $th) {
-        return response()->json(['msg' => 'Error fetching image'], 500);
-    }
+    // } catch (\Throwable $th) {
+    //     return response()->json(['msg' => 'Error fetching image'], 500);
+    // }
+
+    return $slug;
 }
 
 public function getPoster($slug)
@@ -71,9 +73,7 @@ public function getPoster($slug)
                 echo $stream;
             },
             200,
-            [
-                'Content-Type' => 'image/webp',
-            ]
+            ['Content-Type' => 'image/webp']
         );
 
         return $response;
