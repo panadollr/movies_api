@@ -20,7 +20,7 @@ Route::prefix('admin')->group(function () {
 
 use App\Http\Controllers\Admin\ImageController;
     Route::get('image/{slug}-thumb.webp', [ImageController::class, 'getThumb'])->where('slug', '[a-zA-Z0-9\-]+');
-    // Route::get('image/{slug}-poster.webp', [ImageController::class, 'getPoster'])->where('slug', '[a-zA-Z0-9\-]+');
+    Route::get('image/{slug}-poster.webp', [ImageController::class, 'getPoster'])->where('slug', '[a-zA-Z0-9\-]+');
 
 use App\Http\Controllers\Admin\ScheduledTasksController;
     Route::get('commands/crawl:movies', [ScheduledTasksController::class, 'runCrawlMoviesCommand']);
@@ -48,7 +48,6 @@ use App\Http\Controllers\User\MovieController;
     Route::get('tim-kiem', [MovieController::class, 'searchMovie']);
     Route::get('phim-18', [MovieController::class, 'get18sMovies']);
     Route::middleware('cors2')->get('phim-le-2', [MovieController::class, 'getSingleMovies']);
-    Route::get('poster/{slug}', [MovieController::class, 'getPoster']);
 
 use App\Http\Controllers\User\MovieDetailsController;
     Route::get('phim/{slug}', [MovieDetailsController::class, 'getMovieDetails']);

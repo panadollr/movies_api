@@ -59,7 +59,7 @@ class MovieDetailsResource extends JsonResource
             'seo_description' => strip_tags($movie['content']), 
             // 'og_image' => $this->imageDomain . $movie['poster_url'],
             // 'og_image' => $this->formatSeoImage($movie),
-            'og_image' => url($movie['slug'].'-thumb.webp'),
+            'og_image' => url('image/' . $movie['slug'] . '-thumb.webp'),
             'og_url' => $request->path(),
         ] : [],
     ];
