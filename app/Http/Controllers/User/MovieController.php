@@ -333,7 +333,7 @@ class MovieController
         return response($outputImage)
             ->header('Content-Type', 'image/webp');
     } catch (\Throwable $th) {
-        return response()->json(['msg' => 'Không tìm thấy ảnh'], 404);
+        return response()->json(['msg' => 'Error processing image', 'error' => $th->getMessage()], 500);
     }
 }
 
