@@ -281,10 +281,17 @@ class MovieController
             $response = $client->get($imageUrl);
             
             $imageContents = $response->getBody()->getContents();
+
+            // Resize the image and convert it to WebP format with reduced quality
+        $image = Image::make($imageContents)->resize($width, null, function ($constraint) {
+            $constraint->aspectRatio();
+        });
+
+        $webpImage = $image->encode('webp', 70);
     
             return response()->stream(
-                function () use ($imageContents) {
-                    echo $imageContents;
+                function () use ($webpImage) {
+                    echo $webpImage;
                 },
                 200,
                 ['Content-Type' => 'image/webp']
