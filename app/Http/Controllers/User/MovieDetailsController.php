@@ -33,7 +33,16 @@ class MovieDetailsController
         $episodes = json_decode($response->getBody()->getContents())->episodes;
         return $episodes;
     } catch (\Throwable $th) {
-        // return null;
+        return [
+            'server_name' => 'Vietsub #1',
+            'server_data' => [
+                'name' => '',
+                'slug' => '',
+                'filename' => '',
+                'link_embed' => '',
+                'link_m3u8' => ''
+            ]
+        ];
     }
     }
 
@@ -51,12 +60,7 @@ class MovieDetailsController
                     ];
                 return response()->json(new MovieDetailsResource($data), 200);
             }
-            if($movieDetails->episode_current != 'Trailer'){
                 $episodes = $this->getEpisodes($slug);
-            }else {
-                $episodes = [];
-            }
-            
             
                 $data = [
                 'movie' => $movieDetails,
