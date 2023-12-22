@@ -48,7 +48,7 @@ use App\Http\Controllers\User\MovieController;
     Route::get('tim-kiem', [MovieController::class, 'searchMovie']);
     Route::get('phim-18', [MovieController::class, 'get18sMovies']);
     Route::middleware('cors2')->get('phim-le-2', [MovieController::class, 'getSingleMovies']);
-    Route::get('{slug}-poster', [MovieController::class, 'getPoster'])->where('slug', '[a-zA-Z0-9\-]+');
+    Route::get('poster/{slug}', [MovieController::class, 'getPoster']);
 
 use App\Http\Controllers\User\MovieDetailsController;
     Route::get('phim/{slug}', [MovieDetailsController::class, 'getMovieDetails']);
