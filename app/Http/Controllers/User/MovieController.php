@@ -271,70 +271,27 @@ class MovieController
         return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
     } 
     
-    // public function getPoster($slug)
-    // {
-    //     try {
-    //         $width = request()->input('w', 280);
-    //         $imageName = $slug . '-thumb.jpg';
-    //         $imageUrl = config('api_settings.image_domain') . $imageName;
-    //         $client = new Client();
-    //         $response = $client->get($imageUrl);
-            
-    //         $imageContents = $response->getBody()->getContents();
-    
-    //         return response()->stream(
-    //             function () use ($imageContents) {
-    //                 echo $imageContents;
-    //             },
-    //             200,
-    //             ['Content-Type' => 'image/webp']
-    //         );
-    //     } catch (\Throwable $th) {
-    //         return response()->json(['msg' => 'Không tìm thấy ảnh'], 404);
-    //     }
-    // }
-
     public function getPoster($slug)
-{
-    try {
-        $width = request()->input('w', 280);
-        $imageName = $slug . '-thumb.jpg';
-        $imageUrl = config('api_settings.image_domain') . $imageName;
-        $client = new Client();
-        $response = $client->get($imageUrl);
-        
-        $imageContents = $response->getBody()->getContents();
-
-        // Create an image from string
-        $sourceImage = imagecreatefromstring($imageContents);
-
-        // Get the original width and height
-        $originalWidth = imagesx($sourceImage);
-        $originalHeight = imagesy($sourceImage);
-
-        // Calculate the new height based on the provided width
-        $newHeight = ($width / $originalWidth) * $originalHeight;
-
-        // Create a new image with the resized dimensions
-        $resizedImage = imagecreatetruecolor($width, $newHeight);
-
-        // Preserve transparency for PNG images
-        imagealphablending($resizedImage, false);
-        imagesavealpha($resizedImage, true);
-
-        // Resize and copy the original image to the new image
-        imagecopyresampled($resizedImage, $sourceImage, 0, 0, 0, 0, $width, $newHeight, $originalWidth, $originalHeight);
-
-        // Output the image as JPEG with reduced quality
-        ob_start();
-        imagejpeg($resizedImage, null, 70);  // Adjust the quality as needed
-        $outputImage = ob_get_clean();
-
-        return response($outputImage)
-            ->header('Content-Type', 'image/webp');
-    } catch (\Throwable $th) {
-        return response()->json(['msg' => 'Error processing image', 'error' => $th->getMessage()], 500);
+    {
+        try {
+            $width = request()->input('w', 280);
+            $imageName = $slug . '-thumb.jpg';
+            $imageUrl = config('api_settings.image_domain') . $imageName;
+            $client = new Client();
+            $response = $client->get($imageUrl);
+            
+            $imageContents = $response->getBody()->getContents();
+    
+            return response()->stream(
+                function () use ($imageContents) {
+                    echo $imageContents;
+                },
+                200,
+                ['Content-Type' => 'image/webp']
+            );
+        } catch (\Throwable $th) {
+            return response()->json(['msg' => 'Error processing image', 'error' => $th->getMessage()], 500);
+        }
     }
-}
 
 }
