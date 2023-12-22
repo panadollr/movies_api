@@ -51,8 +51,12 @@ class MovieDetailsController
                     ];
                 return response()->json(new MovieDetailsResource($data), 200);
             }
+            if($movieDetails->trailer_url == '' && $movieDetails->episode_current != 'Trailer'){
+                $episodes = $this->getEpisodes($slug);
+            }else {
+                $episodes = [];
+            }
             
-            $episodes = $this->getEpisodes($slug);
             
                 $data = [
                 'movie' => $movieDetails,

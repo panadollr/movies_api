@@ -10,7 +10,7 @@ use App\Models\Episodes;
 use App\Console\Commands\CrawlMovieDetails;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Promise;
+use GuzzleHttp\Promise\Utils;
 use DB;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
@@ -99,16 +99,14 @@ class CrawlMovies extends Command
                 $url = $this->base_url . "danh-sach/phim-moi-cap-nhat?page=$page";
                 $promises[] = $this->client->getAsync($url);
             }
-            $responses = Promise\settle($promises)->wait();
+            $responses = Utils::all($promises)->wait();
  
             foreach ($responses as $response) {
-                if ($response['state'] === 'fulfilled') {
-                    $statusCode = $response['value']->getStatusCode();
+                    $statusCode = $response->getStatusCode();
                     if($statusCode == 200){
-                        $movies_data = json_decode($response['value']->getBody());
+                        $movies_data = json_decode($response->getBody());
                         $batch_movies[] = $movies_data->items;
                     }
-                }
             }
                 $this->processMovies($batch_movies);
         }

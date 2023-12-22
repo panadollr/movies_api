@@ -12,6 +12,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
 use Carbon\Carbon;
 use DB;
+use Illuminate\Support\Facades\Cache;
 
 class MovieController
 {
@@ -268,7 +269,5 @@ class MovieController
 
         return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
     }  
-    
-
 
 }

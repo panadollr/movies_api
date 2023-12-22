@@ -18,6 +18,10 @@ Route::prefix('admin')->group(function () {
         });
 });
 
+use App\Http\Controllers\Admin\ImageController;
+    Route::get('{slug}-thumb.webp', [ImageController::class, 'getThumb'])->where('slug', '[a-zA-Z0-9\-]+');
+    Route::get('{slug}-poster.webp', [ImageController::class, 'getPoster'])->where('slug', '[a-zA-Z0-9\-]+');
+
 use App\Http\Controllers\Admin\ScheduledTasksController;
     Route::get('commands/crawl:movies', [ScheduledTasksController::class, 'runCrawlMoviesCommand']);
     Route::get('commands/crawl:movie_details', [ScheduledTasksController::class, 'runCrawlMovieDetailsCommand']);

@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Promise;
+use GuzzleHttp\Promise\Utils;
 use DB;
 
 use App\Models\Movie;
@@ -185,14 +185,13 @@ class CrawlMovieDetails extends Command
         $url = $this->base_url . "phim/$slug";
         $promises[] = $this->client->getAsync($url);
     }
-    $responses = Promise\settle($promises)->wait();
+    $responses = Utils::all($promises)->wait();
 
     $batch_movie_details = [];
     foreach ($responses as $response) {
-            if ($response['state'] === 'fulfilled') {
-                $statusCode = $response['value']->getStatusCode();
+                $statusCode = $response->getStatusCode();
                 if($statusCode == 200){
-                    $movie_details_data = json_decode($response['value']->getBody())->movie;
+                    $movie_details_data = json_decode($response->getBody())->movie;
                     $existingMovieDetails = MovieDetails::where('_id', $movie_details_data->_id)->first();
                     if (!$existingMovieDetails) {
                         $newMovieDetails = [];
@@ -209,7 +208,6 @@ class CrawlMovieDetails extends Command
                             $this->updateMovieDetailsAttributes($attributes, $arraysToJSON, $existingMovieDetails, $movie_details_data);
                     }
                 }
-            }
         }
         
         if (!empty($batch_movie_details)) {

@@ -17,9 +17,9 @@ class MovieResource extends JsonResource
         parent::__construct($resource);
         $this->imageDomain = config('api_settings.image_domain');
         if(request()->path() == 'xu-huong'){
-            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_600/uploads/movies/";
+            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_500/uploads/movies/";
         } else {
-            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/uploads/movies/";
+            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_280/uploads/movies/";
         }
     }
     
@@ -31,11 +31,13 @@ class MovieResource extends JsonResource
             'id' => $this->_id,
             'name' => $this->name,
             'origin_name' => $this->origin_name,
-            'thumb_url' => $this->formatImageUrl($this->poster_url),
+            // 'thumb_url' => $this->formatImageUrl($this->poster_url),
+            'thumb_url' => url($this->slug.'-thumb.webp'),
+            // 'poster_url' => $this->formatImageUrl($this->thumb_url),
+            // 'poster_url' => $this->formatImageUrlv2(),
+            'poster_url' => $this->formatImageUrlV3(),
             'slug' => $this->slug,
             'year' => $this->year,
-            // 'poster_url' => $this->formatImageUrl($this->thumb_url),
-            'poster_url' => $this->formatImageUrlv2(),
             'content' => $this->content,
             'type' => $this->type,
             'status' => $this->status,
@@ -49,17 +51,30 @@ class MovieResource extends JsonResource
         ]);
     }
 
+    //poster ophim
     protected function formatImageUrl($url)
     {
         return $url ? $this->imageDomain . $url : null;
     }
 
+    //poster cloudinary
     protected function formatImageUrlv2()
     {
         $slug = $this->slug;
         return ($this->year >= 2022)
         ? $this->cloudinaryDomain . $slug . '-thumb.webp'
         : $this->imageDomain . $slug . '-thumb.jpg';
+    }
+
+    //poster test
+    protected function formatImageUrlV3()
+    {
+        $slug = $this->slug;
+        if(request()->path() == 'xu-huong'){
+            return url($slug.'-poster.webp?_w=550');
+        } else {
+            return url($slug.'-poster.webp');
+        }
     }
 
     protected function formattedArray($propertyName)
