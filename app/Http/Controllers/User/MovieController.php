@@ -268,6 +268,10 @@ class MovieController
         ->orWhere('name', 'like', "%$name%");
 
         return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
-    }  
+    } 
+    
+    public function test($slug){
+        return $slug;
+    }
 
 }
