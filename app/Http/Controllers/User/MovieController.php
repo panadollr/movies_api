@@ -13,6 +13,7 @@ use GuzzleHttp\Promise;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Facades\Cache;
+use Intervention\Image\Facades\Image;
 
 class MovieController
 {
@@ -270,8 +271,42 @@ class MovieController
         return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
     } 
     
-    public function test($slug){
-        return $slug;
+    public function getPoster($slug)
+{
+    try {
+        $width = request()->input('w', 280);
+        $imageName = $slug . '-thumb.jpg';
+        $imageUrl = config('api_settings.image_domain') . $imageName;
+        $client = new Client();
+        $response = $client->get($imageUrl);
+        
+        // Download the image
+        // $image = Image::make($imageUrl);
+        $image = Image::make($response->getBody()->detach());
+
+        // Resize the image to a specific width (e.g., 300px)
+        $image->resize($width, null, function ($constraint) {
+            $constraint->aspectRatio();
+        });
+
+        // Convert the image to WebP format
+        $webpImage = $image->encode('webp', 90);
+
+        // Convert the WebP image to a stream
+        $stream = $webpImage->stream();
+
+        $response = response()->stream(
+            function () use ($stream) {
+                echo $stream;
+            },
+            200,
+            ['Content-Type' => 'image/webp']
+        );
+
+        return $response;
+    } catch (\Throwable $th) {
+        return response()->json(['msg' => 'Không tìm thấy ảnh'], 404);
     }
+}
 
 }
