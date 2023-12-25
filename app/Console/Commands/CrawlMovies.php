@@ -37,11 +37,8 @@ class CrawlMovies extends Command
 
         $this->info('Crawling movies data...');
         $this->crawl();
+        // $this->crawlAll();
         $this->info("\nMovies data crawled successfully !");
-
-        // $this->info("\nCrawling movie details data...");
-        // $this->crawlMovieDetails->crawl($this->client, $this->base_url);
-        // $this->info("\nMovie details data crawled successfully !");
         
         $endTime = microtime(true);
         $executionTime = $endTime - $startTime;
@@ -51,12 +48,11 @@ class CrawlMovies extends Command
 
     // protected function getTotalPages()
     // {
-    //     $total_movies = Movie::count();
     //     return $pagination_data['pagination']['totalPages'];
     // }
 
     // protected function crawlAll(){
-    //     $total = $this->getTotalPages();
+    //     $total = 1043;
     //     $batchSize = 10;
     
     //     for ($start = 1; $start <= $total; $start += $batchSize) {
@@ -67,20 +63,17 @@ class CrawlMovies extends Command
     //             $url = $this->base_url . "danh-sach/phim-moi-cap-nhat?page=$page";
     //             $promises[] = $this->client->getAsync($url);
     //         }
-    //         $responses = Promise\settle($promises)->wait();
+    //         $responses = Utils::all($promises)->wait();
  
     //         foreach ($responses as $response) {
-    //             if ($response['state'] === 'fulfilled') {
-    //                 $statusCode = $response['value']->getStatusCode();
-    //                 if($statusCode == 200){
-    //                     $movies_data = json_decode($response['value']->getBody());
+    //             $statusCode = $response->getStatusCode();
+    //             if($statusCode == 200){
+    //                     $movies_data = json_decode($response->getBody());
     //                     $batch_movies[] = $movies_data->items;
     //                 }
-    //             }
     //         }
     //             $this->processMovies($batch_movies);
     //     }
-    //     DB::statement('ALTER TABLE movies ORDER BY modified_time DESC;');
     // }
 
    
@@ -110,7 +103,6 @@ class CrawlMovies extends Command
             }
                 $this->processMovies($batch_movies);
         }
-        // DB::statement('ALTER TABLE movies ORDER BY modified_time DESC;');
     }
     
 
@@ -123,7 +115,7 @@ protected function processMovies($movies_data)
 
     foreach ($movies_data as $resultArray) {
         foreach ($resultArray as $result) {
-        if($result->year >= 2007){
+        if($result->year > 2007){
             $existingMovie = Movie::where('_id', $result->_id)->first();
         if (!$existingMovie) {
             $newMovie = [];
@@ -133,18 +125,39 @@ protected function processMovies($movies_data)
             $newMovies[] = $newMovie;
             
             try {
-                $publicIdImage = "uploads/movies/" . pathinfo($newMovie['thumb_url'], PATHINFO_FILENAME);
-            Cloudinary::upload($newMovie['thumb_url'], [
+            $posterUrl = "https://img.ophim9.cc/uploads/movies/{$result->thumb_url}";
+            $posterName = str_replace("-thumb.jpg", "-poster", $result->thumb_url);
+                $publicIdImage = "uploads/movies/" . $posterName;
+            Cloudinary::upload($posterUrl, [
                 'format' => 'webp',
                 'public_id' => $publicIdImage,
                 'options' => [
                     'format' => 'webp',
-                    'width' => '600',
-                    'height' => 'auto',
                     'quality' => 'auto',
                     'overwrite' => false,
                 ],
+                'transformation' => [
+                    'width' => 450,
+                ],
             ]);
+
+            $thumbUrl = "https://img.ophim9.cc/uploads/movies/{$result->poster_url}";
+            $thumbName = str_replace("-poster.jpg", "-thumb", $result->poster_url);
+                $publicIdImage = "uploads/movies/" . $thumbName;
+            Cloudinary::upload($thumbUrl, [
+                'format' => 'webp',
+                'public_id' => $publicIdImage,
+                'options' => [
+                    'format' => 'webp',
+                    'quality' => 'auto',
+                    'overwrite' => false,
+                ],
+                'transformation' => [
+                    'width' => 1920,
+                    'height' => 1080
+                ],
+            ]);
+            
             } catch (\Throwable $th) {
                 //throw $th;
             }

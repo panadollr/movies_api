@@ -4,6 +4,8 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
+use App\Http\Controllers\User\MovieController;
+
 class MovieDetailsResource extends JsonResource
 {
     protected $imageDomain;
@@ -13,7 +15,7 @@ class MovieDetailsResource extends JsonResource
     {
         parent::__construct($resource);
         $this->imageDomain = config('api_settings.image_domain');
-        $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_350/uploads/movies/";
+        $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_320/uploads/movies/";
     }
 
     public function toArray($request)
@@ -29,11 +31,10 @@ class MovieDetailsResource extends JsonResource
         'content' => $movie['content'],
         'type' => $movie['type'],
         'status' => $movie['status'],
-        'thumb_url' => $this->imageDomain . $movie['poster_url'],
-        'poster_url' => $this->imageDomain . $movie['thumb_url'],
-        // 'thumb_url' => url($movie['slug'].'-thumb.webp'),
-        // 'poster_url' => url($movie['slug'].'-poster.webp?w=320'),
-        // 'poster_url' => $this->formatImageUrlv2($movie),
+        // 'thumb_url' => $this->imageDomain . $movie['poster_url'],
+        'thumb_url' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
+        // 'poster_url' => $this->imageDomain . $movie['thumb_url'],
+        'poster_url' => $this->formatImageWithCloudinaryUrl($movie, 'poster'),
         'is_copyright' => $movie['is_copyright'],
         'sub_docquyen' => (bool) $movie['sub_docquyen'],
         'trailer_url' => $movie['trailer_url'],
@@ -58,25 +59,30 @@ class MovieDetailsResource extends JsonResource
             'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]",
             'seo_description' => strip_tags($movie['content']), 
             // 'og_image' => $this->imageDomain . $movie['poster_url'],
-            // 'og_image' => $this->formatSeoImage($movie),
-            'og_image' => url('image/' . $movie['slug'] . '-thumb.webp'),
+            'og_image' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
             'og_url' => $request->path(),
         ] : [],
     ];
 }
 
-    protected function formatImageUrlv2($movie)
+    protected function formatImageWithCloudinaryUrl($movie, $type)
     {
         $slug = $movie['slug'];
-        return ($movie['year'] >= 2022)
-        ? $this->cloudinaryDomain . $slug . '-thumb.webp'
-        : $this->imageDomain . $slug . '-thumb.jpg'; 
-    }
-
-    protected function formatSeoImage($movie)
-    {
-        $slug = $movie['slug'];
-        return $this->imageDomain . $slug . '-poster.jpg';
+        $cloudinaryFormat = "-$type.webp";
+        if ($movie['year'] == 2023) {
+            $cloudinaryFormat = "-$type.webp";
+            $imageUrl = $this->cloudinaryDomain . $slug . $cloudinaryFormat;
+        } else {
+            if ($type == 'thumb') {
+                $type = 'poster';
+            } else {
+                $type = 'thumb';
+            }
+        
+            $imageUrl = $this->imageDomain . "$slug-$type.jpg";
+        }
+        
+        return $imageUrl;
     }
 
     protected function formattedArray($movie, $propertyName)

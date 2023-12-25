@@ -3,62 +3,63 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
-use GuzzleHttp\Psr7\Stream;
-use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Cache;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Http;
+
+use App\Jobs\ImageUploadJob;
 
 class ImageController
 {
+    protected $imageDomain;
+    protected $cloudinaryDomain;
+
+    public function __construct()
+    {
+        $this->imageDomain = config('api_settings.image_domain');
+        $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/w_280/uploads/movies/";
+    }
    
-public function getThumb($slug)
-{
-    try {
-    $imageName = $slug . '-poster.jpg';
-    $imageUrl = config('api_settings.image_domain') . $imageName;
-    $client = new Client();
-
-    $response = $client->get($imageUrl);
-
-        // Process the image
-        $image = Image::make($response->getBody()->detach());
-        $webpImage = $image->encode('webp', 90);
-        $stream = $webpImage->stream();
-
-        // Return the stream as a response
-        return response()->stream(
-            function () use ($stream) {
-                echo $stream;
-            },
-            200,
-            [
-                'Content-Type' => 'image/webp',
-                'Cache-Control' => 'public, max-age=86400',
-            ]
-        );
-  
-    } catch (\Throwable $th) {
-        return response()->json(['msg' => 'Error fetching image'], 500);
-    }
-}
-
-public function getPoster($slug)
-{
-    try {
-        $imageName = $slug . '-thumb.jpg';
-        $imageUrl = config('api_settings.image_domain') . $imageName;
-        $client = new Client();
-        $response = $client->get($imageUrl);
+// public function getPoster($slug)
+// {
+//     try {
+//         $imageName = $slug . '-thumb.jpg';
+//         $imageUrl =  $this->cloudinaryDomain . $imageName;
+//         // $publicIdImage = "uploads/movies/" . pathinfo($imageUrl, PATHINFO_FILENAME);
+//         $publicIdImage = "uploads/movies/{$slug}-poster";
+//         $cloudinaryImageUrl = Cloudinary::getUrl($publicIdImage);
         
-        $imageContents = $response->getBody()->getContents();
-        $contentType = $response->getHeaderLine('Content-Type');
+//         if ($cloudinaryImageUrl) {
+//             return $cloudinaryImageUrl;
+//         } 
+        
+//             $posterUrl = "https://img.ophim9.cc/uploads/movies/{$imageName}";   
+        
+//             Cloudinary::upload($posterUrl, [
+//                 'format' => 'webp',
+//                 'public_id' => $publicIdImage,
+//                 'options' => [
+//                     'format' => 'webp',
+//                     'quality' => 'auto',
+//                     'overwrite' => false,
+//                 ],
+//                     'transformation' => [
+//                         'width' => 500,
+//                     ],
+//                             ]);
 
-        $response = response($imageContents, 200, ['Content-Type' => $contentType]);
+//         // $cloudinaryImageUrl = Cloudinary::getUrl($publicIdImage);
+//         $cloudinaryImageUrl = $this->cloudinaryDomain . $slug . '-poster.webp';
 
-        return $response;
-    } catch (\Throwable $th) {
-        return response()->json(['msg' => 'Error processing image', 'error' => $th->getMessage()], 500);
-    }
-}
+//         // return redirect($cloudinaryImageUrl);
+//         return $cloudinaryImageUrl;
+//     } catch (\Throwable $th) {
+//         // return  $this->imageDomain . $imageName;
+//         return  $th->getMessage();
+//     }
+// }
+
 
 }

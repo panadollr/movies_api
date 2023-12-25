@@ -19,8 +19,8 @@ Route::prefix('admin')->group(function () {
 });
 
 use App\Http\Controllers\Admin\ImageController;
-    Route::get('image/{slug}-thumb.webp', [ImageController::class, 'getThumb'])->where('slug', '[a-zA-Z0-9\-]+');
-    Route::get('image/{slug}-poster.webp', [ImageController::class, 'getPoster'])->where('slug', '[a-zA-Z0-9\-]+');
+    // Route::get('image/{slug}-thumb.webp', [ImageController::class, 'getThumb'])->where('slug', '[a-zA-Z0-9\-]+');
+    Route::get('image/{slug}-poster', [ImageController::class, 'getPoster'])->where('slug', '[a-zA-Z0-9\-]+');
 
 use App\Http\Controllers\Admin\ScheduledTasksController;
     Route::get('commands/crawl:movies', [ScheduledTasksController::class, 'runCrawlMoviesCommand']);
@@ -47,11 +47,13 @@ use App\Http\Controllers\User\MovieController;
     Route::get('hom-nay-xem-gi', [MovieController::class, 'getMoviesAirToday']);
     Route::get('tim-kiem', [MovieController::class, 'searchMovie']);
     Route::get('phim-18', [MovieController::class, 'get18sMovies']);
+    Route::get('total-movies', [MovieController::class, 'getTotalMovies']);
     Route::middleware('cors2')->get('phim-le-2', [MovieController::class, 'getSingleMovies']);
 
 use App\Http\Controllers\User\MovieDetailsController;
     Route::get('phim/{slug}', [MovieDetailsController::class, 'getMovieDetails']);
     Route::get('phim-tuong-tu/{slug}', [MovieDetailsController::class, 'getSimilarMovies']);
+    Route::get('total-movie_details', [MovieDetailsController::class, 'getTotalMovieDetails']);
 
 use App\Http\Controllers\User\BlogController;
     Route::get('tin-tuc', [BlogController::class, 'getBlogs']);

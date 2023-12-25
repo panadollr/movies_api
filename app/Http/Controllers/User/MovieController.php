@@ -270,6 +270,23 @@ class MovieController
 
         return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
     } 
-    
+
+    public function get18sMovies(){
+        try {
+            $movies = $this->moviesWithNoTrailer->take(10)->get();
+        foreach($movies as $movie){
+            $categories = json_decode($movie->category);
+            if(count($categories) == 3 && $categories[0]->slug == 'hanh-dong'){
+                return $movie;
+        }
+            }
+        } catch (\Throwable $th) {
+            return $th->getMessage();
+        }
+    }
+
+    public function getTotalMovies(){
+        return Movie::count();
+    }
 
 }

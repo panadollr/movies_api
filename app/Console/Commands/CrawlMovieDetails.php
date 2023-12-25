@@ -166,13 +166,18 @@ class CrawlMovieDetails extends Command
     public function crawl()
     {
         $batchSize = 24;
-        $batch_movie_slugs = Movie::orderByDesc('modified_time')->take($batchSize)->pluck('slug')->toArray();
+        $batch_movie_slugs = Movie::orderByDesc('modified_time')->select('slug')->take($batchSize)->pluck('slug')->toArray();
         if (!empty($batch_movie_slugs)) {
             $this->processMovieDetails($batch_movie_slugs);
         }
+    // Movie::orderBy('_id')->select('slug')->take(100)->chunk(100, function ($movies) {
+    //     $batch_movie_slugs = $movies->pluck('slug')->toArray();
+    //     $this->processMovieDetails($batch_movie_slugs);
+    // });      
     }
 
     public function processMovieDetails($batch_movie_slugs) {
+        try {
     $attributes = [
         '_id', 'content', 'type', 'status', 'is_copyright', 'sub_docquyen',
         'trailer_url', 'time', 'episode_current', 'episode_total',
@@ -194,18 +199,19 @@ class CrawlMovieDetails extends Command
                     $movie_details_data = json_decode($response->getBody())->movie;
                     $existingMovieDetails = MovieDetails::where('_id', $movie_details_data->_id)->first();
                     if (!$existingMovieDetails) {
-                        $newMovieDetails = [];
-                        foreach ($attributes as $attribute) {
-                            $newMovieDetails[$attribute] = $movie_details_data->$attribute;
-                        }
-    
-                        foreach ($arraysToJSON as $arrayAttribute) {
-                            $newMovieDetails[$arrayAttribute] = json_encode($movie_details_data->$arrayAttribute);
-                        }
-    
-                        $batch_movie_details[] = $newMovieDetails;
+                        $categories = $movie_details_data->category;
+                        if($categories[0]->slug != 'phim-18'){
+                            $newMovieDetails = $this->prepareNewMovieDetails($attributes, $arraysToJSON, $movie_details_data);
+                            $batch_movie_details[] = $newMovieDetails;
                     } else {
-                            $this->updateMovieDetailsAttributes($attributes, $arraysToJSON, $existingMovieDetails, $movie_details_data);
+                        $movie = Movie::where('_id', $movie_details_data->_id)->first();
+                        if($movie){
+                            $movie->delete();
+                        }
+                    }
+
+                    } else {
+                        $this->handleExistingMovieDetails($attributes, $arraysToJSON, $existingMovieDetails, $movie_details_data);
                     }
                 }
         }
@@ -213,7 +219,47 @@ class CrawlMovieDetails extends Command
         if (!empty($batch_movie_details)) {
                 MovieDetails::insert($batch_movie_details);
             }
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
 }
+
+private function prepareNewMovieDetails($attributes, $arraysToJSON, $movie_details_data)
+{
+    $newMovieDetails = [];
+    foreach ($attributes as $attribute) {
+        $newMovieDetails[$attribute] = $movie_details_data->$attribute;
+    }
+
+    foreach ($arraysToJSON as $arrayAttribute) {
+        $newMovieDetails[$arrayAttribute] = json_encode($movie_details_data->$arrayAttribute);
+    }
+
+    return $newMovieDetails;
+}
+
+private function handleExistingMovieDetails($attributes, $arraysToJSON, $existingMovieDetails, $movie_details_data)
+{
+    $categories = json_decode($existingMovieDetails->category, true);
+
+    if (count($categories) == 1 && $categories[0]['slug'] == 'phim-18') {
+        Movie::where('_id', $existingMovieDetails->_id)->delete();
+    }
+
+    $this->updateMovieDetailsAttributes($attributes, $arraysToJSON, $existingMovieDetails, $movie_details_data);
+}
+
+// protected function filterOutAdultMovies($_id, $categories){
+//     if(count($categories) == 1 && $categories[0]['slug'] == 'phim-18'){
+//        $movie = Movie::where('_id', $_id)->first();
+//        if($movie){
+//         $movie->delete();
+//        }
+//         return true;
+//     } else {
+//         return false;
+//     }
+// }
 
 
 protected function updateMovieDetailsAttributes($attributes, $arraysToJSON, $existingMovieDetails, $newMovieData)
@@ -239,6 +285,8 @@ protected function updateMovieDetailsAttributes($attributes, $arraysToJSON, $exi
         MovieDetails::where('_id', $existingMovieDetails->_id)->update($updates);
     }
 }
+
+
 
 
 }

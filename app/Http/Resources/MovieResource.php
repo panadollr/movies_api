@@ -3,21 +3,24 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use GuzzleHttp\Client;
+
+// use App\Http\Controllers\Admin\ImageController;
+use App\Models\Movie;
 
 
 class MovieResource extends JsonResource
 {
     protected $imageDomain;
     protected $cloudinaryDomain;
+    protected $imageController;
 
     public function __construct($resource)
     {
         parent::__construct($resource);
         $this->imageDomain = config('api_settings.image_domain');
         if(request()->path() == 'xu-huong'){
-            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_500/uploads/movies/";
+            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/uploads/movies/";
         } else {
             $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_280/uploads/movies/";
         }
@@ -25,17 +28,17 @@ class MovieResource extends JsonResource
     
     public function toArray($request)
     {
+        // $imageController = new ImageController();
 
         return array_filter([
             'modified_time' => $this->modified_time,
             'id' => $this->_id,
             'name' => $this->name,
             'origin_name' => $this->origin_name,
-            'poster_url' => $this->formatImageUrl($this->thumb_url),
-            'thumb_url' => $this->formatImageUrl($this->poster_url),
-            // 'poster_url' => $this->formatImageUrlv2(),
-            'thumb_url_2' => url($this->slug.'-thumb.webp'),
-            'poster_url_2' => $this->formatImageUrlV3(),
+            // 'poster_url' => $this->formatImageUrl($this->thumb_url),
+            'poster_url' => $this->formatImageWithCloudinaryUrl('poster'),
+            // 'thumb_url' => $this->formatImageUrl($this->poster_url),
+            'thumb_url' => $this->formatImageWithCloudinaryUrl('thumb'),
             'slug' => $this->slug,
             'year' => $this->year,
             'content' => $this->content,
@@ -58,23 +61,24 @@ class MovieResource extends JsonResource
     }
 
     //poster cloudinary
-    protected function formatImageUrlv2()
+    protected function formatImageWithCloudinaryUrl($type)
     {
         $slug = $this->slug;
-        return ($this->year >= 2022)
-        ? $this->cloudinaryDomain . $slug . '-thumb.webp'
-        : $this->imageDomain . $slug . '-thumb.jpg';
-    }
-
-    //poster test
-    protected function formatImageUrlV3()
-    {
-        $slug = $this->slug;
-        if(request()->path() == 'xu-huong'){
-            return url($slug.'-poster.webp?_w=550');
+        $cloudinaryFormat = "-$type.webp";
+        if ($this->year == 2023) {
+            $cloudinaryFormat = "-$type.webp";
+            $imageUrl = $this->cloudinaryDomain . $slug . $cloudinaryFormat;
         } else {
-            return url($slug.'-poster.webp');
+            if ($type == 'thumb') {
+                $type = 'poster';
+            } else {
+                $type = 'thumb';
+            }
+        
+            $imageUrl = $this->imageDomain . "$slug-$type.jpg";
         }
+        
+        return $imageUrl;
     }
 
     protected function formattedArray($propertyName)
