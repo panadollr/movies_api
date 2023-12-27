@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\MovieDetails;
 use App\Http\Resources\MovieDetailsResource;
 use App\Http\Controllers\User\MovieController;
+use App\Models\Episode;
 
 use GuzzleHttp\Client;
-use DB;
 
 class MovieDetailsController
 {
@@ -25,28 +25,32 @@ class MovieDetailsController
         $this->movieController = $movieController;
     }
 
-    public function getEpisodes($slug){
+
+    public function getOphimEpisodes($slug){
         $url = "https://ophim1.com/phim/$slug";
     try {
         $response = $this->client->get($url);
-        $episodes = json_decode($response->getBody()->getContents())->episodes;
-        return $episodes;
+        $ophimEpisodes = json_decode($response->getBody()->getContents())->episodes[0]->server_data;
+
+        return array_map(function($episode) {
+            return [
+                "slug" => $episode->slug,
+                "link_m3u8" => $episode->link_m3u8,
+                "link_embed" => $episode->link_embed,
+            ];
+        }, $ophimEpisodes);
+
     } catch (\Throwable $th) {
         return [
-            'server_name' => 'Vietsub #1',
-            'server_data' => [
-                'name' => '',
-                'slug' => '',
-                'filename' => '',
-                'link_embed' => '',
-                'link_m3u8' => ''
-            ]
+            "slug" => "",
+            "link_m3u8" => "",
+            "link_embed" => "",
         ];
-    }
+            }
     }
 
     public function getMovieDetails($slug){
-        $cacheKey = 'movie_details_' . $slug;
+        // $cacheKey = 'movie_details_' . $slug;
         
         // return Cache::remember($cacheKey, 1800, function () use ($slug) {
         try {
@@ -55,15 +59,19 @@ class MovieDetailsController
             if(!$movieDetails){
                 $data = [
                     'movie' => [],
-                    'episodes' => [],
+                    'ophim_episodes' => [],
+                    'db_episodes' => []
                     ];
                 return response()->json(new MovieDetailsResource($data), 200);
             }
-                $episodes = $this->getEpisodes($slug);
+                $ophimEpisodes = $this->getOphimEpisodes($slug);
+                $db_episodes = Episode::where('_id', $movieDetails->_id)->select('slug', 'server_2', 'server_3')
+                ->get()->keyBy('slug')->toArray();
             
                 $data = [
                 'movie' => $movieDetails,
-                'episodes' => $episodes,
+                'ophim_episodes' => $ophimEpisodes,
+                'db_episodes' => $db_episodes
                 ];
                 return response()->json(new MovieDetailsResource($data), 200);
 

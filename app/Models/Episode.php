@@ -11,8 +11,10 @@ class Episode extends Model
     public $timestamps = false;
     // protected $primaryKey = 'movie_id';
     protected $fillable =[
-        'movie_id',
-        'server_name',
-        'server_data'
+        '_id',
+        'slug',
+        'server_1',
+        'server_2',
+        'server_3'
     ];
 }

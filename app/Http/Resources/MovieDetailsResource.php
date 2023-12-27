@@ -21,6 +21,8 @@ class MovieDetailsResource extends JsonResource
     public function toArray($request)
 {
     $movie = $this['movie'];
+    $ophimEpisodes = $this['ophim_episodes'];
+    $db_episodes = $this['db_episodes'];
 
     $movieArray = !empty($movie) ? [
         'modified_time' => $movie['modified_time'],
@@ -47,16 +49,17 @@ class MovieDetailsResource extends JsonResource
         'showtimes' => $movie['showtimes'],
         'year' => $movie['year'],
         'view' => $movie['view'],
-        'actor' => json_decode($movie['actor']),
-        'director' => json_decode($movie['director']),
+        // 'actor' => json_decode($movie['actor']),
+        // 'director' => json_decode($movie['director']),
         'category' => $this->formattedCategoriesArray($movie, 'category'),
     ] : [];
 
     return [
         'movie' => $movieArray,
-        'episodes' => $this['episodes'] ?? [],
+        // 'episodes' => $this['episodes'] ?? [],
+        'episodes' => $this->formattedEpisodes($ophimEpisodes, $db_episodes, $movie),
         'seoOnPage' => !empty($movie) ? [
-            'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]",
+            'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]" ." - ". count($ophimEpisodes) . ' tập',
             'seo_description' => strip_tags($movie['content']), 
             // 'og_image' => $this->imageDomain . $movie['poster_url'],
             'og_image' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
@@ -109,5 +112,26 @@ class MovieDetailsResource extends JsonResource
 
         return array_values($filteredCategories);
     }
+
+protected function formattedEpisodes($ophimEpisodes, $db_episodes)
+{
+    $ophimEpisodesV2 = [];
+    foreach ($ophimEpisodes as $ophimEpisode) {
+        $ophimEpisodeSlug = $ophimEpisode['slug'] ? "tap-" . $ophimEpisode['slug'] : "";
+
+        $episodeV2 = [
+            "slug" => $ophimEpisodeSlug,
+            "link_m3u8" => $ophimEpisode['link_m3u8'],
+            "server_1" => $ophimEpisode['link_embed'],
+            "server_2" => $db_episodes[$ophimEpisodeSlug]['server_2'] ?? "",
+            "server_3" => $db_episodes[$ophimEpisodeSlug]['server_3'] ?? "",
+        ];
+
+        $ophimEpisodesV2[] = $episodeV2;
+    }
+
+    return $ophimEpisodesV2;
+}
+
 
 }
