@@ -37,7 +37,6 @@ class ApiRoutesTest extends Command
             'phim-bo',
             'hoat-hinh',
             'subteam',
-            'tv-shows',
             'phim-sap-chieu',
             'the-loai/{category-slug}',
             'quoc-gia/{country-slug}',

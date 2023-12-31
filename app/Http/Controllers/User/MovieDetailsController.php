@@ -34,6 +34,7 @@ class MovieDetailsController
 
         return array_map(function($episode) {
             return [
+                "name" => $episode->name,
                 "slug" => $episode->slug,
                 "link_m3u8" => $episode->link_m3u8,
                 "link_embed" => $episode->link_embed,
@@ -84,14 +85,27 @@ class MovieDetailsController
 
     //CÁC PHIM TƯƠNG TỰ
     public function getSimilarMovies($slug){
-        $title = "Các phim tương tự";
-        $description = "";
-        $movieDetail = $this->movieDetailWithMovieQuery
-                            ->where('slug', $slug)->select('type')
-                            ->first();
-        $similarMovies =  $this->movieController->moviesWithNoTrailer
-        ->where('type', $movieDetail->type)->select($this->movieController->selectedColumnsV2);           
-        return $this->movieController->getMoviesByFilter($similarMovies, 10, $title, $description);
+        try {
+            $title = "Các phim tương tự";
+            $description = "";
+            $movieDetail = $this->movieDetailWithMovieQuery
+                                ->where('slug', $slug)
+                                ->select('type')
+                                ->first();
+    
+            $similarMoviesQuery = $this->movieController->moviesWithNoTrailer
+                ->select($this->movieController->selectedColumnsV2);
+    
+            if ($movieDetail) {
+                $similarMoviesQuery->where('type', $movieDetail->type);
+            }
+    
+            $similarMovies = $similarMoviesQuery;
+    
+            return $this->movieController->getMoviesByFilter($similarMovies, 10, $title, $description);
+        } catch (\Throwable $th) {
+            return $th->getMessage();
+        }
     }
 
     public function getTotalMovieDetails(){

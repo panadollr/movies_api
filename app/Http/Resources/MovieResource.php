@@ -12,17 +12,19 @@ use App\Models\Movie;
 class MovieResource extends JsonResource
 {
     protected $imageDomain;
-    protected $cloudinaryDomain;
+    protected $cloudinaryPosterDomain;
+    protected $cloudinaryThumbDomain;
     protected $imageController;
 
     public function __construct($resource)
     {
         parent::__construct($resource);
         $this->imageDomain = config('api_settings.image_domain');
+        $this->cloudinaryThumbDomain = "https://res.cloudinary.com/dtilp1gei/uploads/movies/";
         if(request()->path() == 'xu-huong'){
-            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/uploads/movies/";
+            $this->cloudinaryPosterDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/ar_1:1,c_fill,g_auto/uploads/movies/";
         } else {
-            $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_280/uploads/movies/";
+            $this->cloudinaryPosterDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_280/uploads/movies/";
         }
     }
     
@@ -65,18 +67,25 @@ class MovieResource extends JsonResource
     {
         $slug = $this->slug;
         $cloudinaryFormat = "-$type.webp";
-        if ($this->year == 2023) {
+        // if ($this->year == 2023) {
             $cloudinaryFormat = "-$type.webp";
-            $imageUrl = $this->cloudinaryDomain . $slug . $cloudinaryFormat;
-        } else {
             if ($type == 'thumb') {
-                $type = 'poster';
+                if($this->year == 2023){
+                    $imageUrl = $this->cloudinaryThumbDomain . $slug . $cloudinaryFormat;
+                }else {
+                    $imageUrl = $this->imageDomain . $slug . $cloudinaryFormat;
+                }
             } else {
-                $type = 'thumb';
+                $imageUrl = $this->cloudinaryPosterDomain . $slug . $cloudinaryFormat;
             }
-        
-            $imageUrl = $this->imageDomain . "$slug-$type.jpg";
-        }
+        // } else {
+        //     if ($type == 'thumb') {
+        //         $type = 'poster';
+        //     } else {
+        //         $type = 'thumb';
+        //     }
+        //     $imageUrl = $this->imageDomain . "$slug-$type.jpg";
+        // }
         
         return $imageUrl;
     }
@@ -84,7 +93,6 @@ class MovieResource extends JsonResource
     protected function formattedArray($propertyName)
     {
         $propertyValue = $this->$propertyName;
-
         return $propertyValue !== null
             ? array_map(function ($item) {
                 return ['name' => $item['name'], 'slug' => $item['slug']];

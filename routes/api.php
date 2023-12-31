@@ -6,11 +6,16 @@ use Illuminate\Support\Facades\Route;
 
 //ADMIN
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\MovieController as AdminMovieController;
 Route::prefix('admin')->group(function () {
     Route::get('general-infomation', [DashboardController::class, 'generalInformation']);
 
     Route::prefix('movies')->group(function () {
         Route::get('top', [DashboardController::class, 'topMovies']);
+        //GIAO DIỆN HIỂN THỊ DANH SÁCH PHIM ĐỂ CHỈNH SỬA TẬP
+        Route::get('edit',[AdminMovieController::class, 'editMovies']);
+        //GIAO DIỆN CHỈNH SỬA CÁC TẬP CỦA 1 PHIM
+        Route::get('edit/detail/{server_number}/{slug}',[AdminMovieController::class, 'episodeMovieDetail']);
     });
 
     Route::prefix('categories')->group(function () {
@@ -36,7 +41,6 @@ use App\Http\Controllers\User\MovieController;
     Route::get('phim-bo', [MovieController::class, 'getSeriesMovies']);
     Route::get('hoat-hinh', [MovieController::class, 'getCartoonMovies']);
     Route::get('subteam', [MovieController::class, 'getSubTeamMovies']);
-    Route::get('tv-shows', [MovieController::class, 'getTVShowMovies']);
     Route::get('phim-sap-chieu', [MovieController::class, 'getUpcomingMovies']);
     
     Route::get('the-loai/{category}', [MovieController::class, 'getMoviesByCategory']);

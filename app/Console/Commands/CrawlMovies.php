@@ -78,11 +78,11 @@ class CrawlMovies extends Command
 
    
     protected function crawl(){
-        // $total = 20;
-        // $batchSize = 5;
+        $total = 1045;
+        $batchSize = 50;
 
-        $total = 1;
-        $batchSize = 1;
+        // $total = 1;
+        // $batchSize = 1;
     
         for ($start = 1; $start <= $total; $start += $batchSize) {
             $end = min($start + $batchSize - 1, $total);
@@ -106,74 +106,165 @@ class CrawlMovies extends Command
     }
     
 
+// protected function processMovies($movies_data)
+// {
+//     $newMovies = [];
+//     $existingIds = [];
+//     $attributes = [
+//         'modified_time', '_id', 'name', 'origin_name', 'thumb_url', 'slug', 'year', 'poster_url'
+//     ];
+
+//     foreach ($movies_data as $resultArray) {
+//         foreach ($resultArray as $result) {
+//             if ($result->year > 2007) {
+//                 $existingIds[] = $result->_id;
+//             }
+//         }
+//     }
+
+//     $existingMovies = Movie::whereIn('_id', $existingIds)->pluck('_id')->toArray();
+
+//     foreach ($movies_data as $resultArray) {
+//         foreach ($resultArray as $result) {
+//             if ($result->year > 2007) {
+//                 if (!in_array($result->_id, $existingMovies)) {
+//                     $newMovie = [];
+//                     foreach ($attributes as $attribute) {
+//                         $newMovie[$attribute] = $attribute === 'modified_time' ? $result->modified->time : $result->$attribute;
+//                     }
+//                     $newMovies[] = $newMovie;
+                    
+//                     if ($result->year === 2023) {
+//                      // ... Cloudinary upload...
+//                     $posterUrl = "https://img.ophim9.cc/uploads/movies/{$result->thumb_url}";
+//                     $posterTransformation = ['width' => 450];
+//                     $this->uploadImageToCloudinary($posterUrl, $posterTransformation, 'uploads/movies/');
+
+//                     $thumbUrl = "https://img.ophim9.cc/uploads/movies/{$result->poster_url}";
+//                     $thumbTransformation = ['width' => 1920, 'height' => 1080];
+//                     $this->uploadImageToCloudinary($thumbUrl, $thumbTransformation, 'uploads/movies/');
+//                     }
+
+//                 } else {
+//                     $existingMovie = Movie::where('_id', $result->_id)->first();
+//                     $this->updateMovieAttributes($existingMovie, $result, $attributes);
+//                 }
+//             }
+//         }
+//     }
+
+//     if (!empty($newMovies)) {
+//         Movie::insert($newMovies);
+//         print_r('New movies inserted!');
+//     }
+// }
+
+
+//TESTING...
 protected function processMovies($movies_data)
 {
     $newMovies = [];
+    $existingIds = [];
     $attributes = [
         'modified_time', '_id', 'name', 'origin_name', 'thumb_url', 'slug', 'year', 'poster_url'
     ];
 
     foreach ($movies_data as $resultArray) {
         foreach ($resultArray as $result) {
-        if($result->year > 2007){
-            $existingMovie = Movie::where('_id', $result->_id)->first();
-        if (!$existingMovie) {
-            $newMovie = [];
-            foreach ($attributes as $attribute) {
-                     $newMovie[$attribute] = $attribute === 'modified_time' ? $result->modified->time : $result->$attribute;
-            }
-            $newMovies[] = $newMovie;
-            
-            try {
-            $posterUrl = "https://img.ophim9.cc/uploads/movies/{$result->thumb_url}";
-            $posterName = str_replace("-thumb.jpg", "-poster", $result->thumb_url);
-                $publicIdImage = "uploads/movies/" . $posterName;
-            Cloudinary::upload($posterUrl, [
-                'format' => 'webp',
-                'public_id' => $publicIdImage,
-                'options' => [
-                    'format' => 'webp',
-                    'quality' => 'auto',
-                    'overwrite' => false,
-                ],
-                'transformation' => [
-                    'width' => 450,
-                ],
-            ]);
-
-            $thumbUrl = "https://img.ophim9.cc/uploads/movies/{$result->poster_url}";
-            $thumbName = str_replace("-poster.jpg", "-thumb", $result->poster_url);
-                $publicIdImage = "uploads/movies/" . $thumbName;
-            Cloudinary::upload($thumbUrl, [
-                'format' => 'webp',
-                'public_id' => $publicIdImage,
-                'options' => [
-                    'format' => 'webp',
-                    'quality' => 'auto',
-                    'overwrite' => false,
-                ],
-                'transformation' => [
-                    'width' => 1920,
-                    'height' => 1080
-                ],
-            ]);
-            
-            } catch (\Throwable $th) {
-                //throw $th;
-            }
-                 
-
-        } else {
-            $this->updateMovieAttributes($existingMovie, $result, $attributes);
+           
+                $existingIds[] = $result->_id;
+           
         }
-        }     
     }
-}
+
+    $existingMovies = Movie::whereIn('_id', $existingIds)->pluck('_id')->toArray();
+    $countries = config('api_settings.countries');
+
+    foreach ($movies_data as $resultArray) {
+        foreach ($resultArray as $result) {
+                if (!in_array($result->_id, $existingMovies)) {
+                    if ($result->year > 2007) {
+                        //truy cập vào chi tiết phim theo slug 
+                    $movie_detail_url = $this->base_url . "phim/$result->slug";
+                    $get_movie_detail = $this->client->getAsync($movie_detail_url);
+                    // Đợi kết quả và lấy response
+                    $response = $get_movie_detail->wait();
+                    if($response->getStatusCode() == 200){
+                        $movie_details_data = json_decode($response->getBody())->movie;
+                        //không phải là tv-shows
+                        if ($movie_details_data->type != 'tvshows') {
+                            $countriesArray = $movie_details_data->country;
+                        if (!empty($countriesArray)) {
+                            $inValidCountries = 0;
+                            foreach ($countriesArray as $country) {
+                                //nếu không tồn tại quốc gia hợp lệ
+                                if (!isset($countries[$country->slug])) {
+                                    $inValidCountries ++;
+                                } 
+                            }
+                            //tổng số phim có quốc gia không hợp lệ bằng 0
+                            if ($inValidCountries === 0) {
+                            $newMovie = [];
+                            foreach ($attributes as $attribute) {
+                            $newMovie[$attribute] = $attribute === 'modified_time' ? $result->modified->time : $result->$attribute;
+                            }
+                            $newMovies[] = $newMovie;
+                    
+                            // ... Cloudinary upload...
+                            $posterUrl = "https://img.ophim9.cc/uploads/movies/{$result->thumb_url}";
+                            if (preg_match('/\/movies\/([^\/]+)-thumb\.jpg$/', $posterUrl, $matches)) {
+                                $slug = $matches[1];
+                                $posterTransformation = ['width' => 450];
+                                $this->uploadImageToCloudinary($slug, 'poster', $posterUrl, $posterTransformation);
+                            }
+
+                            $thumbUrl = "https://img.ophim9.cc/uploads/movies/{$result->poster_url}";
+                            if (preg_match('/\/movies\/([^\/]+)-thumb\.jpg$/', $posterUrl, $matches)) {
+                                $slug = $matches[1];
+                                $thumbTransformation = ['width' => 1920, 'height' => 1080];
+                                $this->uploadImageToCloudinary($slug, 'thumb', $thumbUrl, $thumbTransformation);
+                            }
+                            } 
+
+                        }
+                        }
+                    }
+                }
+
+                } else {
+                    $existingMovie = Movie::where('_id', $result->_id)->first();
+                    $this->updateMovieAttributes($existingMovie, $result, $attributes);
+                }
+        }
+    }
+
+    print_r($newMovies);
+
     if (!empty($newMovies)) {
         Movie::insert($newMovies);
-        print_r('new movie is inserted !');
+        print_r('New movies inserted!');
     }
+    
 }
+
+ // ... Cloudinary upload logic...
+protected function uploadImageToCloudinary($slug, $format, $url, $transformation = []) {
+    try {
+        $publicId = "uploads/movies/$slug-$format";
+        return Cloudinary::upload($url, [
+            'format' => 'webp',
+            'public_id' => $publicId,
+            'options' => [
+                'format' => 'webp',
+                'quality' => 'auto',
+                'overwrite' => false,
+            ],
+            'transformation' => $transformation,
+        ]);
+    } catch (\Throwable $th) {
+      
+    }
+ }
 
 
 protected function updateMovieAttributes($existingMovie, $result, $attributes)

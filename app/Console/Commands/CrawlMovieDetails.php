@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\Utils;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Movie;
 use App\Models\MovieDetails;
@@ -16,23 +16,9 @@ class CrawlMovieDetails extends Command
   
     protected $signature = 'crawl:movie_details';
     protected $description = 'Crawl movie details';
-    // protected $base_url;
-    // protected $client;
 
-    // public function __construct(Client $client)
-    // {
-    //     parent::__construct();
-    //     $this->client = $client;
-    //     $this->base_url = 'https://ophim1.com/';
-    // }
 
-    // public function handle()
-    // {
-    //     $this->info('Crawling movie details data...');
-    //     $this->crawl();
-    //     $this->info('Movie details data crawled successfully.');
-    // }
-
+    //CRAWL TẤT CẢ
     // public function crawlAll(){
     //     $batchSize = 250;
     //     $totalExecutionTime = 0;
@@ -53,90 +39,6 @@ class CrawlMovieDetails extends Command
         
     //     $this->info("Total execution time: {$totalExecutionTime} seconds.");
     // }
-
-
-    //CRAWL THEO CrawlMovies
-    // public function crawl($client, $base_url)
-    // {
-    //     $batchSize = 120;
-    //     $totalExecutionTime = 0;
-    //     $batch_movie_slugs = Movie::select('slug')->take($batchSize)->pluck('slug')->toArray();
-    //     $startTime = microtime(true);
-    //     if (!empty($batch_movie_slugs)) {
-    //         $this->processMovieDetails($batch_movie_slugs, $client, $base_url);
-    //     }
-    //     DB::statement('ALTER TABLE movie_details ORDER BY view DESC;');
-
-    //     $endTime = microtime(true);
-    //     $executionTime = $endTime - $startTime;
-    //     $totalExecutionTime += $executionTime;
-    // }
-
-
-    // public function crawl($client, $base_url)
-    // {
-    //     $batchSize = 120;
-    //     $totalExecutionTime = 0;
-    //     $batch_movie_slugs = Movie::select('slug')->take($batchSize)->pluck('slug')->toArray();
-    //     $startTime = microtime(true);
-    //     if (!empty($batch_movie_slugs)) {
-    //         $this->processMovieDetails($batch_movie_slugs, $client, $base_url);
-    //     }
-    //     DB::statement('ALTER TABLE movie_details ORDER BY view DESC;');
-
-    //     $endTime = microtime(true);
-    //     $executionTime = $endTime - $startTime;
-    //     $totalExecutionTime += $executionTime;
-    // }
-
-
-// public function processMovieDetails($batch_movie_slugs, $client, $base_url) {
-//     $attributes = [
-//         '_id', 'content', 'type', 'status', 'is_copyright', 'sub_docquyen',
-//         'trailer_url', 'time', 'episode_current', 'episode_total',
-//         'quality', 'lang', 'notify', 'showtimes', 'view'
-//     ];
-//     $arraysToJSON = ['actor', 'director', 'category', 'country'];
-   
-//     $promises = [];
-//     foreach ($batch_movie_slugs as $slug) {
-//         $url = $base_url . "phim/$slug";
-//         $promises[] = $client->getAsync($url);
-//     }
-//     $responses = Promise\settle($promises)->wait();
-
-//     $batch_movie_details = [];
-//     foreach ($responses as $response) {
-//             if ($response['state'] === 'fulfilled') {
-//                 $statusCode = $response['value']->getStatusCode();
-//                 if($statusCode == 200){
-//                     $movie_details_data = json_decode($response['value']->getBody())->movie;
-//                     $existingMovieDetails = MovieDetails::where('_id', $movie_details_data->_id)->first();
-//                     if (!$existingMovieDetails) {
-//                         $newMovieDetails = [];
-//                         foreach ($attributes as $attribute) {
-//                             $newMovieDetails[$attribute] = $movie_details_data->$attribute;
-//                         }
-    
-//                         foreach ($arraysToJSON as $arrayAttribute) {
-//                             $newMovieDetails[$arrayAttribute] = json_encode($movie_details_data->$arrayAttribute);
-//                         }
-    
-//                         $batch_movie_details[] = $newMovieDetails;
-//                     } else {
-//                         if($existingMovieDetails->status == 'ongoing'){
-//                             $this->updateMovieDetailsAttributes($attributes, $arraysToJSON, $existingMovieDetails, $movie_details_data);
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-        
-//         if (!empty($batch_movie_details)) {
-//                 MovieDetails::insert($batch_movie_details);
-//             }
-// }
-
 
 //---------------------------------------------------------------//
 
@@ -165,15 +67,21 @@ class CrawlMovieDetails extends Command
 
     public function crawl()
     {
-        $batchSize = 24;
-        $batch_movie_slugs = Movie::orderByDesc('modified_time')->select('slug')->take($batchSize)->pluck('slug')->toArray();
+        //... Lấy tất cả trong movies...
+        // Movie::orderBy('_id')->select('slug')->take(100)->chunk(100, function ($movies) {
+        //     $batch_movie_slugs = $movies->pluck('slug')->toArray();
+        //     $this->processMovieDetails($batch_movie_slugs);
+        // });    
+        
+        //...Lấy các bản ghi từ bảng "movies" mà không có tương ứng trong bảng "movie_details"...
+        $batch_movie_slugs = Movie::whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('movie_details as md')
+                ->whereColumn('md._id', 'movies._id');
+        })->select('slug')->pluck('slug')->toArray();
         if (!empty($batch_movie_slugs)) {
             $this->processMovieDetails($batch_movie_slugs);
         }
-    // Movie::orderBy('_id')->select('slug')->take(100)->chunk(100, function ($movies) {
-    //     $batch_movie_slugs = $movies->pluck('slug')->toArray();
-    //     $this->processMovieDetails($batch_movie_slugs);
-    // });      
     }
 
     public function processMovieDetails($batch_movie_slugs) {
@@ -197,30 +105,23 @@ class CrawlMovieDetails extends Command
                 $statusCode = $response->getStatusCode();
                 if($statusCode == 200){
                     $movie_details_data = json_decode($response->getBody())->movie;
-                    $existingMovieDetails = MovieDetails::where('_id', $movie_details_data->_id)->first();
-                    if (!$existingMovieDetails) {
-                        $categories = $movie_details_data->category;
-                        if($categories[0]->slug != 'phim-18'){
+                    $existingMovieDetail = MovieDetails::where('_id', $movie_details_data->_id)->first();
+
+                    if (!$existingMovieDetail) {
                             $newMovieDetails = $this->prepareNewMovieDetails($attributes, $arraysToJSON, $movie_details_data);
                             $batch_movie_details[] = $newMovieDetails;
                     } else {
-                        $movie = Movie::where('_id', $movie_details_data->_id)->first();
-                        if($movie){
-                            $movie->delete();
-                        }
-                    }
-
-                    } else {
-                        $this->handleExistingMovieDetails($attributes, $arraysToJSON, $existingMovieDetails, $movie_details_data);
+                        $this->handleExistingMovieDetails($attributes, $arraysToJSON, $existingMovieDetail, $movie_details_data);
                     }
                 }
         }
         
         if (!empty($batch_movie_details)) {
                 MovieDetails::insert($batch_movie_details);
+                print_r('New movie detail inserted !');
             }
         } catch (\Throwable $th) {
-            //throw $th;
+            print_r($th->getMessage());
         }
 }
 
@@ -238,16 +139,6 @@ private function prepareNewMovieDetails($attributes, $arraysToJSON, $movie_detai
     return $newMovieDetails;
 }
 
-private function handleExistingMovieDetails($attributes, $arraysToJSON, $existingMovieDetails, $movie_details_data)
-{
-    $categories = json_decode($existingMovieDetails->category, true);
-
-    if (count($categories) == 1 && $categories[0]['slug'] == 'phim-18') {
-        Movie::where('_id', $existingMovieDetails->_id)->delete();
-    }
-
-    $this->updateMovieDetailsAttributes($attributes, $arraysToJSON, $existingMovieDetails, $movie_details_data);
-}
 
 // protected function filterOutAdultMovies($_id, $categories){
 //     if(count($categories) == 1 && $categories[0]['slug'] == 'phim-18'){
@@ -262,7 +153,8 @@ private function handleExistingMovieDetails($attributes, $arraysToJSON, $existin
 // }
 
 
-protected function updateMovieDetailsAttributes($attributes, $arraysToJSON, $existingMovieDetails, $newMovieData)
+//cập nhật các phim đã tồn tại
+protected function handleExistingMovieDetails($attributes, $arraysToJSON, $existingMovieDetails, $newMovieData)
 {
     $updates = [];
 

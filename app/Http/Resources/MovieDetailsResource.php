@@ -117,7 +117,8 @@ protected function formattedEpisodes($ophimEpisodes, $db_episodes)
 {
     $ophimEpisodesV2 = [];
     foreach ($ophimEpisodes as $ophimEpisode) {
-        $ophimEpisodeSlug = $ophimEpisode['slug'] ? "tap-" . $ophimEpisode['slug'] : "";
+        $ophimEpisodeSlug = "tap-" . ($ophimEpisode['slug'] ?: $ophimEpisode['name']);
+        
 
         $episodeV2 = [
             "slug" => $ophimEpisodeSlug,

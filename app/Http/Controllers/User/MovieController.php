@@ -8,12 +8,9 @@ use App\Models\Movie;
 use App\Http\Resources\MovieResource;
 use App\Http\Resources\PaginationResource;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Promise;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Facades\Cache;
-use Intervention\Image\Facades\Image;
 
 class MovieController
 {
@@ -50,8 +47,8 @@ class MovieController
 
     protected function initializeQueries()
     {
-        $this->moviesWithMovieDetailsQuery = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')->select($this->selectedColumns)
-            ->orderByDesc('movies.year');
+        $this->moviesWithMovieDetailsQuery = Movie::join('movie_details', 'movie_details._id', '=', 'movies._id')
+        ->select($this->selectedColumns);
         $this->moviesWithNoTrailer = $this->moviesWithMovieDetailsQuery->where('movie_details.status', '!=', 'trailer')
             ->where('movie_details.episode_current', '!=', 'Trailer');
     }
@@ -178,13 +175,6 @@ class MovieController
         return $this->getMoviesByFilter($subTeamMovies, 24, $title, $description);
     }
 
-    //TV-SHOWS
-    public function getTVShowMovies(){
-        $title = "Tv Shows, Tv Shows hay tuyển chọn, Tv Shows mới nhất \$year";
-        $description = "TV Shows mới nhất tuyển chọn chất lượng cao, TV Shows mới nhất \$year vietsub cập nhật nhanh nhất. TV Shows vietsub nhanh nhất.";
-        return $this->getMoviesByType('tvshows', $title, $description);
-    }
-
     //PHIM SẮP CHIẾU
     public function getUpcomingMovies(){
         $title = "Phim sắp chiếu \$year";
@@ -219,7 +209,9 @@ class MovieController
     //PHIM MỚI CẬP NHẬT THEO LOẠI 
     protected function getNewUpdatedMoviesByType($type, $title, $description){
         $newUpdatedMoviesByType = $this->moviesWithNoTrailer
-        ->whereBetween('modified_time', [$this->week, $this->tomorrow])
+        
+        ->whereBetween('modified_time', [$this->week, $this->tomorrow]) 
+        ->orderByDesc('year')   
         ->orderByDesc('modified_time')
         ->where('type', $type)
         ->select($this->selectedColumnsV2);
@@ -283,10 +275,6 @@ class MovieController
         } catch (\Throwable $th) {
             return $th->getMessage();
         }
-    }
-
-    public function getTotalMovies(){
-        return Movie::count();
-    }
+    }    
 
 }
