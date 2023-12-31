@@ -119,7 +119,6 @@ protected function formattedEpisodes($ophimEpisodes, $db_episodes)
     foreach ($ophimEpisodes as $ophimEpisode) {
         $ophimEpisodeSlug = "tap-" . ($ophimEpisode['slug'] ?: $ophimEpisode['name']);
         
-
         $episodeV2 = [
             "slug" => $ophimEpisodeSlug,
             "link_m3u8" => $ophimEpisode['link_m3u8'],
@@ -131,6 +130,12 @@ protected function formattedEpisodes($ophimEpisodes, $db_episodes)
         $ophimEpisodesV2[] = $episodeV2;
     }
 
+    if(count($ophimEpisodesV2) > 1){
+        usort($ophimEpisodesV2, function ($a, $b) {
+        return strnatcmp($a['slug'], $b['slug']);
+    });
+    }
+    
     return $ophimEpisodesV2;
 }
 

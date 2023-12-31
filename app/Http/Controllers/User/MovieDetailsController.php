@@ -32,14 +32,27 @@ class MovieDetailsController
         $response = $this->client->get($url);
         $ophimEpisodes = json_decode($response->getBody()->getContents())->episodes[0]->server_data;
 
-        return array_map(function($episode) {
+        if(count($ophimEpisodes) > 1){
+            return array_map(function($episode) {
             return [
-                "name" => $episode->name,
-                "slug" => $episode->slug,
+                "name" => (int) $episode->name,
+                "slug" => (int) $episode->slug,
                 "link_m3u8" => $episode->link_m3u8,
                 "link_embed" => $episode->link_embed,
             ];
         }, $ophimEpisodes);
+        } else {
+            return array_map(function($episode) {
+                return [
+                    "name" => $episode->name,
+                    "slug" => $episode->slug,
+                    "link_m3u8" => $episode->link_m3u8,
+                    "link_embed" => $episode->link_embed,
+                ];
+            }, $ophimEpisodes);
+        }
+        
+        
 
     } catch (\Throwable $th) {
         return [

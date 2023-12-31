@@ -67,13 +67,13 @@ class MovieResource extends JsonResource
     {
         $slug = $this->slug;
         $cloudinaryFormat = "-$type.webp";
+        $ophimFormat = "-$type.jpg";
         // if ($this->year == 2023) {
-            $cloudinaryFormat = "-$type.webp";
             if ($type == 'thumb') {
                 if($this->year == 2023){
                     $imageUrl = $this->cloudinaryThumbDomain . $slug . $cloudinaryFormat;
                 }else {
-                    $imageUrl = $this->imageDomain . $slug . $cloudinaryFormat;
+                    $imageUrl = $this->imageDomain . $slug . $ophimFormat;
                 }
             } else {
                 $imageUrl = $this->cloudinaryPosterDomain . $slug . $cloudinaryFormat;
