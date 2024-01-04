@@ -3,9 +3,8 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
-class BlogResource extends JsonResource
+class BlogDetailResource extends JsonResource
 {
     protected $imageDomain;
     protected $cloudinaryThumbDomain;
@@ -14,7 +13,7 @@ class BlogResource extends JsonResource
     {
         parent::__construct($resource);
         $this->imageDomain = config('api_settings.image_domain');
-        $this->cloudinaryThumbDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,h_230/uploads/movies/";
+        $this->cloudinaryThumbDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_320/uploads/movies/";
     }
 
     public function toArray($request)
@@ -23,9 +22,17 @@ class BlogResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'slug' => $this->slug,
             'thumb_url' => $this->formatImageWithCloudinaryUrl('thumb'),
+            'content' => $this->content,
             'movie_type' => $this->movie_type,
             'date' => '12/2023',
+            'seoOnPage' => [
+                'seo_title' => $this->title,
+                'seo_description' => strip_tags(str_replace(["\r", "\n"], '', "$this->content")), 
+                'og_image' => $this->formatImageWithCloudinaryUrl('thumb'),
+                'og_url' => $request->path(),
+            ]
         ];
     }
 

@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-use App\Models\MovieDetails;
-
 class Movie extends Model
 {
     protected $table = 'movies';
     public $timestamps = false;
     // protected $primaryKey = '_id';
+    
     protected $fillable =[
         'modified_time',
         '_id',
@@ -22,5 +21,20 @@ class Movie extends Model
         'poster_url',
     ];
 
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONS
+    |--------------------------------------------------------------------------
+    */
+
+    public function movieDetails()
+    {
+        return $this->hasOne(MovieDetails::class, '_id', '_id'); // Thay 'foreign_key' bằng khóa ngoại thực tế
+    }
+
+    public function episodes()
+    {
+        return $this->hasMany(Episode::class, '_id', '_id'); // Thay 'foreign_key' bằng khóa ngoại thực tế
+    }
 }
 

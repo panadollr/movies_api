@@ -18,7 +18,7 @@
 
 <div style="padding: 10px;">
 <table class="ui celled padded table">
-<h2 class="ui center aligned header" style="margin-top: 20px; color: white">Chỉnh sửa tập phim phim</h2>
+<h2 class="ui center aligned header" style="margin-top: 5px; color: white">Chỉnh sửa tập phim</h2>
 
 <center>
 <form action="{{ url('admin/movies/edit') }}" method="GET">  
@@ -36,8 +36,7 @@
     <th >slug</th>
     <th >Loại phim</th>
     <th>Số tập phim đã có trên server 2 (abyss)</th>
-    <th>Số tập phim đã có trên server 3 (ok.ru)</th>
-    <th class="five wide">Tùy chỉnh</th>
+    <th class="three wide">Tùy chỉnh</th>
   </tr></thead>
   <tbody>
     @if(request()->input('slug'))
@@ -89,38 +88,7 @@
     {{$episodesServer3Count}} / {{$number}}
       </td>
       <td>
-      @php
-        $episodesServer3Count = 0;
-      @endphp
-      
-      @foreach($episodes as $episode)
-        @if($movie->_id == $episode->_id)
-          @if($episode->server_3 != '')
-            @php
-                $episodesServer3Count++;
-            @endphp
-          @endif
-        @endif
-      @endforeach
-
-      @php
-      $string = str($movie->episode_current);
-      if (preg_match('/\((\d+)\/\d+\)/', $string, $matches)) {
-          $number = $matches[1];
-      } elseif (preg_match('/\d+/', $string, $matches)) {
-          $number = $matches[0];
-      } else if($string == "Full"){
-        $number = 1;
-      }
-      else {
-          $number = null;
-      }
-      @endphp
-    {{$episodesServer3Count}} / {{$number}}
-      </td>
-      <td>
       <button class="ui black button">Server 2 (abyss)</button>
-      <button class="ui blue button">Server 3 (ok.ru)</button>
       </td>
     </tr>
     @endforeach

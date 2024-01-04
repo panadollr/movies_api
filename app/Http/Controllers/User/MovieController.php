@@ -20,7 +20,7 @@ class MovieController
     'movie_details.episode_current', 'movie_details.quality', 'movie_details.lang',
     'movie_details.showtimes', 'movie_details.category', 'movie_details.country']; 
     public $selectedColumnsV2 = ['movies._id', 'movies.name', 'movies.thumb_url', 'movies.slug', 'movies.year',
-    'movie_details.type', 'movie_details.episode_current', 'movie_details.category'];
+    'movie_details.sub_docquyen', 'movie_details.type', 'movie_details.episode_current', 'movie_details.category'];
     protected $moviesWithMovieDetailsQuery; 
     public $moviesWithNoTrailer;
     protected $today;
@@ -85,8 +85,7 @@ class MovieController
                 $query->where('movies.year', '=', $year);
             }
 
-            $columns = ['movies._id', 'name', 'slug', 'thumb_url', 'year', 'episode_current', 'category'];
-            $result = ($limit === 'all') ? $query->select($columns)->get() : $query->paginate($limit);
+            $result = ($limit === 'all') ? $query->select($this->selectedColumnsV2)->get() : $query->paginate($limit);
             $data = MovieResource::collection($result);
         
             $responseData = [
@@ -209,8 +208,6 @@ class MovieController
     //PHIM MỚI CẬP NHẬT THEO LOẠI 
     protected function getNewUpdatedMoviesByType($type, $title, $description){
         $newUpdatedMoviesByType = $this->moviesWithNoTrailer
-        
-        ->whereBetween('modified_time', [$this->week, $this->tomorrow]) 
         ->orderByDesc('year')   
         ->orderByDesc('modified_time')
         ->where('type', $type)
@@ -244,23 +241,20 @@ class MovieController
 
     //TÌM KIẾM PHIM
     public function searchMovie(Request $request){
-        $name = $request->keyword;
-        $title = "Phim $name | $name vietsub | Phim $name hay | Tuyển tập $name mới nhất \$year";
-        $description = "Phim $name hay tuyển tập, phim $name mới nhất, tổng hợp phim $name, $name full HD, $name vietsub, xem $name online";
-        $keywords = explode(' ', $name);
-        
-    //     $searchedMovies = $this->moviesWithNoTrailer
-    // ->where(function ($query) use ($name) {
-    //     $query->where('name', 'like', "%{$name}%")
-    //           ->orWhere('origin_name', 'like', "%{$name}%")
-    //           ->orWhere('content', 'like', "%{$name}%");
-    // });
+        try {
+            $keyword = $request->keyword;
+        $title = "Phim $keyword | $keyword vietsub | Phim $keyword hay | Tuyển tập $keyword mới nhất \$year";
+        $description = "Phim $keyword hay tuyển tập, phim $keyword mới nhất, tổng hợp phim $keyword, $keyword full HD, $keyword vietsub, xem $keyword online";
 
-    $searchedMovies = $this->moviesWithNoTrailer
-        ->where('name', $name)
-        ->orWhere('name', 'like', "%$name%");
+        $searchedMovies = $this->moviesWithNoTrailer
+        ->where('name', 'like', '%' . $keyword . '%')->orWhere('origin_name', 'like', '%' . $keyword . '%')
+        ->select($this->selectedColumnsV2);
 
         return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
+        } catch (\Throwable $th) {
+            return $th->getMessage();
+        }
+        
     } 
 
     public function get18sMovies(){

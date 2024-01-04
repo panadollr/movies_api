@@ -3,9 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use GuzzleHttp\Client;
 
-// use App\Http\Controllers\Admin\ImageController;
 use App\Models\Movie;
 
 
@@ -20,17 +18,17 @@ class MovieResource extends JsonResource
     {
         parent::__construct($resource);
         $this->imageDomain = config('api_settings.image_domain');
-        $this->cloudinaryThumbDomain = "https://res.cloudinary.com/dtilp1gei/uploads/movies/";
         if(request()->path() == 'xu-huong'){
+            $this->cloudinaryThumbDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_1100/uploads/movies/";
             $this->cloudinaryPosterDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/ar_1:1,c_fill,g_auto/uploads/movies/";
         } else {
+            $this->cloudinaryThumbDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_280/uploads/movies/";
             $this->cloudinaryPosterDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_280/uploads/movies/";
         }
     }
     
     public function toArray($request)
     {
-        // $imageController = new ImageController();
 
         return array_filter([
             'modified_time' => $this->modified_time,
@@ -68,7 +66,6 @@ class MovieResource extends JsonResource
         $slug = $this->slug;
         $cloudinaryFormat = "-$type.webp";
         $ophimFormat = "-$type.jpg";
-        // if ($this->year == 2023) {
             if ($type == 'thumb') {
                 if($this->year == 2023){
                     $imageUrl = $this->cloudinaryThumbDomain . $slug . $cloudinaryFormat;
@@ -78,14 +75,6 @@ class MovieResource extends JsonResource
             } else {
                 $imageUrl = $this->cloudinaryPosterDomain . $slug . $cloudinaryFormat;
             }
-        // } else {
-        //     if ($type == 'thumb') {
-        //         $type = 'poster';
-        //     } else {
-        //         $type = 'thumb';
-        //     }
-        //     $imageUrl = $this->imageDomain . "$slug-$type.jpg";
-        // }
         
         return $imageUrl;
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
+use App\Models\Movie;
 use App\Models\MovieDetails;
 use App\Http\Resources\MovieDetailsResource;
 use App\Http\Controllers\User\MovieController;
@@ -94,6 +95,31 @@ class MovieDetailsController
             }
         // });
     }
+
+    public function getMovieDetailV2(){
+        try {
+        $movie = Movie::where('slug', 'quai-hiep-nhat-chi-mai')->first();
+
+        if ($movie && $movie->movieDetails()->exists()) {
+            // $movieDetails = $movie->movieDetails + $movie;
+            $movieDetails = $movie->toArray() + $movie->movieDetails->toArray();
+            $ophimEpisodes = $this->getOphimEpisodes('quai-hiep-nhat-chi-mai');
+            $db_episodes = $movie->episodes->pluck('slug', 'server_2', 'server_3')->keyBy('slug')->toArray();
+
+            // $data = [
+            //     'movie' => $movieDetails,
+            //     'ophim_episodes' => $ophimEpisodes,
+            //     'db_episodes' => $db_episodes
+            //     ];
+            //     return response()->json(new MovieDetailsResource($data), 200);
+            return $db_episodes;
+        } else {
+            return "No movie details found for the specified movie.";
+        }
+        } catch (\Throwable $th) {
+            return $th->getMessage();
+        }
+    } 
 
 
     //CÁC PHIM TƯƠNG TỰ

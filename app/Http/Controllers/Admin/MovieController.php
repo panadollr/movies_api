@@ -8,6 +8,7 @@ use App\Models\Episode;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\Request;
 
 class MovieController
 {
@@ -90,11 +91,42 @@ class MovieController
     
             $ophimEpisodesV2[] = $episodeV2;
         }
+
+        if(count($ophimEpisodesV2) > 1){
+            usort($ophimEpisodesV2, function ($a, $b) {
+            return strnatcmp($a['slug'], $b['slug']);
+        });
+        }
     
             return view('edit_movie_detail', compact('movieDetail', 'ophimEpisodesV2'));
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()], 500);
         }
+    }
+
+    public function updateEpisodes(Request $request, $_id){
+        // $episodes = Episode::where('_id', $_id)->get();
+        $server2Data = $request->input('server_2');
+        foreach($server2Data as $key => $value){
+            if ($value !== null) {
+            $episode = Episode::where('_id', $_id)->where('slug', $key)->first();
+            if(!$episode){
+                // nếu episode chưa tồn tại thì insert
+                $newEpisode = [
+                    '_id' => $_id,
+                    'slug' => $key,
+                    'server_2' => $value,
+                ];
+                Episode::insert($newEpisode);
+            } else {
+                $server_2 = $episode->server_2;
+                if($value != $server_2){
+                    Episode::where('_id', $_id)->where('slug', $key)->update(['server_2' => $value]);
+                }
+            }
+        }
+        }
+        return 'success';
     }
 
 }

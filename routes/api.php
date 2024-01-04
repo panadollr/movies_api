@@ -15,7 +15,8 @@ Route::prefix('admin')->group(function () {
         //GIAO DIỆN HIỂN THỊ DANH SÁCH PHIM ĐỂ CHỈNH SỬA TẬP
         Route::get('edit',[AdminMovieController::class, 'editMovies']);
         //GIAO DIỆN CHỈNH SỬA CÁC TẬP CỦA 1 PHIM
-        Route::get('edit/detail/{server_number}/{slug}',[AdminMovieController::class, 'episodeMovieDetail']);
+        Route::get('edit/detail/{slug}',[AdminMovieController::class, 'episodeMovieDetail']);
+        Route::post('episodes/update/{_id}',[AdminMovieController::class, 'updateEpisodes']);
     });
 
     Route::prefix('categories')->group(function () {
@@ -58,6 +59,7 @@ use App\Http\Controllers\User\MovieDetailsController;
     Route::get('phim/{slug}', [MovieDetailsController::class, 'getMovieDetails']);
     Route::get('phim-tuong-tu/{slug}', [MovieDetailsController::class, 'getSimilarMovies']);
     Route::get('total-movie_details', [MovieDetailsController::class, 'getTotalMovieDetails']);
+    Route::get('phim-v2/{slug}', [MovieDetailsController::class, 'getMovieDetailV2']);
 
 use App\Http\Controllers\User\BlogController;
     Route::get('tin-tuc', [BlogController::class, 'getBlogs']);

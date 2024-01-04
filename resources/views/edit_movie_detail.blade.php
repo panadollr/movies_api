@@ -14,19 +14,27 @@
 </style>
 
 <body>
+<h1 class="ui inverted center aligned header" style="margin-top: 10px;">Chỉnh sửa tập phim : {{$movieDetail->name}} ({{count($ophimEpisodesV2)}} tập)</h1>
 <div class="ui container">
-    <br>
-    <h1 class="ui inverted center aligned header">Chỉnh sửa tập phim trên của phim : {{$movieDetail->name}}</h1>
-<form class="ui inverted form">
-@foreach($ophimEpisodesV2 as $t)
+<form class="ui inverted form" action="{{ url('admin/movies/episodes/update/'. $movieDetail->_id) }}" method="POST">
+@foreach($ophimEpisodesV2 as $episode)
+<div style="border: 2px solid white; margin-top: 10px; padding: 10px">
   <div class="field">
-    <label>First Name</label>
-    <input type="text" name="first-name" placeholder="First Name">
-    <label>First Name</label>
-    <input type="text" name="first-name" placeholder="First Name">
+    <h4 class="ui inverted header">Link_m3u8 {{$episode['slug']}}: <span style="color:#21ba45">{{$episode['link_m3u8']}}</span></h4>
+  </div>
+  <div class="field">
+  <div class="ui labeled input">
+  <div class="ui blue label">
+  Link abyss {{$episode['slug']}}
+  </div>
+  <input name="server_2[{{$episode['slug']}}]" type="text" value="{{$episode['server_2']}}">
+</div>
+  </div>
   </div>
   @endforeach
-  <button class="ui button" type="submit">Submit</button>
+  <br>
+  <center><button class="ui fluid green button" type="submit">Cập nhật</button></center>
+  <br>
 </form>
 </div>
 

@@ -38,20 +38,22 @@ class BlogController
         }
     }
 
-    protected function generateSeoData($title, $description)
+    protected function generateSeoData()
     {
+        $title = "Tổng hợp các review, đánh giá, thông tin phim mới trên Flashmov - flashmov.xyz";
+        $description = "Xem các review, đánh giá, thông tin mới nhất về phim trên Flashmov. Flashmov cung cấp những thông tin chi tiết, đánh giá chân thực để bạn có sự lựa chọn tốt nhất.";
         return [
             'seo_title' =>  $title,
             'seo_description' => $description, 
-            'og_image' => '',
+            'og_image' => "https://res.cloudinary.com/dtilp1gei/image/upload/v1704197910/thumb_blogs_seo.jpg",
             'og_url' => request()->path(),
         ];
     }
 
     public function getBlogs(){
-        $limit = $request->limit ?? 5;
+        $limit = request()->input('limit', 5);
         try {
-        $query = Blog::select(['id', 'title', 'slug', 'poster_url', 'movie_type', 'date']);
+        $query = Blog::select(['id', 'title', 'slug', 'thumb_url', 'movie_type', 'date']);
         
         if($limit == 'all'){
             $blogs = $query->get();
@@ -60,11 +62,10 @@ class BlogController
         }
         $data = [
             'data' => BlogResource::collection($blogs),
-            'seoOnPage' => ''
+            'seoOnPage' => $this->generateSeoData()
          ];
-    
-        return response()->json($data, 200);
-        // return response()->json(new PaginationResource(BlogResource::collection($blog)), 200);
+
+        return response()->json(new PaginationResource($data), 200);
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()], 500);
         }
@@ -77,7 +78,7 @@ class BlogController
         if (!$blogDetail) {
             return response()->json(['error' => 'Blog này không tồn tại !'], 404);
         }
-        return response()->json(new BlogResource($blogDetail), 200);
+        return response()->json(new BlogDetailResource($blogDetail), 200);
 
         } catch (\Throwable $th) {
         return response()->json(['error' => $th->getMessage()], 500);
@@ -86,7 +87,7 @@ class BlogController
 
 
     public function similarBlogs($slug){
-        $limit = $request->limit ?? 5;
+        $limit = request()->input('limit', 5);
         try {
         $blogDetail = Blog::where('slug', $slug)->first();
         $blog = Blog::select(['id', 'title', 'slug', 'poster_url', 'movie_type', 'date'])

@@ -9,13 +9,15 @@ use App\Http\Controllers\User\MovieController;
 class MovieDetailsResource extends JsonResource
 {
     protected $imageDomain;
-    protected $cloudinaryDomain;
+    protected $cloudinaryPosterDomain;
+    protected $cloudinaryThumbDomain;
 
     public function __construct($resource)
     {
         parent::__construct($resource);
         $this->imageDomain = config('api_settings.image_domain');
-        $this->cloudinaryDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_320/uploads/movies/";
+        $this->cloudinaryPosterDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_300/uploads/movies/";
+        $this->cloudinaryThumbDomain = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_320/uploads/movies/";
     }
 
     public function toArray($request)
@@ -72,17 +74,15 @@ class MovieDetailsResource extends JsonResource
     {
         $slug = $movie['slug'];
         $cloudinaryFormat = "-$type.webp";
-        if ($movie['year'] == 2023) {
-            $cloudinaryFormat = "-$type.webp";
-            $imageUrl = $this->cloudinaryDomain . $slug . $cloudinaryFormat;
-        } else {
-            if ($type == 'thumb') {
-                $type = 'poster';
-            } else {
-                $type = 'thumb';
+        $ophimFormat = "-$type.jpg";
+        if ($type == 'thumb') {
+            if($movie['year'] == 2023){
+                $imageUrl = $this->cloudinaryThumbDomain . $slug . $cloudinaryFormat;
+            }else {
+                $imageUrl = $this->imageDomain . $slug . $ophimFormat;
             }
-        
-            $imageUrl = $this->imageDomain . "$slug-$type.jpg";
+        } else {
+            $imageUrl = $this->cloudinaryPosterDomain . $slug . $cloudinaryFormat;
         }
         
         return $imageUrl;

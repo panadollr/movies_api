@@ -78,9 +78,14 @@ class CrawlMovieDetails extends Command
             $query->select(DB::raw(1))
                 ->from('movie_details as md')
                 ->whereColumn('md._id', 'movies._id');
-        })->select('slug')->pluck('slug')->toArray();
-        if (!empty($batch_movie_slugs)) {
-            $this->processMovieDetails($batch_movie_slugs);
+        })->orderBy('slug')->pluck('slug')->toArray();
+        $batch_movie_slugs2 = Movie::orderByDesc('modified_time')
+        ->take(48)->orderBy('slug')->pluck('slug')->toArray();
+
+        $mergedArray = array_unique(array_merge($batch_movie_slugs, $batch_movie_slugs2));
+
+        if (!empty($mergedArray)) {
+            $this->processMovieDetails($mergedArray);
         }
     }
 
