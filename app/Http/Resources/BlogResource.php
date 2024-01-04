@@ -23,6 +23,7 @@ class BlogResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'slug' => $this->slug,
             'thumb_url' => $this->formatImageWithCloudinaryUrl('thumb'),
             'movie_type' => $this->movie_type,
             'date' => '12/2023',
