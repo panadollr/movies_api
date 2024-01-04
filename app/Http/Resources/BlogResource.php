@@ -24,6 +24,7 @@ class BlogResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'slug' => $this->slug,
+            'poster_url' => $this->formatImageWithCloudinaryUrl('thumb'),
             'thumb_url' => $this->formatImageWithCloudinaryUrl('thumb'),
             'movie_type' => $this->movie_type,
             'date' => '12/2023',
