@@ -90,7 +90,7 @@ class BlogController
         $limit = request()->input('limit', 5);
         try {
         $blogDetail = Blog::where('slug', $slug)->first();
-        $blog = Blog::select(['id', 'title', 'slug', 'poster_url', 'movie_type', 'date'])
+        $blog = Blog::select(['id', 'title', 'slug', 'poster_url', 'thumb_url', 'movie_type', 'date'])
         ->where('slug', '!=', $slug)
         ->where('movie_type', $blogDetail->movie_type)
         ->paginate($limit);
