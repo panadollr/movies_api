@@ -50,7 +50,7 @@ class BlogController
         return [
             'seo_title' =>  $title,
             'seo_description' => $description, 
-            'og_image' => "https://res.cloudinary.com/dtilp1gei/image/upload/v1704197910/thumb_blogs_seo.png",
+            'og_image' => "https://res.cloudinary.com/dtilp1gei/image/upload/v1704431920/uploads/movies/thumb_blogs_seo.png",
             'og_url' => request()->path(),
         ];
     }
