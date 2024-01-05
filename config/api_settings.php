@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'website_name' => 'Flashmov',
+    'website_domain' => 'flashmov.xyz',
     'api_domain' => env('API_DOMAIN', 'https://ophim1.com/'),
     'image_domain' => env('IMAGE_DOMAIN', 'https://img.ophim9.cc/uploads/movies/'),
     'facebook_url' => env('APP_FACEBOOK_URL', 'https://www.facebook.com/example'),

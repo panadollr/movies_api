@@ -45,12 +45,12 @@ class BlogController
 
     protected function generateSeoData()
     {
-        $title = "Tổng hợp các review, đánh giá, thông tin phim mới trên Flashmov - flashmov.xyz";
-        $description = "Xem các review, đánh giá, thông tin mới nhất về phim trên Flashmov. Flashmov cung cấp những thông tin chi tiết, đánh giá chân thực để bạn có sự lựa chọn tốt nhất.";
+        $title = "Tổng hợp các tin tức, đánh giá phim mới nhất - Flashmov";
+        $description = "Xem các tin tức, đánh giá mới nhất về phim trên Flashmov. Flashmov cung cấp những thông tin chi tiết, đánh giá chân thực.";
         return [
             'seo_title' =>  $title,
             'seo_description' => $description, 
-            'og_image' => "https://res.cloudinary.com/dtilp1gei/image/upload/v1704197910/thumb_blogs_seo.jpg",
+            'og_image' => "https://res.cloudinary.com/dtilp1gei/image/upload/v1704197910/thumb_blogs_seo.png",
             'og_url' => request()->path(),
         ];
     }
