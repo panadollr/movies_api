@@ -14,14 +14,16 @@ use DateTime;
 
 class BlogController
 {
-    public function addSlug(Request $request){
+    public function addBlog(Request $request){
         $title = $request->title;
+        $slug = Str::slug($title, '-');
         $poster_url = $request->poster_url;
         $thumb_url = $request->thumb_url;
         $content = $request->content;
         $movie_type = $request->movie_type;
         $date = new DateTime();
         try {
+            if (!Blog::where('slug', $slug)->exists()) {
          Blog::create([
             'title' => $title,
             'slug' => Str::slug($title, '-'),
@@ -29,8 +31,11 @@ class BlogController
             'thumb_url' => $poster_url,
             'content' => $content,
             'movie_type' => $movie_type,
-            'date' => $date
+            'date' => new DateTime()
         ]);
+            } else {
+                return response()->json('Tiêu đề đã tồn tại !', 500);
+            }
     
         return response()->json('Thêm bài viết thành công !', 200);
         } catch (\Throwable $th) {

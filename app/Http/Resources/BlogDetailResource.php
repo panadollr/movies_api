@@ -23,7 +23,7 @@ class BlogDetailResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'slug' => $this->slug,
-            'poster_url' => $this->formatImageWithCloudinaryUrl('poster'),
+            'poster_url' => $this->formatImageWithCloudinaryUrl('thumb'),
             'thumb_url' => $this->formatImageWithCloudinaryUrl('thumb'),
             'content' => $this->content,
             'movie_type' => $this->movie_type,
@@ -47,7 +47,7 @@ class BlogDetailResource extends JsonResource
             if ($type == 'thumb') {
                 $imageUrl = $this->cloudinaryThumbDomain . $slug . $cloudinaryFormat;
             } else {
-                $imageUrl = $this->cloudinaryPosterDomain . $slug . $cloudinaryFormat;
+                $imageUrl = $this->cloudinaryThumbDomain . $slug . $cloudinaryFormat;
             }
     
         return $imageUrl;
