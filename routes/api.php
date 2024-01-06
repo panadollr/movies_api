@@ -7,20 +7,26 @@ use Illuminate\Support\Facades\Route;
 //ADMIN
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MovieController as AdminMovieController;
+use App\Http\Controllers\Admin\EpisodeController as AdminEpisodeController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 Route::prefix('admin')->group(function () {
     Route::get('general-infomation', [DashboardController::class, 'generalInformation']);
 
     Route::prefix('movies')->group(function () {
         Route::get('top', [DashboardController::class, 'topMovies']);
-        //GIAO DIỆN HIỂN THỊ DANH SÁCH PHIM ĐỂ CHỈNH SỬA TẬP
-        Route::get('edit',[AdminMovieController::class, 'editMovies']);
-        //GIAO DIỆN CHỈNH SỬA CÁC TẬP CỦA 1 PHIM
-        Route::get('edit/detail/{slug}',[AdminMovieController::class, 'episodeMovieDetail']);
-        Route::post('episodes/update/{_id}',[AdminMovieController::class, 'updateEpisodes']);
+    });
+
+    Route::prefix('episodes')->group(function () {
+        Route::get('',[AdminEpisodeController::class, 'getEpisodes'])->name('episodes.index');
+        Route::get('edit/{slug}',[AdminEpisodeController::class, 'episodeDetail']);
+        Route::post('update/{_id}',[AdminEpisodeController::class, 'updateEpisodes']);
     });
 
     Route::prefix('blogs')->group(function () {
+        Route::get('add-index', function(){
+            return view('admin.blog.add_blog');
+        });
+        Route::post('create', [AdminBlogController::class, 'createBlog']);
         Route::get('edit/{slug}', [AdminBlogController::class, 'getBlogDetail']);
         Route::post('update/{slug}', [AdminBlogController::class, 'updateBlog']);
     });
@@ -71,6 +77,5 @@ use App\Http\Controllers\User\BlogController;
     Route::get('tin-tuc', [BlogController::class, 'getBlogs']);
     Route::get('tin-tuc/{slug}', [BlogController::class, 'blogDetail']);
     Route::get('tin-tuc-tuong-tu/{slug}', [BlogController::class, 'similarBlogs']);
-    Route::get('them-tin-tuc', [BlogController::class, 'addBlog']);
 
 

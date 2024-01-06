@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8">
     <title>{{$blog->title}}</title>
-   
+
     @extends('libraries')
 </head>
 <body >
     <br>
-    <div class="ui container" style="width: 70%;">
+    <div class="ui container">
     <h2 class="ui center aligned header">Chỉnh sửa blog</h2>
         <form class="ui form" action="{{ url('admin/blogs/update/'. $blog->slug) }}" method="post">
         <div class="field">

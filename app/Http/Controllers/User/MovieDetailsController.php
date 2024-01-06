@@ -12,6 +12,7 @@ use App\Http\Controllers\User\MovieController;
 use App\Models\Episode;
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\DB;
 
 class MovieDetailsController
 {
@@ -129,14 +130,16 @@ class MovieDetailsController
             $description = "";
             $movieDetail = $this->movieDetailWithMovieQuery
                                 ->where('slug', $slug)
-                                ->select('type')
+                                ->select('type', 'category', 'country')
                                 ->first();
     
             $similarMoviesQuery = $this->movieController->moviesWithNoTrailer
                 ->select($this->movieController->selectedColumnsV2);
     
             if ($movieDetail) {
-                $similarMoviesQuery->where('type', $movieDetail->type);
+                $similarMoviesQuery->where('type', $movieDetail->type)
+                ->where('category', $movieDetail->category)
+                ->orWhere('country', $movieDetail->country);
             }
     
             $similarMovies = $similarMoviesQuery;

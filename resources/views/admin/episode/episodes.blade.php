@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Movie CMS</title>
+  <title>Episode CMS</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css" integrity="sha512-KXol4x3sVoO+8ZsWPFI/r5KBVB/ssCGB5tsv2nVOKwLg33wTFP3fmnXa47FdSVIshVTgsYk/1734xSk9aFIa4A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
@@ -14,21 +14,48 @@
 </style>
 
 <body>
-  
 
 <div style="padding: 10px;">
-<table class="ui celled padded table">
+<table class="ui celled table">
 <h2 class="ui center aligned header" style="margin-top: 5px; color: white">Chỉnh sửa tập phim</h2>
 
 <center>
-<form action="{{ url('admin/movies/edit') }}" method="GET">  
+<div class="ui stackable three item menu"  style="width: 80%;">
+<a href="{{ url('admin/episodes') }}" class="item {{ empty(request()->all()) ? 'active' : '' }}">Tất cả</a>
+<div class="ui simple dropdown item" >
+    Lọc theo loại phim
+    <i class="dropdown icon"></i>
+    <div class="menu">
+      <a href="{{ url('admin/episodes') }}" class="item {{ empty(request()->all()) ? 'active' : '' }}">Tất cả</a>
+      <a href="{{ url('admin/episodes?type=series') }}" class="item {{ request('type') == 'series' ? 'active' : '' }}">Phim bộ</a>
+      <a href="{{ url('admin/episodes?type=single') }}" class="item {{ request('type') == 'single' ? 'active' : '' }}">Phim lẻ</a>
+    </div>
+  </div>
+
+<a class="item"><form action="{{ url('admin/episodes') }}" method="GET">  
 <div class="ui action input">
-  <input type="text" name="slug" placeholder="Tìm kiếm phim theo slug">
-  <button class="ui icon button">
+  <input style="border: 2px solid black;" type="text" name="searchTerm" placeholder="Tìm kiếm phim theo slug hoặc tên">
+  <button class="ui icon black button">
     <i class="search icon"></i>
   </button>
 </div>
-</form>
+</form></a>
+</div>
+
+<div class="ui stackable borderless menu">
+@php
+    $alphabets = ['A', 'Ă', 'Â', 'B', 'C' ,'D', 'Đ',
+                  'E', 'Ê', 'G', 'H', 'I', 'K', 'L', 'M',
+                  'N', 'O', 'Ô', 'Ơ', 'P', 'Q', 'R',
+                  'S', 'T', 'U', 'Ư', 'V', 'X', 'Y'];
+    @endphp
+
+    <div class="header item">Lọc theo bảng chữ cái</div>
+    @foreach($alphabets as $alphabet)
+    <a href="{{ url('admin/episodes?type=alphabet&alphabet=' . $alphabet) }}" class="item {{ request('alphabet') == $alphabet ? 'active' : '' }}">{{ $alphabet }}</a>
+  @endforeach
+</div>
+
 </center>
 
   <thead>
@@ -51,27 +78,17 @@
       {{$movie->slug}}
       </td>
       <td>
-      @if($movie->type == 'series')
-        Phim bộ
+      @if($movie->type == 'single')
+      Phim lẻ
       @else 
-        Phim lẻ
+        Phim bộ
       @endif
       </td>
       <td>
       @php
-        $episodesServer3Count = 0;
-      @endphp
-      
-      @foreach($episodes as $episode)
-        @if($movie->_id == $episode->_id)
-          @if($episode->server_3 != '')
-            @php
-                $episodesServer3Count++;
-            @endphp
-          @endif
-        @endif
-      @endforeach
-
+        $episodesServer2Count = collect($episodes)->where('_id', $movie->_id)->where('server_2', '!=', '')->count();
+    @endphp
+    
       @php
       $string = str($movie->episode_current);
       if (preg_match('/\((\d+)\/\d+\)/', $string, $matches)) {
@@ -85,10 +102,18 @@
           $number = null;
       }
       @endphp
-    {{$episodesServer3Count}} / {{$number}}
+    {{$episodesServer2Count}} / {{$number}}
+    <span style="margin-left: 10px;"></span>
+    @if($episodesServer2Count == $number )
+    <div class="ui green label">Đã hoàn thành</div>
+    @else
+    <div class="ui black label">Chưa hoàn thành</div>
+    @endif
       </td>
       <td>
-      <button class="ui black button">Server 2 (abyss)</button>
+        <center>
+      <a href="{{ url('admin/episodes/edit/'. $movie->slug) }}" class="ui blue button">Chỉnh sửa Server 2 (abyss)</a>
+      </center>
       </td>
     </tr>
     @endforeach

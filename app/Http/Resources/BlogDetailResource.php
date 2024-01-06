@@ -29,7 +29,7 @@ class BlogDetailResource extends JsonResource
             'movie_type' => $this->movie_type,
             'date' => '12/2023',
             'seoOnPage' => [
-                'seo_title' => $this->title .  "- " .config('api_settings.website_name'),
+                'seo_title' => $this->title .  " - " .config('api_settings.website_name'),
                 'seo_description' => strip_tags(str_replace(["\r", "\n"], '', "$this->content")), 
                 'og_image' => $this->formatImageWithCloudinaryUrl('thumb'),
                 'og_url' => $request->path(),

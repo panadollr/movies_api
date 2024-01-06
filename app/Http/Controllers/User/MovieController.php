@@ -247,8 +247,10 @@ class MovieController
         $description = "Phim $keyword hay tuyển tập, phim $keyword mới nhất, tổng hợp phim $keyword, $keyword full HD, $keyword vietsub, xem $keyword online";
 
         $searchedMovies = $this->moviesWithNoTrailer
-        ->where('name', 'like', '%' . $keyword . '%')->orWhere('origin_name', 'like', '%' . $keyword . '%')
-        ->select($this->selectedColumnsV2);
+            ->where(function($q) use ($keyword) {
+            $q->where('movies.slug', 'LIKE', "%$keyword%")
+              ->orWhere('movies.name', 'LIKE', "%$keyword%");
+        })->select($this->selectedColumnsV2);;
 
         return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
         } catch (\Throwable $th) {
