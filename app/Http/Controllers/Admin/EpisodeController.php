@@ -39,8 +39,8 @@ class EpisodeController
                 $query->whereRaw("SUBSTRING(name, 1, 1) = ?", [$alphabet]);
             }
 
-            $columns = ['movies._id', 'name', 'movies.slug', 'type', 'episode_current'];
-            $result = $query->select($columns)->paginate(8);
+            $columns = ['movies._id', 'name', 'movies.slug', 'type', 'time', 'poster_url', 'episode_current'];
+            $result = $query->select($columns)->paginate(6);
             $result->appends(request()->query());
 
             return $result;

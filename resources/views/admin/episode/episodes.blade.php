@@ -60,8 +60,10 @@
 
   <thead>
     <tr><th>Tên phim</th>
+    <th>Ảnh</th>
     <th >slug</th>
     <th >Loại phim</th>
+    <th >Thời lượng</th>
     <th>Số tập phim đã có trên server 2 (abyss)</th>
     <th class="three wide">Tùy chỉnh</th>
   </tr></thead>
@@ -75,6 +77,13 @@
       {{$movie->name}}
       </td>
       <td>
+      @php 
+      $file_name = $movie->poster_url;
+      $new_file_name = str_replace(".jpg", ".webp", $file_name);
+      @endphp
+      <img src="https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_70/uploads/movies/{{$new_file_name}}" alt="" srcset="">
+      </td>
+      <td>
       {{$movie->slug}}
       </td>
       <td>
@@ -83,6 +92,9 @@
       @else 
         Phim bộ
       @endif
+      </td>
+      <td>
+        {{$movie->time}}
       </td>
       <td>
       @php
