@@ -9,6 +9,13 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MovieController as AdminMovieController;
 use App\Http\Controllers\Admin\EpisodeController as AdminEpisodeController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\URL;
+
+if(App::environment('production')){
+    URL::forceScheme('https');
+}
+
 Route::prefix('admin')->group(function () {
     Route::get('general-infomation', [DashboardController::class, 'generalInformation']);
 

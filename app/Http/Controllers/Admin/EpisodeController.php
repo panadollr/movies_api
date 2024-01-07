@@ -139,7 +139,7 @@ class EpisodeController
             }
         }
         
-        return response()->json(['msg' => 'Đã cập nhật thành công !'], 200);
+        // return redirect()->route('episodes.index');
     }
 
 }

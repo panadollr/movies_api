@@ -80,7 +80,7 @@ class CrawlMovieDetails extends Command
                 ->whereColumn('md._id', 'movies._id');
         })->orderBy('slug')->pluck('slug')->toArray();
         $batch_movie_slugs2 = Movie::orderByDesc('modified_time')
-        ->take(48)->orderBy('slug')->pluck('slug')->toArray();
+        ->take(120)->orderBy('slug')->pluck('slug')->toArray();
 
         $mergedArray = array_unique(array_merge($batch_movie_slugs, $batch_movie_slugs2));
 
