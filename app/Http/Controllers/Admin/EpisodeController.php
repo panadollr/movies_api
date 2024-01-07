@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 
 use App\Models\Movie;
 use App\Models\Episode;
+use App\Models\MovieDetails;
 
 class EpisodeController 
 {
@@ -138,8 +139,10 @@ class EpisodeController
                     }
             }
         }
+
+        $movieDetail = Movie::where('_id', $_id)->select('slug')->first();
         
-        return redirect()->route('episodes.index');
+        return redirect("admin/episodes?searchTerm=$movieDetail->slug");
     }
 
 }
