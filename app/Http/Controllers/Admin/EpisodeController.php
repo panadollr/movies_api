@@ -139,7 +139,7 @@ class EpisodeController
             }
         }
         
-        // return redirect()->route('episodes.index');
+        return redirect()->route('episodes.index');
     }
 
 }
