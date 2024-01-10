@@ -25,6 +25,7 @@ class MovieDetailsResource extends JsonResource
     $movie = $this['movie'];
     $ophimEpisodes = $this['ophim_episodes'];
     $db_episodes = $this['db_episodes'];
+    $categoryConfig = config('api_settings.categories');
 
     $movieArray = !empty($movie) ? [
         'modified_time' => $movie['modified_time'],
@@ -35,10 +36,10 @@ class MovieDetailsResource extends JsonResource
         'content' => $movie['content'],
         'type' => $movie['type'],
         'status' => $movie['status'],
-        // 'thumb_url' => $this->imageDomain . $movie['poster_url'],
-        'thumb_url' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
-        // 'poster_url' => $this->imageDomain . $movie['thumb_url'],
-        'poster_url' => $this->formatImageWithCloudinaryUrl($movie, 'poster'),
+        'thumb_url' => $this->imageDomain . $movie['poster_url'],
+        'poster_url' => $this->imageDomain . $movie['thumb_url'],
+        // 'thumb_url' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
+        // 'poster_url' => $this->formatImageWithCloudinaryUrl($movie, 'poster'),
         'is_copyright' => $movie['is_copyright'],
         'sub_docquyen' => (bool) $movie['sub_docquyen'],
         'trailer_url' => $movie['trailer_url'],
@@ -51,9 +52,7 @@ class MovieDetailsResource extends JsonResource
         'showtimes' => $movie['showtimes'],
         'year' => $movie['year'],
         'view' => $movie['view'],
-        // 'actor' => json_decode($movie['actor']),
-        // 'director' => json_decode($movie['director']),
-        'category' => $this->formattedCategoriesArray($movie, 'category'),
+        'category' => $this->formattedJsonWithConfig($movie['category'], $categoryConfig),
     ] : [];
 
     return [
@@ -63,8 +62,8 @@ class MovieDetailsResource extends JsonResource
         'seoOnPage' => !empty($movie) ? [
             'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]" ." - ". count($ophimEpisodes) . ' tập',
             'seo_description' => strip_tags($movie['content']), 
-            // 'og_image' => $this->imageDomain . $movie['poster_url'],
-            'og_image' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
+            'og_image' => $this->imageDomain . $movie['poster_url'],
+            // 'og_image' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
             'og_url' => $request->path(),
         ] : [],
     ];
@@ -88,30 +87,29 @@ class MovieDetailsResource extends JsonResource
         return $imageUrl;
     }
 
-    protected function formattedArray($movie, $propertyName)
-    {
-        $propertyValue = $movie[$propertyName];
+//     protected function formattedCategoriesArray($movie, $propertyName)
+// {
+//     $categories = config('api_settings.categories');
+//     $propertyValue = collect(json_decode($movie[$propertyName], true))->pluck('slug')->toArray();
+//     $filteredCategories = array_intersect_key($categories, array_flip($propertyValue));
+//     $formattedCategories = array_map(function ($name) {
+//         return ['name' => $name];
+//     }, $filteredCategories);
 
-        return array_map(function ($item) {
-                return ['name' => $item['name']];
-            }, json_decode($propertyValue, true));
-    }
+//     return array_values($formattedCategories);
+// }
 
+protected function formattedJsonWithConfig($jsonData, $arrayConfig)
+{
+    $propertyValue = collect(json_decode($jsonData, true))->pluck('slug')->toArray();
+    $filteredArrayConfig = array_intersect_key($arrayConfig, array_flip($propertyValue));
+    $formattedJsonData = array_map(function ($name) {
+        return ['name' => $name];
+    }, $filteredArrayConfig);
 
-    protected function formattedCategoriesArray($movie, $propertyName)
-    {
-        $categories = config('api_settings.categories');
-        $propertyValue = collect(json_decode($movie[$propertyName], true))->pluck('slug')->toArray();
+    return array_values($formattedJsonData);
+}
 
-        $filteredCategories = [];
-        foreach ($propertyValue as $categorySlug) {
-            if (array_key_exists($categorySlug, $categories)) {
-                $filteredCategories[] = ['name' => $categories[$categorySlug]];
-            }
-        }
-
-        return array_values($filteredCategories);
-    }
 
 protected function formattedEpisodes($ophimEpisodes, $db_episodes)
 {
@@ -124,7 +122,6 @@ protected function formattedEpisodes($ophimEpisodes, $db_episodes)
             "link_m3u8" => $ophimEpisode['link_m3u8'],
             "server_1" => $ophimEpisode['link_embed'],
             "server_2" => $db_episodes[$ophimEpisodeSlug]['server_2'] ?? "",
-            "server_3" => $db_episodes[$ophimEpisodeSlug]['server_3'] ?? "",
         ];
 
         $ophimEpisodesV2[] = $episodeV2;

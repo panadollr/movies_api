@@ -30,6 +30,22 @@ class MovieDetails extends Model
         'category',
         'country'
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONS
+    |--------------------------------------------------------------------------
+    */
+
+    public function movie()
+    {
+        return $this->hasMany(Movie::class, '_id', '_id'); // Thay 'foreign_key' bằng khóa ngoại thực tế
+    }
+
+    public function episodes()
+    {
+        return $this->hasMany(Episode::class, '_id', '_id'); // Thay 'foreign_key' bằng khóa ngoại thực tế
+    }
 }
 
 

@@ -24,6 +24,7 @@ class DashboardController
 
     public function generalInformation()
 {
+    try {
     $cacheKey = 'movies_info';
     $data = cache()->remember($cacheKey, 120, function () {
         $totalMovies = Movie::count();
@@ -38,6 +39,10 @@ class DashboardController
         return response()->json(['error' => 'Không có dữ liệu !'], 404);
     }
     return response()->json($data, 200);
+} catch (\Throwable $th) {
+    //throw $th;
+    return response()->json($th->getMessage(), 500);
+}
 }
 
 

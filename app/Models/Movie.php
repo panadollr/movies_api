@@ -27,7 +27,7 @@ class Movie extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function movieDetails()
+    public function movie_details()
     {
         return $this->hasOne(MovieDetails::class, '_id', '_id'); // Thay 'foreign_key' bằng khóa ngoại thực tế
     }

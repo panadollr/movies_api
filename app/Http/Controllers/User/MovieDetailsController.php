@@ -81,7 +81,7 @@ class MovieDetailsController
                 return response()->json(new MovieDetailsResource($data), 200);
             }
                 $ophimEpisodes = $this->getOphimEpisodes($slug);
-                $db_episodes = Episode::where('_id', $movieDetails->_id)->select('slug', 'server_2', 'server_3')
+                $db_episodes = Episode::where('_id', $movieDetails->_id)->select('slug', 'server_2')
                 ->get()->keyBy('slug')->toArray();
             
                 $data = [
@@ -97,31 +97,6 @@ class MovieDetailsController
         // });
     }
 
-    public function getMovieDetailV2(){
-        try {
-        $movie = Movie::where('slug', 'quai-hiep-nhat-chi-mai')->first();
-
-        if ($movie && $movie->movieDetails()->exists()) {
-            // $movieDetails = $movie->movieDetails + $movie;
-            $movieDetails = $movie->toArray() + $movie->movieDetails->toArray();
-            $ophimEpisodes = $this->getOphimEpisodes('quai-hiep-nhat-chi-mai');
-            $db_episodes = $movie->episodes->pluck('slug', 'server_2', 'server_3')->keyBy('slug')->toArray();
-
-            // $data = [
-            //     'movie' => $movieDetails,
-            //     'ophim_episodes' => $ophimEpisodes,
-            //     'db_episodes' => $db_episodes
-            //     ];
-            //     return response()->json(new MovieDetailsResource($data), 200);
-            return $db_episodes;
-        } else {
-            return "No movie details found for the specified movie.";
-        }
-        } catch (\Throwable $th) {
-            return $th->getMessage();
-        }
-    } 
-
 
     //CÁC PHIM TƯƠNG TỰ
     public function getSimilarMovies($slug){
@@ -130,16 +105,19 @@ class MovieDetailsController
             $description = "";
             $movieDetail = $this->movieDetailWithMovieQuery
                                 ->where('slug', $slug)
-                                ->select('type', 'category', 'country')
+                                ->select('slug', 'type', 'category', 'country')
                                 ->first();
     
             $similarMoviesQuery = $this->movieController->moviesWithNoTrailer
                 ->select($this->movieController->selectedColumnsV2);
     
             if ($movieDetail) {
-                $similarMoviesQuery->where('type', $movieDetail->type)
-                ->where('category', $movieDetail->category)
-                ->orWhere('country', $movieDetail->country);
+                $similarMoviesQuery->where('movies.slug', '!=', $movieDetail->slug)
+                ->where(function ($query) use ($movieDetail) {
+                    $query->where('type', $movieDetail->type)
+                        ->where('category', $movieDetail->category)
+                        ->orWhere('country', $movieDetail->country);
+                });
             }
     
             $similarMovies = $similarMoviesQuery;

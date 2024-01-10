@@ -81,8 +81,8 @@ class CrawlMovies extends Command
         // $total = 1045;
         // $batchSize = 20;
 
-        $total = 10;
-        $batchSize = 5;
+        $total = 100;
+        $batchSize = 10;
     
         for ($start = 1; $start <= $total; $start += $batchSize) {
             $end = min($start + $batchSize - 1, $total);

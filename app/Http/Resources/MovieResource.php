@@ -6,7 +6,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 use App\Models\Movie;
 
-
 class MovieResource extends JsonResource
 {
     protected $imageDomain;
@@ -35,10 +34,10 @@ class MovieResource extends JsonResource
             'id' => $this->_id,
             'name' => $this->name,
             'origin_name' => $this->origin_name,
-            // 'poster_url' => $this->formatImageUrl($this->thumb_url),
-            'poster_url' => $this->formatImageWithCloudinaryUrl('poster'),
-            // 'thumb_url' => $this->formatImageUrl($this->poster_url),
-            'thumb_url' => $this->formatImageWithCloudinaryUrl('thumb'),
+            'poster_url' => $this->formatImageUrl($this->thumb_url),
+            'thumb_url' => $this->formatImageUrl($this->poster_url),
+            // 'poster_url' => $this->formatImageWithCloudinaryUrl('poster'),
+            // 'thumb_url' => $this->formatImageWithCloudinaryUrl('thumb'),
             'slug' => $this->slug,
             'year' => $this->year,
             'content' => $this->content,
@@ -73,7 +72,13 @@ class MovieResource extends JsonResource
                     $imageUrl = $this->imageDomain . $slug . $ophimFormat;
                 }
             } else {
-                $imageUrl = $this->cloudinaryPosterDomain . $slug . $cloudinaryFormat;
+                $modifiedTimeTimestamp = strtotime($this->modified_time);
+                $targetDateTimestamp = strtotime("10/1/2024");
+                if($modifiedTimeTimestamp > $targetDateTimestamp){
+                    $imageUrl = $this->imageDomain . $slug . $ophimFormat;
+                }else {
+                    $imageUrl = $this->cloudinaryPosterDomain . $slug . $cloudinaryFormat;
+                }
             }
         
         return $imageUrl;
