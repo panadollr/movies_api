@@ -36,8 +36,10 @@ class MovieDetailsResource extends JsonResource
         'content' => $movie['content'],
         'type' => $movie['type'],
         'status' => $movie['status'],
-        'thumb_url' => $this->imageDomain . $movie['poster_url'],
-        'poster_url' => $this->imageDomain . $movie['thumb_url'],
+        // 'thumb_url' => $this->imageDomain . $movie['poster_url'],
+        // 'poster_url' => $this->imageDomain . $movie['thumb_url'],
+        'thumb_url' => $this->formatOphimImageUrl($movie['poster_url']),
+        'poster_url' => $this->formatOphimImageUrl($movie['thumb_url']),
         // 'thumb_url' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
         // 'poster_url' => $this->formatImageWithCloudinaryUrl($movie, 'poster'),
         'is_copyright' => $movie['is_copyright'],
@@ -62,11 +64,18 @@ class MovieDetailsResource extends JsonResource
         'seoOnPage' => !empty($movie) ? [
             'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]" ." - ". count($ophimEpisodes) . ' tập',
             'seo_description' => strip_tags($movie['content']), 
-            'og_image' => $this->imageDomain . $movie['poster_url'],
+            'thumb_url' => $this->formatOphimImageUrl($movie['poster_url']),
             // 'og_image' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
             'og_url' => $request->path(),
         ] : [],
     ];
+}
+
+//poster va thumbnail ophim
+protected function formatOphimImageUrl($url)
+{
+        return $url ? "https://ophim9.cc/_next/image?url=http%3A%2F%2Fimg.ophim1.com%2Fuploads%2Fmovies%2F$url&w=256&q=75" : null;
+    
 }
 
     protected function formatImageWithCloudinaryUrl($movie, $type)
@@ -86,18 +95,6 @@ class MovieDetailsResource extends JsonResource
         
         return $imageUrl;
     }
-
-//     protected function formattedCategoriesArray($movie, $propertyName)
-// {
-//     $categories = config('api_settings.categories');
-//     $propertyValue = collect(json_decode($movie[$propertyName], true))->pluck('slug')->toArray();
-//     $filteredCategories = array_intersect_key($categories, array_flip($propertyValue));
-//     $formattedCategories = array_map(function ($name) {
-//         return ['name' => $name];
-//     }, $filteredCategories);
-
-//     return array_values($formattedCategories);
-// }
 
 protected function formattedJsonWithConfig($jsonData, $arrayConfig)
 {
