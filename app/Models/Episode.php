@@ -9,8 +9,8 @@ class Episode extends Model
 {
     protected $table = 'episodes';
     public $timestamps = false;
-    // protected $primaryKey = 'movie_id';
     protected $fillable =[
+        'episode_id',
         '_id',
         'slug',
         'server_1',

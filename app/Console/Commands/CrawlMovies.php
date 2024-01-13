@@ -211,18 +211,28 @@ protected function processMovies($movies_data)
                             $newMovies[] = $newMovie;
                     
                             // ... Cloudinary upload...
-                            $posterUrl = "https://img.ophim9.cc/uploads/movies/{$result->thumb_url}";
+                            //upload poster
+                            $posterUrl = "https://img.ophim10.cc/uploads/movies/{$result->thumb_url}";
                             if (preg_match('/\/movies\/([^\/]+)-thumb\.jpg$/', $posterUrl, $matches)) {
                                 $slug = $matches[1];
-                                $posterTransformation = ['width' => 450];
-                                $this->uploadImageToCloudinary($slug, 'poster', $posterUrl, $posterTransformation);
+                                $quality = '50';
+                                $posterTransformation = [
+                                    'width' => 500,
+                                    'crop' => 'scale'
+                                ];
+                                $this->uploadImageToCloudinary('posters', $slug, 'poster', $posterUrl, $quality, $posterTransformation);
                             }
 
-                            $thumbUrl = "https://img.ophim9.cc/uploads/movies/{$result->poster_url}";
-                            if (preg_match('/\/movies\/([^\/]+)-thumb\.jpg$/', $posterUrl, $matches)) {
+                            //upload thumbnail
+                            $thumbUrl = "https://img.ophim10.cc/uploads/movies/{$result->poster_url}";
+                            if (preg_match('/\/movies\/([^\/]+)-poster\.jpg$/', $thumbUrl, $matches)) {
                                 $slug = $matches[1];
-                                $thumbTransformation = ['width' => 1920, 'height' => 1080];
-                                $this->uploadImageToCloudinary($slug, 'thumb', $thumbUrl, $thumbTransformation);
+                                $quality = '55';
+                                $thumbTransformation = [
+                                            'width' => 1000,
+                                            'crop' => 'scale'
+                                        ];
+                                $this->uploadImageToCloudinary('thumbs', $slug, 'thumb', $thumbUrl, $quality, $thumbTransformation);
                             }
                             } 
 
@@ -248,17 +258,14 @@ protected function processMovies($movies_data)
 }
 
  // ... Cloudinary upload logic...
-protected function uploadImageToCloudinary($slug, $format, $url, $transformation = []) {
+protected function uploadImageToCloudinary($saveFolder, $slug, $type, $url, $quality, $transformation = []) {
     try {
-        $publicId = "uploads/movies/$slug-$format";
+        $publicId = "$saveFolder/$slug-$type";
         return Cloudinary::upload($url, [
             'format' => 'webp',
             'public_id' => $publicId,
-            'options' => [
-                'format' => 'webp',
-                'quality' => 'auto',
-                'overwrite' => false,
-            ],
+            'quality' => $quality,
+            'overwrite' => false,
             'transformation' => $transformation,
         ]);
     } catch (\Throwable $th) {

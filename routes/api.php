@@ -77,7 +77,7 @@ use App\Http\Controllers\User\MovieController;
 use App\Http\Controllers\User\MovieDetailsController;
     Route::get('phim/{slug}', [MovieDetailsController::class, 'getMovieDetails']);
     Route::get('phim-tuong-tu/{slug}', [MovieDetailsController::class, 'getSimilarMovies']);
-    Route::get('total-movie_details', [MovieDetailsController::class, 'getTotalMovieDetails']);
+    Route::get('phim-v2/{slug}/{episode_slug}', [MovieDetailsController::class, 'getMovieDetailV2']);
     Route::get('phim-v2/{slug}', [MovieDetailsController::class, 'getMovieDetailV2']);
 
 use App\Http\Controllers\User\BlogController;

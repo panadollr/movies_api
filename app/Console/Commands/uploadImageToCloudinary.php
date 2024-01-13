@@ -18,179 +18,104 @@ class UploadImageToCloudinary extends Command
 
     public function handle()
     {
-        // $this->info('uploading images to cloudinary...');
-        // $this->uploadPoster();
-        // // $this->uploadThumb();
-        // $this->info('uploaded images to cloudinary successfully');
-
-        // $slug = "nhanh-hon-nua-di-anh";
-        // $posterUrl = "https://img.ophim9.cc/uploads/movies/$slug-thumb.jpg";
-        // $posterTransformation = ['width' => 450];
-        // $this->uploadImageToCloudinary($slug, 'poster', $posterUrl, $posterTransformation);
-
         $this->info('uploading images to cloudinary...');
-        // $this->getUnuploadMoviePosters();
-        $this->getUnuploadMovieThumbs();
+        $this->uploadPosters();
+        // $this->uploadThumbs();
         $this->info('uploaded images to cloudinary successfully');
                     
     }
 
-
-    protected function getUnuploadMoviePosters()
-{
+    // ... Cloudinary upload logic...
+protected function uploadImageToCloudinary($saveFolder, $slug, $type, $url, $quality, $transformation = []) {
     try {
-    $client = new Client();
-    $promises = [];
-    $movies = Movie::select('slug', 'thumb_url')->get();
-
-    foreach ($movies as $movie) {
-        if (preg_match('/([^\/]+)-thumb\.jpg$/', $movie->thumb_url, $matches)) {
-            $cloudinaryPosterUrl = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_50/uploads/movies/{$matches[1]}-poster.webp";
-        }
-
-        $promises[] = $client->getAsync($cloudinaryPosterUrl, ['connect_timeout' => 3])->then(
-            function ($response) use ($movie) {
-                if ($response->getStatusCode() != 200) {
-                    $posterUrl = "https://img.ophim9.cc/uploads/movies/{$movie->thumb_url}";
-                    if (preg_match('/\/movies\/([^\/]+)-thumb\.jpg$/', $posterUrl, $matches)) {
-                        $slug = $matches[1];
-                        $posterTransformation = ['width' => 450];
-                        $this->uploadImageToCloudinary($slug, 'poster', $posterUrl, $posterTransformation);
-                    }
-                }
-            }
-        );
-    }
-
-    Utils::all($promises)->wait();
-} catch (\Throwable $th) {
-    //throw $th;
-}
-}
-
-
-protected function getUnuploadMovieThumbs()
-{
-    try {
-    $client = new Client();
-    $promises = [];
-    //6960
-    $movies = Movie::select('slug', 'poster_url')->skip(3000)->take(3000)->get();
-
-        foreach ($movies as $movie) {
-        if (preg_match('/([^\/]+)-poster\.jpg$/', $movie->poster_url, $matches)) {
-        $cloudinaryPosterUrl = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_50/uploads/movies/{$matches[1]}-thumb.webp";
-    }
-        $promises[] = $client->getAsync($cloudinaryPosterUrl)->then(
-            function ($response) use ($movie) {
-                // Process successful response here if needed
-            },
-            function (RequestException $e) use ($movie) {
-                $thumbUrl = "https://img.ophim10.cc/uploads/movies/{$movie->poster_url}";
-                if (preg_match('/\/movies\/([^\/]+)-poster\.jpg$/', $thumbUrl, $matches)) {
-                    $slug = $matches[1];
-                    $thumbTransformation = ['width' => 1280, 'height' => 720];
-                    $this->uploadImageToCloudinary($slug, 'thumb', $thumbUrl, $thumbTransformation);
-                }
-            }
-        );
-    }
-
-    // Wait for all promises to settle
-    Utils::all($promises)->wait();
-        } catch (\Throwable $th) {
-        }
-}
-
-
-     // ... Cloudinary upload logic...
-protected function uploadImageToCloudinary($slug, $format, $url, $transformation = []) {
-    try {
-        $publicId = "uploads/movies/$slug-$format";
+        $publicId = "$saveFolder/$slug-$type";
         return Cloudinary::upload($url, [
             'format' => 'webp',
             'public_id' => $publicId,
-            'options' => [
-                'format' => 'webp',
-                'quality' => 'auto',
-                'overwrite' => false,
-            ],
+            'quality' => $quality,
+            'overwrite' => false,
             'transformation' => $transformation,
         ]);
-        print_r('uploaded 1 poster !');
     } catch (\Throwable $th) {
       
     }
  }
 
-public function uploadPoster()
+//     protected function uploadPosters()
+// {
+//     try {
+//     $client = new Client();
+//     $promises = [];
+//     // $movies = Movie::select('slug', 'thumb_url')->get();
+//     $movies = Movie::select('slug', 'thumb_url')->take(1)->get();
+
+//     foreach ($movies as $movie) {
+//         if (preg_match('/([^\/]+)-thumb\.jpg$/', $movie->thumb_url, $matches)) {
+//             $cloudinaryPosterUrl = "https://res.cloudinary.com/dtilp1gei/image/upload/c_thumb,w_50/uploads/movies/{$matches[1]}-poster.webp";
+//         }
+
+//         $promises[] = $client->getAsync($cloudinaryPosterUrl, ['connect_timeout' => 3])->then(
+//             function ($response) use ($movie) {
+//                 if ($response->getStatusCode() != 200) {
+//                     $posterUrl = "https://img.ophim9.cc/uploads/movies/{$movie->thumb_url}";
+//                     if (preg_match('/\/movies\/([^\/]+)-thumb\.jpg$/', $posterUrl, $matches)) {
+//                         $slug = $matches[1];
+//                         $posterTransformation = [
+//                             'width' => 300,
+//                             'crop' => 'scale'
+//                         ];
+//                         $quality ='45';
+//                         $this->uploadImageToCloudinary('posters', $slug, 'poster', $posterUrl, $quality, $posterTransformation);
+//                     }
+//                 }
+//             }
+//         );
+//     }
+
+//     Utils::all($promises)->wait();
+// } catch (\Throwable $th) {
+//     //throw $th;
+// }
+// }
+
+protected function uploadPosters()
 {
-    $batchSize = 100;
-    $offset = Movie::count() - $batchSize; // lưu ý 
-
-        // $batchMovieThumbUrls = Movie::where('year', 2023)
-        // ->pluck('thumb_url')
-        // // ->skip(1240)
-        // ->toArray();
-
-        // $batchMovieThumbUrls = Movie::skip($offset)
-        //     ->where('year', 2023)
-        //     ->take($batchSize)
-        //     ->pluck('thumb_url')
-        //     ->toArray();
-        
-        // $batchMovieThumbUrls = Movie::where('year', 2023)
-        // ->orderByDesc('modified_time')
-        // ->take($batchSize)
-        // ->pluck('thumb_url')
-        // ->toArray();
-
-        $batchMovieThumbUrls = Movie::pluck('thumb_url')
-        ->toArray();
-
-        // ... Cloudinary upload...
-        foreach ($batchMovieThumbUrls as $thumbUrl) {
-        $posterUrl = "https://img.ophim9.cc/uploads/movies/{$thumbUrl}";
-        if (preg_match('/\/movies\/([^\/]+)-thumb\.jpg$/', $posterUrl, $matches)) {
-            $slug = $matches[1];
-            $posterTransformation = ['width' => 450];
-            $this->uploadImageToCloudinary($slug, 'poster', $posterUrl, $posterTransformation);
-            print_r('uploaded 1 poster !');
-        }
-        }
+    $movies = Movie::select('slug', 'thumb_url')->skip(0)->take(3000)->get();
+    // Movie::orderBy('_id')->select('slug', 'thumb_url')->chunk(200, function ($movies) {
+    foreach ($movies as $movie) {
+                    $posterUrl = "https://img.ophim10.cc/uploads/movies/{$movie->thumb_url}";
+                    if (preg_match('/\/movies\/([^\/]+)-thumb\.jpg$/', $posterUrl, $matches)) {
+                        $slug = $matches[1];
+                        $posterTransformation = [
+                            'width' => 500,
+                            'crop' => 'scale'
+                        ];
+                        $quality ='50';
+                        $this->uploadImageToCloudinary('posters', $slug, 'poster', $posterUrl, $quality, $posterTransformation);
+                    }
+    }
+// });
 }
 
 
-public function uploadThumb()
+protected function uploadThumbs()
 {
-    $batchSize = 100;
-    $offset = Movie::count() - $batchSize; // lưu ý 
-
-        // $batchMoviePosterUrls = Movie::where('year', 2023)
-        // ->pluck('poster_url')
-        // // ->skip(1240)
-        // ->toArray();
-
-        // $batchMoviePosterUrls = Movie::skip($offset)
-        //     ->where('year', 2023)
-        //     ->take($batchSize)
-        //     ->pluck('poster_url')
-        //     ->toArray();
-
-        $batchMoviePosterUrls = Movie::where('year', 2023)
-            ->orderByDesc('modified_time')
-            ->take($batchSize)
-            ->pluck('poster_url')
-            ->toArray();
-
-        foreach ($batchMoviePosterUrls as $posterUrl) {
-            $thumbUrl = "https://img.ophim9.cc/uploads/movies/{$posterUrl}";
-            $slug = preg_replace('/-poster\.jpg$/', '', $posterUrl);
-            $thumbTransformation = ['width' => 1920, 'height' => 1080];
-            $this->uploadImageToCloudinary($slug, 'thumb', $thumbUrl, $thumbTransformation);
-            print_r('uploaded 1 thumb !');
-        }
+    Movie::orderBy('_id')->select('slug', 'poster_url')->chunk(200, function ($movies) {
+        foreach ($movies as $movie) {
+                $thumbUrl = "https://img.ophim10.cc/uploads/movies/{$movie->poster_url}";
+                if (preg_match('/\/movies\/([^\/]+)-poster\.jpg$/', $thumbUrl, $matches)) {
+                    $slug = $matches[1];
+                    $thumbTransformation = [
+                        'width' => 1000,
+                        'crop' => 'scale'
+                    ];
+                    $quality ='55';
+                    $this->uploadImageToCloudinary('thumbs', $slug, 'thumb', $thumbUrl, $quality, $thumbTransformation);
+                }
+    }
+});
 }
+
 
 
 }

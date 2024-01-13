@@ -119,6 +119,7 @@ class EpisodeController
     }
 
     public function updateEpisodes(Request $request, $_id){
+        try {
         $server2Data = $request->input('server_2');
         foreach($server2Data as $key => $value){
             if ($value !== null && $value !== '') {
@@ -143,6 +144,9 @@ class EpisodeController
         $movieDetail = Movie::where('_id', $_id)->select('slug')->first();
         
         return redirect("admin/episodes?searchTerm=$movieDetail->slug");
+    } catch (\Throwable $th) {
+        return response()->json(['error' => $th->getMessage()], 500);
+    }
     }
 
 }

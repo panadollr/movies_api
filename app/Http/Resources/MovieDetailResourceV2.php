@@ -4,9 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-use App\Http\Controllers\User\MovieController;
-
-class MovieDetailsResource extends JsonResource
+class MovieDetailResourceV2 extends JsonResource
 {
     protected $imageDomain;
     protected $cloudinaryPosterDomain;
@@ -23,8 +21,9 @@ class MovieDetailsResource extends JsonResource
     public function toArray($request)
 {
     $movie = $this['movie'];
-    $ophimEpisodes = $this['ophim_episodes'];
-    $db_episodes = $this['db_episodes'];
+    $ophimEpisodes = $this['ophimEpisodes'];
+    $dbEpisodes = $this['dbEpisodes'];
+    $episodeSlug = $this['episodeSlug'];
     $categoryConfig = config('api_settings.categories');
 
     $movieArray = !empty($movie) ? [
@@ -36,12 +35,8 @@ class MovieDetailsResource extends JsonResource
         'content' => $movie['content'],
         'type' => $movie['type'],
         'status' => $movie['status'],
-        // 'thumb_url' => $this->imageDomain . $movie['poster_url'],
-        // 'poster_url' => $this->imageDomain . $movie['thumb_url'],
         'thumb_url' => $this->formatOphimImageUrl($movie['poster_url']),
         'poster_url' => $this->formatOphimImageUrl($movie['thumb_url']),
-        // 'thumb_url' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
-        // 'poster_url' => $this->formatImageWithCloudinaryUrl($movie, 'poster'),
         'is_copyright' => $movie['is_copyright'],
         'sub_docquyen' => (bool) $movie['sub_docquyen'],
         'trailer_url' => $movie['trailer_url'],
@@ -57,15 +52,16 @@ class MovieDetailsResource extends JsonResource
         'category' => $this->formattedJsonWithConfig($movie['category'], $categoryConfig),
     ] : [];
 
-    $formattedEpisodes = $this->formattedEpisodes($ophimEpisodes, $db_episodes, $movie);
+    $episodes = $this->formattedEpisodes($ophimEpisodes, $dbEpisodes);
+    $episodeCurrent = $this->getEpisodeCurrent($episodes, $episodeSlug);
 
     return [
+        'episodeCurrent' => $episodeCurrent,
         'movie' => $movieArray,
-        // 'episodes' => $this['episodes'] ?? [],
-        'episodes' => $formattedEpisodes,
+        'episodes' => $episodes,
         'seoOnPage' => !empty($movie) ? [
             // 'seo_title2' => $this->formattedSeoTitle($movie, $formattedCurrenEpisode),
-            'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]" ." - ". count($ophimEpisodes) . ' tập',
+            'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]" ." - tập",
             'seo_description' => strip_tags($movie['content']), 
             'thumb_url' => $this->formatOphimImageUrl($movie['poster_url']),
             // 'og_image' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
@@ -73,6 +69,7 @@ class MovieDetailsResource extends JsonResource
         ] : [],
     ];
 }
+
 
 //poster va thumbnail ophim
 protected function formatOphimImageUrl($url)
@@ -109,30 +106,58 @@ protected function formattedJsonWithConfig($jsonData, $arrayConfig)
     return array_values($formattedJsonData);
 }
 
-
-protected function formattedEpisodes($ophimEpisodes, $db_episodes)
-{
-    $ophimEpisodesV2 = [];
-    foreach ($ophimEpisodes as $ophimEpisode) {
-
-        $episodeV2 = [
-            "name" => $ophimEpisode['name'],
-            "slug" => $ophimEpisode['slug'],
-            "link_m3u8" => $ophimEpisode['link_m3u8'],
-            "server_1" => $ophimEpisode['link_embed'],
-            "server_2" => $db_episodes[$ophimEpisode['slug']]['server_2'] ?? "",
+protected function formattedEpisodes($formattedOphimEpisodes, $dbEpisodes){
+    $episodes = [];
+    foreach ($formattedOphimEpisodes as $formattedOphimEpisode) {
+        $episode = [
+            'name' => $formattedOphimEpisode['name'],
+            'slug' => $formattedOphimEpisode['slug'],
+            'link_m3u8' => $formattedOphimEpisode['link_m3u8'],
+            'links' => [],
         ];
 
-        $ophimEpisodesV2[] = $episodeV2;
+        $defaultLink = [
+            "server_name" => "Vietsub #1",
+            "link_embed" => $formattedOphimEpisode['link_embed'],
+        ];
+
+        $episode['links'][] = $defaultLink;
+        $servers = []; 
+
+        foreach ($dbEpisodes as $dbEpisode) {
+            $serverName = $dbEpisode['server_name'];
+            $slug = $dbEpisode['slug'];
+            $link_embed = $dbEpisode['link'];
+
+            if (!isset($servers[$serverName]) && $formattedOphimEpisode['slug'] === $slug) {
+                $link = [
+                    "server_name" => $serverName,
+                    "link_embed" =>  $link_embed,
+                ];
+
+                $episode['links'][] = $link;
+                $servers[$serverName] = true;
+            }
+        }
+
+        $episodes[] = $episode;
     }
 
-    if (count($ophimEpisodesV2) > 1) {
-        usort($ophimEpisodesV2, function ($a, $b) {
-            return $a['name'] - $b['name'];
-        });
+    return $episodes;
+}
+
+protected function getEpisodeCurrent($episodes, $episodeSlug) {
+    foreach ($episodes as $episode) {
+        if (isset($episode['slug']) && $episode['slug'] === $episodeSlug) {
+            return $episode;
+        }
     }
-    
-    return $ophimEpisodesV2;
+    return null;
+}
+
+protected function formattedSeoTitle($movie, $formattedCurrenEpisode){
+    $episodeName = $formattedCurrenEpisode['name'];
+    return "{$movie['name']} - {$movie['origin_name']} - ({$movie['year']}) [{$movie['quality']} - {$movie['lang']}] - Tập $episodeName";
 }
 
 

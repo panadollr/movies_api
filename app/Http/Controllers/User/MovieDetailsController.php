@@ -5,14 +5,13 @@ namespace App\Http\Controllers\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
-use App\Models\Movie;
 use App\Models\MovieDetails;
 use App\Http\Resources\MovieDetailsResource;
+use App\Http\Resources\MovieDetailResourceV2;
 use App\Http\Controllers\User\MovieController;
 use App\Models\Episode;
-
+use App\Models\EpisodeV2;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\DB;
 
 class MovieDetailsController
 {
@@ -27,43 +26,49 @@ class MovieDetailsController
         $this->movieController = $movieController;
     }
 
-
-    public function getOphimEpisodes($slug){
-        $url = "https://ophim1.com/phim/$slug";
+    public function getOphimEpisodes($slug)
+{
+    $url = "https://ophim1.com/phim/$slug";
     try {
         $response = $this->client->get($url);
-        $ophimEpisodes = json_decode($response->getBody()->getContents())->episodes[0]->server_data;
+        $responseContent = json_decode($response->getBody()->getContents())->episodes[0];
+        $episodes = $responseContent->server_data;
+        $ophimEpisodes = array_map([$this, 'mapEpisode'], $episodes);
 
-        if(count($ophimEpisodes) > 1){
-            return array_map(function($episode) {
-            return [
-                "name" => (int) $episode->name,
-                "slug" => (int) $episode->slug,
-                "link_m3u8" => $episode->link_m3u8,
-                "link_embed" => $episode->link_embed,
-            ];
-        }, $ophimEpisodes);
-        } else {
-            return array_map(function($episode) {
-                return [
-                    "name" => $episode->name,
-                    "slug" => $episode->slug,
-                    "link_m3u8" => $episode->link_m3u8,
-                    "link_embed" => $episode->link_embed,
-                ];
-            }, $ophimEpisodes);
+        if (count($ophimEpisodes) > 1) {
+            usort($ophimEpisodes, function ($a, $b) {
+                return $a['name'] - $b['name'];
+            });
         }
-        
-        
-
+        return $ophimEpisodes;
     } catch (\Throwable $th) {
-        return [
-            "slug" => "",
-            "link_m3u8" => "",
-            "link_embed" => "",
-        ];
-            }
+        return $this->getDefaultEpisode();
     }
+}
+
+private function mapEpisode($episode)
+{
+    $isFull = strtolower($episode->name) == 'full' || strtolower($episode->slug) == 'full';
+    $ophimEpisodeName = $isFull ? strtolower($episode->slug ?: $episode->name) : (int) ($episode->slug ?: $episode->name);
+    $ophimEpisodeSlug = "tap-" . $ophimEpisodeName;
+    
+    return [
+        "name" =>  strval($ophimEpisodeName),
+        "slug" => $ophimEpisodeSlug,
+        "link_m3u8" => $episode->link_m3u8,
+        "link_embed" => $episode->link_embed,
+    ];
+}
+
+private function getDefaultEpisode()
+{
+    return [
+        "name" => "",
+        "slug" => "",
+        "link_m3u8" => "",
+        "link_embed" => "",
+    ];
+}
 
     public function getMovieDetails($slug){
         // $cacheKey = 'movie_details_' . $slug;
@@ -97,7 +102,6 @@ class MovieDetailsController
         // });
     }
 
-
     //CÁC PHIM TƯƠNG TỰ
     public function getSimilarMovies($slug){
         try {
@@ -128,8 +132,44 @@ class MovieDetailsController
         }
     }
 
-    public function getTotalMovieDetails(){
-        return MovieDetails::count();
+    public function getMovieDetailV2($slug, $episodeSlug = null){
+        try {
+            $movieDetail = $this->movieDetailWithMovieQuery
+                            ->where('slug', $slug)->first();
+            $emptyMovieDetail = [
+                'movie' => [],
+                'ophimEpisodes' => [],
+                'dbEpisodes' => [],
+                'episodeSlug' => null
+                ];
+
+            if(!$movieDetail){
+                return response()->json(new MovieDetailResourceV2($emptyMovieDetail), 200);
+            }
+            
+                $ophimEpisodes = $this->getOphimEpisodes($slug);
+                $episodeSlug = $episodeSlug ?? $ophimEpisodes[0]['slug'];
+                $episodeSlugs = array_column($ophimEpisodes, 'slug');
+                $matchEpisodeSlug = in_array($episodeSlug, $episodeSlugs);
+                if(!$matchEpisodeSlug){
+                    return response()->json(new MovieDetailResourceV2($emptyMovieDetail), 200);
+                }
+
+                $dbEpisodes = EpisodeV2::join('episode_servers', 'episode_servers.server_id', '=', 'episodes_v2.server_id')
+                ->where('movie_id', $movieDetail->_id)
+                ->get();
+            
+                $data = [
+                'movie' => $movieDetail,
+                'ophimEpisodes' => $ophimEpisodes,
+                'dbEpisodes' => $dbEpisodes,
+                'episodeSlug' => $episodeSlug,
+                ];
+                return response()->json(new MovieDetailResourceV2($data), 200);
+
+            } catch (\Throwable $th) {
+                return response()->json(['error' => $th->getMessage()], 500);
+            }
     }
 
 }
