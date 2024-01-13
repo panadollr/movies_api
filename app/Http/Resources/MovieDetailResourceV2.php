@@ -106,22 +106,22 @@ protected function formattedJsonWithConfig($jsonData, $arrayConfig)
     return array_values($formattedJsonData);
 }
 
-protected function formattedEpisodes($formattedOphimEpisodes, $dbEpisodes){
+protected function formattedEpisodes($ophimEpisodes, $dbEpisodes){
     $episodes = [];
-    foreach ($formattedOphimEpisodes as $formattedOphimEpisode) {
+    foreach ($ophimEpisodes as $ophimEpisode) {
         $episode = [
-            'name' => $formattedOphimEpisode['name'],
-            'slug' => $formattedOphimEpisode['slug'],
-            'link_m3u8' => $formattedOphimEpisode['link_m3u8'],
-            'links' => [],
+            'name' => "Tập " . $ophimEpisode['name'],
+            'slug' => $ophimEpisode['slug'],
+            'link_m3u8' => $ophimEpisode['link_m3u8'],
+            'sources' => [],
         ];
 
         $defaultLink = [
             "server_name" => "Vietsub #1",
-            "link_embed" => $formattedOphimEpisode['link_embed'],
+            "link_embed" => $ophimEpisode['link_embed'],
         ];
 
-        $episode['links'][] = $defaultLink;
+        $episode['sources'][] = $defaultLink;
         $servers = []; 
 
         foreach ($dbEpisodes as $dbEpisode) {
@@ -129,13 +129,13 @@ protected function formattedEpisodes($formattedOphimEpisodes, $dbEpisodes){
             $slug = $dbEpisode['slug'];
             $link_embed = $dbEpisode['link'];
 
-            if (!isset($servers[$serverName]) && $formattedOphimEpisode['slug'] === $slug) {
+            if (!isset($servers[$serverName]) && $ophimEpisode['slug'] === $slug) {
                 $link = [
                     "server_name" => $serverName,
                     "link_embed" =>  $link_embed,
                 ];
 
-                $episode['links'][] = $link;
+                $episode['sources'][] = $link;
                 $servers[$serverName] = true;
             }
         }
@@ -156,8 +156,7 @@ protected function getEpisodeCurrent($episodes, $episodeSlug) {
 }
 
 protected function formattedSeoTitle($movie, $episodeCurrentName){
-    return "{$movie['name']} - {$movie['origin_name']} - ({$movie['year']}) [{$movie['quality']} - {$movie['lang']}] - Tập $episodeCurrentName";
+    return "{$movie['name']} - {$movie['origin_name']} - ({$movie['year']}) [{$movie['quality']} - {$movie['lang']}] - $episodeCurrentName";
 }
-
 
 }
