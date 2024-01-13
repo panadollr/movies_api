@@ -61,8 +61,7 @@ class MovieDetailResourceV2 extends JsonResource
         'movie' => $movieArray,
         'episodes' => $episodes,
         'seoOnPage' => !empty($movie) ? [
-            'seo_title2' => $this->formattedSeoTitle($movie, $episodeCurrentName),
-            'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]" ." - tập",
+            'seo_title' => $this->formattedSeoTitle($movie, $episodeCurrentName),
             'seo_description' => strip_tags($movie['content']), 
             'thumb_url' => $this->formatOphimImageUrl($movie['poster_url']),
             // 'og_image' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
