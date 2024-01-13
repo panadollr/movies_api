@@ -116,6 +116,10 @@ private function getDefaultEpisode()
                 return response()->json(new MovieDetailResource($emptyMovieDetail), 200);
             }
             
+            if($movieDetail->status == 'trailer' || $movieDetail->episode_current == 'Trailer'){
+                $episodeSlug = null;
+            }
+            
                 $ophimEpisodes = $this->getOphimEpisodes($slug);
                 $episodeSlug = $episodeSlug ?? $ophimEpisodes[0]['slug'];
                 $episodeSlugs = array_column($ophimEpisodes, 'slug');
