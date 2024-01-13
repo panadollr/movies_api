@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MovieDetailResourceV2 extends JsonResource
+class MovieDetailResource extends JsonResource
 {
     protected $imageDomain;
     protected $cloudinaryPosterDomain;

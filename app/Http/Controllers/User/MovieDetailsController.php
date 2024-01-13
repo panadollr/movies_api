@@ -6,9 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 use App\Models\MovieDetails;
-use App\Http\Resources\MovieDetailsResource;
-use App\Http\Resources\MovieDetailResourceV2;
 use App\Http\Controllers\User\MovieController;
+use App\Http\Resources\MovieDetailResource;
 use App\Models\Episode;
 use App\Models\EpisodeV2;
 use GuzzleHttp\Client;
@@ -70,36 +69,76 @@ private function getDefaultEpisode()
     ];
 }
 
-    public function getMovieDetails($slug){
-        // $cacheKey = 'movie_details_' . $slug;
+    // public function getMovieDetailsV1($slug){
+    //     // $cacheKey = 'movie_details_' . $slug;
         
-        // return Cache::remember($cacheKey, 1800, function () use ($slug) {
+    //     // return Cache::remember($cacheKey, 1800, function () use ($slug) {
+    //     try {
+    //         $movieDetails = $this->movieDetailWithMovieQuery
+    //                         ->where('slug', $slug)->first();
+    //         if(!$movieDetails){
+    //             $data = [
+    //                 'movie' => [],
+    //                 'ophim_episodes' => [],
+    //                 'db_episodes' => []
+    //                 ];
+    //             return response()->json(new MovieDetailsResource($data), 200);
+    //         }
+    //             $ophimEpisodes = $this->getOphimEpisodes($slug);
+    //             $db_episodes = Episode::where('_id', $movieDetails->_id)->select('slug', 'server_2')
+    //             ->get()->keyBy('slug')->toArray();
+            
+    //             $data = [
+    //             'movie' => $movieDetails,
+    //             'ophim_episodes' => $ophimEpisodes,
+    //             'db_episodes' => $db_episodes
+    //             ];
+    //             return response()->json(new MovieDetailsResourceV1($data), 200);
+
+    //         } catch (\Throwable $th) {
+    //             return response()->json(['error' => $th->getMessage()], 500);
+    //         }
+    //     // });
+    // }
+
+    public function getMovieDetail($slug, $episodeSlug = null){
         try {
-            $movieDetails = $this->movieDetailWithMovieQuery
+            $movieDetail = $this->movieDetailWithMovieQuery
                             ->where('slug', $slug)->first();
-            if(!$movieDetails){
-                $data = [
-                    'movie' => [],
-                    'ophim_episodes' => [],
-                    'db_episodes' => []
-                    ];
-                return response()->json(new MovieDetailsResource($data), 200);
+            $emptyMovieDetail = [
+                'movie' => [],
+                'ophimEpisodes' => [],
+                'dbEpisodes' => [],
+                'episodeSlug' => null
+                ];
+
+            if(!$movieDetail){
+                return response()->json(new MovieDetailResource($emptyMovieDetail), 200);
             }
+            
                 $ophimEpisodes = $this->getOphimEpisodes($slug);
-                $db_episodes = Episode::where('_id', $movieDetails->_id)->select('slug', 'server_2')
-                ->get()->keyBy('slug')->toArray();
+                $episodeSlug = $episodeSlug ?? $ophimEpisodes[0]['slug'];
+                $episodeSlugs = array_column($ophimEpisodes, 'slug');
+                $matchEpisodeSlug = in_array($episodeSlug, $episodeSlugs);
+                if(!$matchEpisodeSlug){
+                    return response()->json(new MovieDetailResource($emptyMovieDetail), 200);
+                }
+
+                $dbEpisodes = EpisodeV2::join('episode_servers', 'episode_servers.server_id', '=', 'episodes_v2.server_id')
+                ->where('movie_id', $movieDetail->_id)
+                ->get();
             
                 $data = [
-                'movie' => $movieDetails,
-                'ophim_episodes' => $ophimEpisodes,
-                'db_episodes' => $db_episodes
+                'movie' => $movieDetail,
+                'ophimEpisodes' => $ophimEpisodes,
+                'dbEpisodes' => $dbEpisodes,
+                'episodeSlug' => $episodeSlug,
                 ];
-                return response()->json(new MovieDetailsResource($data), 200);
+                return response()->json(new MovieDetailResource($data), 200);
 
             } catch (\Throwable $th) {
                 return response()->json(['error' => $th->getMessage()], 500);
             }
-        // });
     }
 
     //CÁC PHIM TƯƠNG TỰ
@@ -130,46 +169,6 @@ private function getDefaultEpisode()
         } catch (\Throwable $th) {
             return $th->getMessage();
         }
-    }
-
-    public function getMovieDetailV2($slug, $episodeSlug = null){
-        try {
-            $movieDetail = $this->movieDetailWithMovieQuery
-                            ->where('slug', $slug)->first();
-            $emptyMovieDetail = [
-                'movie' => [],
-                'ophimEpisodes' => [],
-                'dbEpisodes' => [],
-                'episodeSlug' => null
-                ];
-
-            if(!$movieDetail){
-                return response()->json(new MovieDetailResourceV2($emptyMovieDetail), 200);
-            }
-            
-                $ophimEpisodes = $this->getOphimEpisodes($slug);
-                $episodeSlug = $episodeSlug ?? $ophimEpisodes[0]['slug'];
-                $episodeSlugs = array_column($ophimEpisodes, 'slug');
-                $matchEpisodeSlug = in_array($episodeSlug, $episodeSlugs);
-                if(!$matchEpisodeSlug){
-                    return response()->json(new MovieDetailResourceV2($emptyMovieDetail), 200);
-                }
-
-                $dbEpisodes = EpisodeV2::join('episode_servers', 'episode_servers.server_id', '=', 'episodes_v2.server_id')
-                ->where('movie_id', $movieDetail->_id)
-                ->get();
-            
-                $data = [
-                'movie' => $movieDetail,
-                'ophimEpisodes' => $ophimEpisodes,
-                'dbEpisodes' => $dbEpisodes,
-                'episodeSlug' => $episodeSlug,
-                ];
-                return response()->json(new MovieDetailResourceV2($data), 200);
-
-            } catch (\Throwable $th) {
-                return response()->json(['error' => $th->getMessage()], 500);
-            }
     }
 
 }

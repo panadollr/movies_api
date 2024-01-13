@@ -6,7 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 use App\Http\Controllers\User\MovieController;
 
-class MovieDetailsResource extends JsonResource
+class MovieDetailsResourceV1 extends JsonResource
 {
     protected $imageDomain;
     protected $cloudinaryPosterDomain;

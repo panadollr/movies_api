@@ -75,10 +75,9 @@ use App\Http\Controllers\User\MovieController;
     Route::middleware('cors2')->get('phim-le-2', [MovieController::class, 'getSingleMovies']);
 
 use App\Http\Controllers\User\MovieDetailsController;
-    Route::get('phim/{slug}', [MovieDetailsController::class, 'getMovieDetails']);
+    Route::get('phim/{slug}/{episode_slug}', [MovieDetailsController::class, 'getMovieDetail']);
+    Route::get('phim/{slug}', [MovieDetailsController::class, 'getMovieDetail']);
     Route::get('phim-tuong-tu/{slug}', [MovieDetailsController::class, 'getSimilarMovies']);
-    Route::get('phim-v2/{slug}/{episode_slug}', [MovieDetailsController::class, 'getMovieDetailV2']);
-    Route::get('phim-v2/{slug}', [MovieDetailsController::class, 'getMovieDetailV2']);
 
 use App\Http\Controllers\User\BlogController;
     Route::get('tin-tuc', [BlogController::class, 'getBlogs']);
