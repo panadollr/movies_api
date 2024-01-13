@@ -167,7 +167,7 @@ private function getDefaultEpisode()
     
             return $this->movieController->getMoviesByFilter($similarMovies, 10, $title, $description);
         } catch (\Throwable $th) {
-            return $th->getMessage();
+            return response()->json(['error' => $th->getMessage()], 500);
         }
     }
 

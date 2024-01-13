@@ -56,18 +56,29 @@ class MovieDetailResource extends JsonResource
     $episodeCurrent = $this->getEpisodeCurrent($formattedEpisodes, $episodeSlug, $movie['name']);
     $episodeCurrentName = $episodeCurrent['name'];
 
+    if ($movie['status'] == 'trailer' || $movie['episode_current'] == 'Trailer') {
+        $episodeCurrent = [];
+        $episodes = [];
+        $seoTitle = 'Trailer';
+    } else {
+        $episodeCurrent = $episodeCurrent;
+        $episodes = $this->formattedCleanerEpisodes($formattedEpisodes, $movie['name']);
+        $seoTitle = $episodeCurrentName;
+    }
+    
     return [
         'episodeCurrent' => $episodeCurrent,
         'movie' => $movieArray,
-        'episodes' => $this->formattedCleanerEpisodes($formattedEpisodes, $movie['name']),
+        'episodes' => $episodes,
         'seoOnPage' => !empty($movie) ? [
-            'seo_title' => $this->formattedSeoTitle($movie, $episodeCurrentName),
+            'seo_title' => $this->formattedSeoTitle($movie, $seoTitle),
             'seo_description' => strip_tags($movie['content']), 
             'seo_image' => $this->formatOphimImageUrl($movie['poster_url']),
             // 'og_image' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
             'og_url' => $request->path(),
         ] : [],
     ];
+    
 }
 
 
