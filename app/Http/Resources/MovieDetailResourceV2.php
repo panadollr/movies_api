@@ -52,18 +52,18 @@ class MovieDetailResourceV2 extends JsonResource
         'category' => $this->formattedJsonWithConfig($movie['category'], $categoryConfig),
     ] : [];
 
-    $episodes = $this->formattedEpisodes($ophimEpisodes, $dbEpisodes);
-    $episodeCurrent = $this->getEpisodeCurrent($episodes, $episodeSlug);
+    $formattedEpisodes = $this->formattedEpisodes($ophimEpisodes, $dbEpisodes, $movie['name']);
+    $episodeCurrent = $this->getEpisodeCurrent($formattedEpisodes, $episodeSlug, $movie['name']);
     $episodeCurrentName = $episodeCurrent['name'];
 
     return [
         'episodeCurrent' => $episodeCurrent,
         'movie' => $movieArray,
-        'episodes' => $episodes,
+        'episodes' => $this->formattedCleanerEpisodes($formattedEpisodes, $movie['name']),
         'seoOnPage' => !empty($movie) ? [
             'seo_title' => $this->formattedSeoTitle($movie, $episodeCurrentName),
             'seo_description' => strip_tags($movie['content']), 
-            'thumb_url' => $this->formatOphimImageUrl($movie['poster_url']),
+            'seo_image' => $this->formatOphimImageUrl($movie['poster_url']),
             // 'og_image' => $this->formatImageWithCloudinaryUrl($movie, 'thumb'),
             'og_url' => $request->path(),
         ] : [],
@@ -74,7 +74,7 @@ class MovieDetailResourceV2 extends JsonResource
 //poster va thumbnail ophim
 protected function formatOphimImageUrl($url)
 {
-        return $url ? "https://ophim9.cc/_next/image?url=http%3A%2F%2Fimg.ophim1.com%2Fuploads%2Fmovies%2F$url&w=256&q=75" : null;
+        return $url ? "https://ophim10.cc/_next/image?url=http%3A%2F%2Fimg.ophim1.com%2Fuploads%2Fmovies%2F$url&w=256&q=75" : null;
 }
 
     protected function formatImageWithCloudinaryUrl($movie, $type)
@@ -110,7 +110,7 @@ protected function formattedEpisodes($ophimEpisodes, $dbEpisodes){
     $episodes = [];
     foreach ($ophimEpisodes as $ophimEpisode) {
         $episode = [
-            'name' => "Tập " . $ophimEpisode['name'],
+            'name' => 'Tập ' . $ophimEpisode['name'],
             'slug' => $ophimEpisode['slug'],
             'link_m3u8' => $ophimEpisode['link_m3u8'],
             'sources' => [],
@@ -146,9 +146,19 @@ protected function formattedEpisodes($ophimEpisodes, $dbEpisodes){
     return $episodes;
 }
 
-protected function getEpisodeCurrent($episodes, $episodeSlug) {
+protected function formattedCleanerEpisodes($episodes, $movieName){
+     return array_map(function ($episode) use ($movieName) {
+        return [
+            'name' => $movieName . ' - ' . $episode['name'],
+            'slug' => $episode['slug'],
+        ];
+    }, $episodes);
+}
+
+protected function getEpisodeCurrent($episodes, $episodeSlug, $movieName) {
     foreach ($episodes as $episode) {
         if (isset($episode['slug']) && $episode['slug'] === $episodeSlug) {
+            $episode['name'] = $movieName . ' - ' . $episode['name'];
             return $episode;
         }
     }
