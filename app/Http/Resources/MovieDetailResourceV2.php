@@ -54,13 +54,14 @@ class MovieDetailResourceV2 extends JsonResource
 
     $episodes = $this->formattedEpisodes($ophimEpisodes, $dbEpisodes);
     $episodeCurrent = $this->getEpisodeCurrent($episodes, $episodeSlug);
+    $episodeCurrentName = $episodeCurrent['name'];
 
     return [
         'episodeCurrent' => $episodeCurrent,
         'movie' => $movieArray,
         'episodes' => $episodes,
         'seoOnPage' => !empty($movie) ? [
-            // 'seo_title2' => $this->formattedSeoTitle($movie, $formattedCurrenEpisode),
+            'seo_title2' => $this->formattedSeoTitle($movie, $episodeCurrentName),
             'seo_title' => $movie['name'] ." - ". $movie['origin_name'] ." (". $movie['year'] .") [". $movie['quality'] ."-". $movie['lang'] ."]" ." - tập",
             'seo_description' => strip_tags($movie['content']), 
             'thumb_url' => $this->formatOphimImageUrl($movie['poster_url']),
@@ -155,9 +156,8 @@ protected function getEpisodeCurrent($episodes, $episodeSlug) {
     return null;
 }
 
-protected function formattedSeoTitle($movie, $formattedCurrenEpisode){
-    $episodeName = $formattedCurrenEpisode['name'];
-    return "{$movie['name']} - {$movie['origin_name']} - ({$movie['year']}) [{$movie['quality']} - {$movie['lang']}] - Tập $episodeName";
+protected function formattedSeoTitle($movie, $episodeCurrentName){
+    return "{$movie['name']} - {$movie['origin_name']} - ({$movie['year']}) [{$movie['quality']} - {$movie['lang']}] - Tập $episodeCurrentName";
 }
 
 
