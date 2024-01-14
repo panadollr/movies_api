@@ -59,7 +59,7 @@ class MovieDetailResource extends JsonResource
     if ($movie['status'] == 'trailer' || $movie['episode_current'] == 'Trailer') {
         $episodeCurrent = [];
         $episodes = [];
-        $seoTitle = 'Trailer';
+        $seoTitle = 'Trailer, Sắp Chiếu';
     } else {
         $episodeCurrent = $episodeCurrent;
         $episodes = $this->formattedCleanerEpisodes($formattedEpisodes, $movie['name']);
