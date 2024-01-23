@@ -9,6 +9,7 @@ class Movie extends Model
     protected $table = 'movies';
     public $timestamps = false;
     // protected $primaryKey = '_id';
+    protected $searchable = ['name', 'slug'];
     
     protected $fillable =[
         'modified_time',
@@ -27,9 +28,9 @@ class Movie extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function movie_details()
+    public function movie_detail()
     {
-        return $this->hasOne(MovieDetails::class, '_id', '_id'); // Thay 'foreign_key' bằng khóa ngoại thực tế
+        return $this->hasOne(MovieDetails::class, '_id', '_id');
     }
 
     public function episodes()

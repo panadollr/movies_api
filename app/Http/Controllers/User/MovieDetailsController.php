@@ -10,7 +10,9 @@ use App\Http\Controllers\User\MovieController;
 use App\Http\Resources\MovieDetailResource;
 use App\Models\Episode;
 use App\Models\EpisodeV2;
+use App\Models\Movie;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\DB;
 
 class MovieDetailsController
 {
@@ -22,6 +24,7 @@ class MovieDetailsController
     {
         $this->client = $client;
         $this->movieDetailWithMovieQuery = MovieDetails::join('movies', 'movies._id', '=', 'movie_details._id');
+        // $this->movieDetailWithMovieQuery = MovieDetails::with('movie');
         $this->movieController = $movieController;
     }
 
@@ -105,6 +108,7 @@ private function getDefaultEpisode()
         try {
             $movieDetail = $this->movieDetailWithMovieQuery
                             ->where('slug', $slug)->first();
+        
             $emptyMovieDetail = [
                 'movie' => [],
                 'ophimEpisodes' => [],
@@ -138,8 +142,8 @@ private function getDefaultEpisode()
                 'dbEpisodes' => $dbEpisodes,
                 'episodeSlug' => $episodeSlug,
                 ];
-                return response()->json(new MovieDetailResource($data), 200);
 
+                return response()->json(new MovieDetailResource($data), 200);
             } catch (\Throwable $th) {
                 return response()->json(['error' => $th->getMessage()], 500);
             }

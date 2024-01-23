@@ -39,7 +39,7 @@ class MovieDetails extends Model
 
     public function movie()
     {
-        return $this->hasMany(Movie::class, '_id', '_id'); // Thay 'foreign_key' bằng khóa ngoại thực tế
+        return $this->belongsTo(Movie::class, '_id', '_id');
     }
 
     public function episodes()

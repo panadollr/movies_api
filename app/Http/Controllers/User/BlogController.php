@@ -22,7 +22,7 @@ class BlogController
         return [
             'seo_title' =>  $title,
             'seo_description' => $description, 
-            'og_image' => "https://res.cloudinary.com/dtilp1gei/image/upload/v1704431920/uploads/movies/thumb_blogs_seo.png",
+            'og_image' => "https://firebasestorage.googleapis.com/v0/b/hired-dacs4.appspot.com/o/thumb_blogs_seo.jpg?alt=media&token=cd81f0c6-e822-4565-bdcc-1d2e119ce00d",
             'og_url' => request()->path(),
         ];
     }

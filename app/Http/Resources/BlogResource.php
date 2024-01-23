@@ -24,8 +24,9 @@ class BlogResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'slug' => $this->slug,
-            'poster_url' => $this->formatImageWithCloudinaryUrl('thumb'),
-            'thumb_url' => $this->formatImageWithCloudinaryUrl('thumb'),
+            // 'poster_url' => $this->formatImageWithCloudinaryUrl('thumb'),
+            // 'thumb_url' => $this->formatImageWithCloudinaryUrl('thumb'),
+            'poster_url' => $this->formatImageUrl($this->thumb_url),
             'movie_type' => $this->movie_type,
             'date' => '12/2023',
         ];
@@ -46,5 +47,11 @@ class BlogResource extends JsonResource
     
         return $imageUrl;
     }
+    }
+
+    //anh ophim
+    protected function formatImageUrl($url)
+    {
+            return $url ? "https://ophim10.cc/_next/image?url=http%3A%2F%2Fimg.ophim1.com%2Fuploads%2Fmovies%2F$url&w=192&q=75" : null;
     }
 }

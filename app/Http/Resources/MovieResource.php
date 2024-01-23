@@ -29,27 +29,52 @@ class MovieResource extends JsonResource
     public function toArray($request)
     {
 
+        // return array_filter([
+        //     'modified_time' => $this->modified_time,
+        //     'id' => $this->_id,
+        //     'name' => $this->name,
+        //     'origin_name' => $this->origin_name,
+        //     'poster_url' => $this->formatImageUrl($this->thumb_url),
+        //     'thumb_url' => $this->formatImageUrl($this->poster_url),
+        //     // 'poster_url' => $this->formatImageWithCloudinaryUrl('poster'),
+        //     // 'thumb_url' => $this->formatImageWithCloudinaryUrl('thumb'),
+        //     'slug' => $this->slug,
+        //     'year' => $this->year,
+        //     'content' => $this->content,
+        //     'type' => $this->type,
+        //     'status' => $this->status,
+        //     'sub_docquyen' => (bool) $this->sub_docquyen,
+        //     'time' => $this->time,
+        //     'episode_current' => $this->episode_current === 'Tập 0'? 'Trailer' : $this->episode_current,
+        //     'quality' => $this->quality,
+        //     'lang' => $this->lang,
+        //     'category' => $this->formattedCategoriesArray('category'),
+        //     // 'country' => $this->formattedArray('country'),
+        // ]);
+
+        $categoryConfig = config('api_settings.categories');
+        $countryConfig = config('api_settings.countries');
+
         return array_filter([
-            'modified_time' => $this->modified_time,
             'id' => $this->_id,
             'name' => $this->name,
-            'origin_name' => $this->origin_name,
             'poster_url' => $this->formatImageUrl($this->thumb_url),
             'thumb_url' => $this->formatImageUrl($this->poster_url),
             // 'poster_url' => $this->formatImageWithCloudinaryUrl('poster'),
             // 'thumb_url' => $this->formatImageWithCloudinaryUrl('thumb'),
             'slug' => $this->slug,
             'year' => $this->year,
-            'content' => $this->content,
-            'type' => $this->type,
-            'status' => $this->status,
-            'sub_docquyen' => (bool) $this->sub_docquyen,
-            'time' => $this->time,
-            'episode_current' => $this->episode_current === 'Tập 0'? 'Trailer' : $this->episode_current,
-            'quality' => $this->quality,
-            'lang' => $this->lang,
-            'category' => $this->formattedCategoriesArray('category'),
-            // 'country' => $this->formattedArray('country'),
+            'content' => $this->movie_detail->content,
+            'type' => $this->movie_detail->type,
+            'status' => $this->movie_detail->status,
+            'view' => $this->movie_detail->view,
+            'sub_docquyen' => (bool) $this->movie_detail->sub_docquyen,
+            'time' => $this->movie_detail->time,
+            'episode_current' => $this->movie_detail->episode_current === 'Tập 0'? 'Trailer' : $this->movie_detail->episode_current,
+            'quality' => $this->movie_detail->quality,
+            'lang' => $this->movie_detail->lang,
+            'category' => $this->formattedJsonWithConfig($this->movie_detail->category, $categoryConfig),
+            'country' => $this->formattedJsonWithConfig($this->movie_detail->country, $countryConfig),
         ]);
     }
 
@@ -100,21 +125,32 @@ class MovieResource extends JsonResource
             : null;
     }
 
-    protected function formattedCategoriesArray($propertyName)
-    {
-        $propertyValue = $this->$propertyName;
-        $categories = config('api_settings.categories');
-        $propertyValue = collect(json_decode($this->$propertyName, true))->pluck('slug')->toArray();
+    // protected function formattedCategoriesArray($propertyName)
+    // {
+    //     $propertyValue = $this->$propertyName;
+    //     $categories = config('api_settings.categories');
+    //     $propertyValue = collect(json_decode($this->$propertyName, true))->pluck('slug')->toArray();
     
-        $filteredCategories = [];
-        foreach ($propertyValue as $categorySlug) {
-            if (array_key_exists($categorySlug, $categories)) {
-                    $filteredCategories[] = ['name' => $categories[$categorySlug]];
-            }
-        }
+    //     $filteredCategories = [];
+    //     foreach ($propertyValue as $categorySlug) {
+    //         if (array_key_exists($categorySlug, $categories)) {
+    //                 $filteredCategories[] = ['name' => $categories[$categorySlug]];
+    //         }
+    //     }
     
-        return array_values($filteredCategories);
-    }
+    //     return array_values($filteredCategories);
+    // }
+
+    protected function formattedJsonWithConfig($jsonData, $arrayConfig)
+{
+    $propertyValue = collect(json_decode($jsonData, true))->pluck('slug')->toArray();
+    $filteredArrayConfig = array_intersect_key($arrayConfig, array_flip($propertyValue));
+    $formattedJsonData = array_map(function ($name) {
+        return ['name' => $name];
+    }, $filteredArrayConfig);
+
+    return array_values($formattedJsonData);
+}
 
 }
 

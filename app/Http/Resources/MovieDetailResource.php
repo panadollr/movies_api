@@ -25,6 +25,7 @@ class MovieDetailResource extends JsonResource
     $dbEpisodes = $this['dbEpisodes'];
     $episodeSlug = $this['episodeSlug'];
     $categoryConfig = config('api_settings.categories');
+    $countryConfig = config('api_settings.countries');
 
     $movieArray = !empty($movie) ? [
         'modified_time' => $movie['modified_time'],
@@ -49,7 +50,10 @@ class MovieDetailResource extends JsonResource
         'showtimes' => $movie['showtimes'],
         'year' => $movie['year'],
         'view' => $movie['view'],
+        'actor' => json_decode($movie['actor']),
+        'director' => json_decode($movie['director']),
         'category' => $this->formattedJsonWithConfig($movie['category'], $categoryConfig),
+        'country' => $this->formattedJsonWithConfig($movie['country'], $countryConfig),
     ] : [];
 
     $formattedEpisodes = $this->formattedEpisodes($ophimEpisodes, $dbEpisodes, $movie['name']);
@@ -157,14 +161,35 @@ protected function formattedEpisodes($ophimEpisodes, $dbEpisodes){
     return $episodes;
 }
 
-protected function formattedCleanerEpisodes($episodes, $movieName){
-     return array_map(function ($episode) use ($movieName) {
-        return [
-            'name' => $movieName . ' - ' . $episode['name'],
-            'slug' => $episode['slug'],
-        ];
-    }, $episodes);
+// protected function formattedCleanerEpisodes($episodes, $movieName){
+//      return array_map(function ($episode) use ($movieName) {
+//         return [
+//             'name' => $movieName . ' - ' . $episode['name'],
+//             'slug' => $episode['slug'],
+//         ];
+//     }, $episodes);
+// }
+
+protected function formattedCleanerEpisodes($episodes, $movieName) {
+    $uniqueSlugs = [];
+
+    return array_reduce($episodes, function ($result, $episode) use ($movieName, &$uniqueSlugs) {
+        $name = $movieName . ' - ' . $episode['name'];
+        $slug = $episode['slug'];
+
+        // Kiểm tra xem slug đã xuất hiện chưa
+        if (!in_array($slug, $uniqueSlugs)) {
+            $uniqueSlugs[] = $slug;
+            $result[] = [
+                'name' => $name,
+                'slug' => $slug,
+            ];
+        }
+
+        return $result;
+    }, []);
 }
+
 
 protected function getEpisodeCurrent($episodes, $episodeSlug, $movieName) {
     foreach ($episodes as $episode) {
