@@ -209,13 +209,9 @@ class MovieController
         // ->where('movie_details.episode_current', 'Trailer')
         // ->where('movie_details.trailer_url', '!=', '')
         // ->select($this->selectedColumnsV2);
-        $upcomingMovies = $this->moviesWithMovieDetailsQuery->whereHas('movie_detail', function ($query) {
-            $query->where(function ($subquery) {
-                $subquery->where('episode_current', 'Trailer')
-                ->orWhere('status', 'trailer')
-                ->orwhere('trailer_url', '!=', '');
-            });
-        });
+        $upcomingMovies = Movie::leftJoin('movie_details', 'movie_details._id', '=', 'movies._id')
+        ->where('movie_details.episode_current', 'Trailer')
+        ->where('movie_details.trailer_url', '!=', '');
         return $this->getMoviesByFilter($upcomingMovies, 24, $title, $description);
     }
 
