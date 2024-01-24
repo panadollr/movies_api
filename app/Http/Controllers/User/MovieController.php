@@ -307,7 +307,9 @@ class MovieController
 
         $searchedMovies = $this->moviesWithNoTrailer
         ->where('name', 'LIKE', "$keyword%")
-        ->orWhere('origin_name', 'LIKE', "$keyword%");
+        ->orWhere('name', 'LIKE', substr($keyword, 0, strpos($keyword, ' ')) . '%')
+        ->orWhere('origin_name', 'LIKE', "$keyword%")
+        ->orWhere('slug', 'LIKE', "$keyword%");
 
         return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
         } catch (\Throwable $th) {
