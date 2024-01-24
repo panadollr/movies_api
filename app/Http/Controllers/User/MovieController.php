@@ -305,9 +305,14 @@ class MovieController
         //       ->orWhere('name', 'LIKE', "$keyword%");
         // })->select($this->selectedColumnsV2);
 
+        // $searchedMovies = $this->moviesWithNoTrailer
+        // ->where('name', 'LIKE', "$keyword%")
+        // ->orWhere('name', 'LIKE', substr($keyword, 0, strpos($keyword, ' ')) . '%')
+        // ->orWhere('origin_name', 'LIKE', "$keyword%")
+        // ->orWhere('slug', 'LIKE', "$keyword%");
+
         $searchedMovies = $this->moviesWithNoTrailer
         ->where('name', 'LIKE', "$keyword%")
-        ->orWhere('name', 'LIKE', substr($keyword, 0, strpos($keyword, ' ')) . '%')
         ->orWhere('origin_name', 'LIKE', "$keyword%")
         ->orWhere('slug', 'LIKE', "$keyword%");
 
