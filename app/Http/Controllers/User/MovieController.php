@@ -311,10 +311,23 @@ class MovieController
         // ->orWhere('origin_name', 'LIKE', "$keyword%")
         // ->orWhere('slug', 'LIKE', "$keyword%");
 
-        $searchedMovies = $this->moviesWithNoTrailer
-        ->where('name', 'LIKE', "$keyword%")
-        ->orWhere('origin_name', 'LIKE', "$keyword%")
-        ->orWhere('slug', 'LIKE', "$keyword%");
+
+        $words = explode(' ', $keyword);
+    $searchedMovies = $this->moviesWithNoTrailer
+    ->where(function ($query) use ($keyword, $words) {
+        $query->orWhere(function ($innerQuery) use ($keyword) {
+            $innerQuery->where('name', 'LIKE', $keyword . '%')
+                ->orWhere('origin_name', 'LIKE', $keyword . '%')
+                ->orWhere('slug', 'LIKE', $keyword . '%');
+        });
+
+        foreach ($words as $word) {
+            $query->orWhere('name', 'LIKE', '%' . $word . '%');
+        }
+    })
+    ->orderBy(function ($query) use ($keyword) {
+        return $query->selectRaw("CASE WHEN name LIKE '{$keyword}%' THEN 0 ELSE 1 END");
+    });
 
         return $this->getMoviesByFilter($searchedMovies, 24, $title, $description);
         } catch (\Throwable $th) {
