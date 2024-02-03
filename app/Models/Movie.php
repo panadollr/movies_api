@@ -11,16 +11,16 @@ class Movie extends Model
     // protected $primaryKey = '_id';
     protected $searchable = ['name', 'slug'];
     
-    protected $fillable =[
-        'modified_time',
-        '_id',
-        'name',
-        'origin_name',
-        'thumb_url',
-        'slug',
-        'year',
-        'poster_url',
-    ];
+    // protected $fillable =[
+    //     'modified_time',
+    //     '_id',
+    //     'name',
+    //     'origin_name',
+    //     'thumb_url',
+    //     'slug',
+    //     'year',
+    //     'poster_url'
+    // ];
 
     /*
     |--------------------------------------------------------------------------
@@ -35,7 +35,7 @@ class Movie extends Model
 
     public function episodes()
     {
-        return $this->hasMany(Episode::class, '_id', '_id'); // Thay 'foreign_key' bằng khóa ngoại thực tế
+        return $this->hasMany(Episode::class, '_id', '_id');
     }
 }
 

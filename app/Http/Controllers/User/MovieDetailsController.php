@@ -17,14 +17,15 @@ use Illuminate\Support\Facades\DB;
 class MovieDetailsController
 {
     protected $client;
-    protected $movieDetailWithMovieQuery;
+    protected $movieDetailQuery;
     protected $movieController;
 
     public function __construct(Client $client, MovieController $movieController)
     {
         $this->client = $client;
-        $this->movieDetailWithMovieQuery = MovieDetails::join('movies', 'movies._id', '=', 'movie_details._id');
-        // $this->movieDetailWithMovieQuery = MovieDetails::with('movie');
+        // $this->movieDetailQuery = MovieDetails::join('movies', 'movies._id', '=', 'movie_details._id');
+        // $this->movieDetailQuery = MovieDetails::with('movie');
+        $this->movieDetailQuery = Movie::query();
         $this->movieController = $movieController;
     }
 
@@ -77,7 +78,7 @@ private function getDefaultEpisode()
         
     //     // return Cache::remember($cacheKey, 1800, function () use ($slug) {
     //     try {
-    //         $movieDetails = $this->movieDetailWithMovieQuery
+    //         $movieDetails = $this->movieDetailQuery
     //                         ->where('slug', $slug)->first();
     //         if(!$movieDetails){
     //             $data = [
@@ -104,10 +105,55 @@ private function getDefaultEpisode()
     //     // });
     // }
 
+    // public function getMovieDetail($slug, $episodeSlug = null){
+    //     try {
+    //         $movieDetail = $this->movieDetailQuery
+    //                         ->where('slug', $slug)->first();
+        
+    //         $emptyMovieDetail = [
+    //             'movie' => [],
+    //             'ophimEpisodes' => [],
+    //             'dbEpisodes' => [],
+    //             'episodeSlug' => null
+    //             ];
+
+    //         if(!$movieDetail){
+    //             return response()->json(new MovieDetailResource($emptyMovieDetail), 200);
+    //         }
+            
+    //         if($movieDetail->status == 'trailer' || $movieDetail->episode_current == 'Trailer'){
+    //             $episodeSlug = null;
+    //         }
+            
+    //             $ophimEpisodes = $this->getOphimEpisodes($slug);
+    //             $episodeSlug = $episodeSlug ?? $ophimEpisodes[0]['slug'];
+    //             $episodeSlugs = array_column($ophimEpisodes, 'slug');
+    //             $matchEpisodeSlug = in_array($episodeSlug, $episodeSlugs);
+    //             if(!$matchEpisodeSlug){
+    //                 return response()->json(new MovieDetailResource($emptyMovieDetail), 200);
+    //             }
+
+    //             $dbEpisodes = EpisodeV2::join('episode_servers', 'episode_servers.server_id', '=', 'episodes_v2.server_id')
+    //             ->where('movie_id', $movieDetail->_id)
+    //             ->get();
+            
+    //             $data = [
+    //             'movie' => $movieDetail,
+    //             'ophimEpisodes' => $ophimEpisodes,
+    //             'dbEpisodes' => $dbEpisodes,
+    //             'episodeSlug' => $episodeSlug,
+    //             ];
+
+    //             return response()->json(new MovieDetailResource($data), 200);
+    //         } catch (\Throwable $th) {
+    //             return response()->json(['error' => $th->getMessage()], 500);
+    //         }
+    // }
+
+    //new version 3/2/2024
     public function getMovieDetail($slug, $episodeSlug = null){
         try {
-            $movieDetail = $this->movieDetailWithMovieQuery
-                            ->where('slug', $slug)->first();
+            $movieDetail = $this->movieDetailQuery->where('slug', $slug)->first();
         
             $emptyMovieDetail = [
                 'movie' => [],
@@ -129,7 +175,7 @@ private function getDefaultEpisode()
                 $episodeSlugs = array_column($ophimEpisodes, 'slug');
                 $matchEpisodeSlug = in_array($episodeSlug, $episodeSlugs);
                 if(!$matchEpisodeSlug){
-                    return response()->json(new MovieDetailResource($emptyMovieDetail), 200);
+                    return response()->json(new MovieDetailResource($emptyMovieDetail));
                 }
 
                 $dbEpisodes = EpisodeV2::join('episode_servers', 'episode_servers.server_id', '=', 'episodes_v2.server_id')
@@ -143,7 +189,7 @@ private function getDefaultEpisode()
                 'episodeSlug' => $episodeSlug,
                 ];
 
-                return response()->json(new MovieDetailResource($data), 200);
+                return response()->json(new MovieDetailResource($data));
             } catch (\Throwable $th) {
                 return response()->json(['error' => $th->getMessage()], 500);
             }
@@ -154,7 +200,7 @@ private function getDefaultEpisode()
         try {
             $title = "Các phim tương tự";
             $description = "";
-            $movieDetail = $this->movieDetailWithMovieQuery
+            $movieDetail = $this->movieDetailQuery
                                 ->where('slug', $slug)
                                 ->select('slug', 'type', 'category', 'country')
                                 ->first();

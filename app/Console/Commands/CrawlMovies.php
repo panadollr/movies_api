@@ -81,8 +81,8 @@ class CrawlMovies extends Command
         // $total = 1045;
         // $batchSize = 20;
 
-        $total = 100;
-        $batchSize = 10;
+        $total = 10;
+        $batchSize = 2;
     
         for ($start = 1; $start <= $total; $start += $batchSize) {
             $end = min($start + $batchSize - 1, $total);
@@ -161,6 +161,120 @@ class CrawlMovies extends Command
 
 
 //TESTING...
+// protected function processMovies($movies_data)
+// {
+//     $newMovies = [];
+//     $existingIds = [];
+//     $attributes = [
+//         'modified_time', '_id', 'name', 'origin_name', 'thumb_url', 'slug', 'year', 'poster_url'
+//     ];
+
+//     foreach ($movies_data as $resultArray) {
+//         foreach ($resultArray as $result) {
+           
+//                 $existingIds[] = $result->_id;
+           
+//         }
+//     }
+
+//     $existingMovies = Movie::whereIn('_id', $existingIds)->pluck('_id')->toArray();
+//     $countries = config('api_settings.countries');
+
+//     foreach ($movies_data as $resultArray) {
+//         foreach ($resultArray as $result) {
+//                 if (!in_array($result->_id, $existingMovies)) {
+//                     if ($result->year > 2007) {
+//                         //truy cập vào chi tiết phim theo slug 
+//                     $movie_detail_url = $this->base_url . "phim/$result->slug";
+//                     $get_movie_detail = $this->client->getAsync($movie_detail_url);
+//                     // Đợi kết quả và lấy response
+//                     $response = $get_movie_detail->wait();
+//                     if($response->getStatusCode() == 200){
+//                         $movie_details_data = json_decode($response->getBody())->movie;
+//                         //không phải là tv-shows
+//                         if ($movie_details_data->type != 'tvshows') {
+//                             $countriesArray = $movie_details_data->country;
+//                         if (!empty($countriesArray)) {
+//                             $inValidCountries = 0;
+//                             foreach ($countriesArray as $country) {
+//                                 //nếu không tồn tại quốc gia hợp lệ
+//                                 if (!isset($countries[$country->slug])) {
+//                                     $inValidCountries ++;
+//                                 } 
+//                             }
+//                             //tổng số phim có quốc gia không hợp lệ bằng 0
+//                             if ($inValidCountries === 0) {
+//                             $newMovie = [];
+//                             foreach ($attributes as $attribute) {
+//                             $newMovie[$attribute] = $attribute === 'modified_time' ? $result->modified->time : $result->$attribute;
+//                             }
+//                             $newMovies[] = $newMovie;
+                    
+//                             // ... Cloudinary upload...
+//                             //upload poster
+//                             $posterUrl = "https://img.ophim10.cc/uploads/movies/{$result->thumb_url}";
+//                             if (preg_match('/\/movies\/([^\/]+)-thumb\.jpg$/', $posterUrl, $matches)) {
+//                                 $slug = $matches[1];
+//                                 $quality = '50';
+//                                 $posterTransformation = [
+//                                     'width' => 500,
+//                                     'crop' => 'scale'
+//                                 ];
+//                                 $this->uploadImageToCloudinary('posters', $slug, 'poster', $posterUrl, $quality, $posterTransformation);
+//                             }
+
+//                             //upload thumbnail
+//                             $thumbUrl = "https://img.ophim10.cc/uploads/movies/{$result->poster_url}";
+//                             if (preg_match('/\/movies\/([^\/]+)-poster\.jpg$/', $thumbUrl, $matches)) {
+//                                 $slug = $matches[1];
+//                                 $quality = '55';
+//                                 $thumbTransformation = [
+//                                             'width' => 1000,
+//                                             'crop' => 'scale'
+//                                         ];
+//                                 $this->uploadImageToCloudinary('thumbs', $slug, 'thumb', $thumbUrl, $quality, $thumbTransformation);
+//                             }
+//                             } 
+
+//                         }
+//                         }
+//                     }
+//                 }
+
+//                 } else {
+//                     $existingMovie = Movie::where('_id', $result->_id)->first();
+//                     $this->updateMovieAttributes($existingMovie, $result, $attributes);
+//                 }
+//         }
+//     }
+
+//     print_r($newMovies);
+
+//     if (!empty($newMovies)) {
+//         Movie::insert($newMovies);
+//         print_r('New movies inserted!');
+//     }
+    
+// }
+
+ // ... Cloudinary upload logic...
+// protected function uploadImageToCloudinary($saveFolder, $slug, $type, $url, $quality, $transformation = []) {
+//     try {
+//         $publicId = "$saveFolder/$slug-$type";
+//         return Cloudinary::upload($url, [
+//             'format' => 'webp',
+//             'public_id' => $publicId,
+//             'quality' => $quality,
+//             'overwrite' => false,
+//             'transformation' => $transformation,
+//         ]);
+//     } catch (\Throwable $th) {
+      
+//     }
+//  }
+
+
+//V2
 protected function processMovies($movies_data)
 {
     $newMovies = [];
@@ -168,12 +282,15 @@ protected function processMovies($movies_data)
     $attributes = [
         'modified_time', '_id', 'name', 'origin_name', 'thumb_url', 'slug', 'year', 'poster_url'
     ];
+    $detailAttributes = [
+        'content', 'type', 'status', 'is_copyright', 'sub_docquyen',
+        'trailer_url', 'time', 'episode_current', 'episode_total',
+        'quality', 'lang', 'notify', 'showtimes', 'view'
+    ];
 
     foreach ($movies_data as $resultArray) {
         foreach ($resultArray as $result) {
-           
-                $existingIds[] = $result->_id;
-           
+            $existingIds[] = $result->_id;
         }
     }
 
@@ -182,115 +299,118 @@ protected function processMovies($movies_data)
 
     foreach ($movies_data as $resultArray) {
         foreach ($resultArray as $result) {
-                if (!in_array($result->_id, $existingMovies)) {
-                    if ($result->year > 2007) {
-                        //truy cập vào chi tiết phim theo slug 
+            if (!in_array($result->_id, $existingMovies)) {
+                if ($result->year > 2007) {
                     $movie_detail_url = $this->base_url . "phim/$result->slug";
                     $get_movie_detail = $this->client->getAsync($movie_detail_url);
-                    // Đợi kết quả và lấy response
                     $response = $get_movie_detail->wait();
-                    if($response->getStatusCode() == 200){
+
+                    if ($response->getStatusCode() == 200) {
                         $movie_details_data = json_decode($response->getBody())->movie;
-                        //không phải là tv-shows
+
                         if ($movie_details_data->type != 'tvshows') {
                             $countriesArray = $movie_details_data->country;
-                        if (!empty($countriesArray)) {
-                            $inValidCountries = 0;
-                            foreach ($countriesArray as $country) {
-                                //nếu không tồn tại quốc gia hợp lệ
-                                if (!isset($countries[$country->slug])) {
-                                    $inValidCountries ++;
-                                } 
-                            }
-                            //tổng số phim có quốc gia không hợp lệ bằng 0
-                            if ($inValidCountries === 0) {
-                            $newMovie = [];
-                            foreach ($attributes as $attribute) {
-                            $newMovie[$attribute] = $attribute === 'modified_time' ? $result->modified->time : $result->$attribute;
-                            }
-                            $newMovies[] = $newMovie;
-                    
-                            // ... Cloudinary upload...
-                            //upload poster
-                            $posterUrl = "https://img.ophim10.cc/uploads/movies/{$result->thumb_url}";
-                            if (preg_match('/\/movies\/([^\/]+)-thumb\.jpg$/', $posterUrl, $matches)) {
-                                $slug = $matches[1];
-                                $quality = '50';
-                                $posterTransformation = [
-                                    'width' => 500,
-                                    'crop' => 'scale'
-                                ];
-                                $this->uploadImageToCloudinary('posters', $slug, 'poster', $posterUrl, $quality, $posterTransformation);
-                            }
 
-                            //upload thumbnail
-                            $thumbUrl = "https://img.ophim10.cc/uploads/movies/{$result->poster_url}";
-                            if (preg_match('/\/movies\/([^\/]+)-poster\.jpg$/', $thumbUrl, $matches)) {
-                                $slug = $matches[1];
-                                $quality = '55';
-                                $thumbTransformation = [
-                                            'width' => 1000,
-                                            'crop' => 'scale'
-                                        ];
-                                $this->uploadImageToCloudinary('thumbs', $slug, 'thumb', $thumbUrl, $quality, $thumbTransformation);
-                            }
-                            } 
+                            if (!empty($countriesArray)) {
+                                $inValidCountries = 0;
 
-                        }
+                                foreach ($countriesArray as $country) {
+                                    if (!isset($countries[$country->slug])) {
+                                        $inValidCountries++;
+                                    } 
+                                }
+
+                                if ($inValidCountries === 0) {
+                                    $newMovie = [];
+
+                                    foreach ($attributes as $attribute) {
+                                        // $newMovie[$attribute] = $attribute === 'modified_time' ? $result->modified->time : $result->$attribute;
+                                        if (in_array($attribute, $detailAttributes)) {
+                                            $newMovie[$attribute] = json_encode($movie_details_data->$attribute);
+                                        } else {
+                                            // Common attributes
+                                            $newMovie[$attribute] = $attribute === 'modified_time' ? $result->modified->time : $result->$attribute;
+                                        }
+                                    }
+
+                                    $newMovies[] = $newMovie;
+                                    // print('new movie has _id' . $newMovie['_id'] . 'is ready to insert');
+                                }
+                            }
                         }
                     }
                 }
-
-                } else {
-                    $existingMovie = Movie::where('_id', $result->_id)->first();
-                    $this->updateMovieAttributes($existingMovie, $result, $attributes);
-                }
+            } else {
+                $existingMovie = Movie::where('_id', $result->_id)->first();
+                $this->updateMovieAttributes($existingMovie, $result, $attributes);
+            }
         }
     }
 
     print_r($newMovies);
 
     if (!empty($newMovies)) {
-        Movie::insert($newMovies);
-        print_r('New movies inserted!');
+        // Movie::insert($newMovies);
+        // print_r('New movies inserted!');
     }
-    
 }
 
- // ... Cloudinary upload logic...
-protected function uploadImageToCloudinary($saveFolder, $slug, $type, $url, $quality, $transformation = []) {
-    try {
-        $publicId = "$saveFolder/$slug-$type";
-        return Cloudinary::upload($url, [
-            'format' => 'webp',
-            'public_id' => $publicId,
-            'quality' => $quality,
-            'overwrite' => false,
-            'transformation' => $transformation,
-        ]);
-    } catch (\Throwable $th) {
-      
-    }
- }
 
+
+// protected function processMovieDetails(){
+    
+// }
+
+
+// protected function updateMovieAttributes($existingMovie, $result, $attributes)
+// {
+//     $updates = [];
+//     foreach ($attributes as $attribute) {
+//         $newValue = ($attribute === 'modified_time') ? $result->modified->time : $result->$attribute;
+
+//         if ($existingMovie->$attribute != $newValue) {
+//             $updates[$attribute] = $newValue;
+//         }
+//     }
+
+//     if (!empty($updates)) {
+//         Movie::where('_id', $existingMovie->_id)->update($updates);
+//     }
+// }
 
 protected function updateMovieAttributes($existingMovie, $result, $attributes)
 {
     $updates = [];
+    $detailAttributes = [
+        'content', 'type', 'status', 'is_copyright', 'sub_docquyen',
+        'trailer_url', 'time', 'episode_current', 'episode_total',
+        'quality', 'lang', 'notify', 'showtimes', 'view'
+    ];
 
-    foreach ($attributes as $attribute) {
-        $newValue = ($attribute === 'modified_time') ? $result->modified->time : $result->$attribute;
+    $movie_detail_url = $this->base_url . "phim/$result->slug";
+    $get_movie_detail = $this->client->getAsync($movie_detail_url);
+    $response = $get_movie_detail->wait();
 
-        if ($existingMovie->$attribute != $newValue) {
-            $updates[$attribute] = $newValue;
+    if ($response->getStatusCode() == 200) {
+        $movie_details_data = json_decode($response->getBody())->movie;
+
+        foreach ($attributes as $attribute) {
+            $newValue = $attribute === 'modified_time' ? $result->modified->time : $result->$attribute;
+
+            if (in_array($attribute, $detailAttributes)) {
+                $newValue = json_encode($movie_details_data->$attribute);
+            }
+
+            if ($existingMovie->$attribute != $newValue) {
+                $updates[$attribute] = $newValue;
+            }
+        }
+
+        if (!empty($updates)) {
+            Movie::where('_id', $existingMovie->_id)->update($updates);
         }
     }
-
-    if (!empty($updates)) {
-        Movie::where('_id', $existingMovie->_id)->update($updates);
-    }
 }
-
 
 
 }

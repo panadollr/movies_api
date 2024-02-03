@@ -31,10 +31,7 @@
 
 <script src="https://cdn.ckeditor.com/ckeditor5/40.2.0/super-build/ckeditor.js"></script>
 <script>
-            // This sample still does not showcase all CKEditor&nbsp;5 features (!)
-            // Visit https://ckeditor.com/docs/ckeditor5/latest/features/index.html to browse all the features.
             CKEDITOR.ClassicEditor.create(document.getElementById("blog-textarea"), {
-                // https://ckeditor.com/docs/ckeditor5/latest/features/toolbar/toolbar.html#extended-toolbar-configuration-format
                 toolbar: {
                     items: [
                         'exportPDF','exportWord', '|',
@@ -54,6 +51,12 @@
                     ],
                     shouldNotGroupWhenFull: true
                 },
+                contentStyle: {
+            body: {
+                backgroundColor: 'black', // Set the background color to black
+                color: 'white' // Set the text color to white, or any other color that suits your design
+            }
+        },
                 // Changing the language of the interface requires loading the language file using the <script> tag.
                 // language: 'es',
                 list: {
