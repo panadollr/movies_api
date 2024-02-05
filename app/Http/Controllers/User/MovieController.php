@@ -10,6 +10,21 @@ use App\Http\Resources\PaginationResource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * @OA\Info(
+ *      version="1.0.0",
+ *      title="L5 OpenApi",
+ *      description="L5 Swagger OpenApi description",
+ *      @OA\Contact(
+ *          email="darius@matulionis.lt"
+ *      ),
+ *     @OA\License(
+ *         name="Apache 2.0",
+ *         url="https://www.apache.org/licenses/LICENSE-2.0.html"
+ *     )
+ * )
+ */
+
 class MovieController
 {
 
@@ -115,6 +130,36 @@ class MovieController
         return $categories[$slug] ?? null;
     }
 
+     /**
+     * @OA\Get(
+     *     path="/the-loai",
+     *     tags={"category"},
+     *     summary="Finds Pets by status",
+     *     description="Multiple status values can be provided with comma separated string",
+     *     operationId="findPetsByStatus",
+     *     deprecated=true,
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Status values that needed to be considered for filter",
+     *         required=true,
+     *         explode=true,
+     *         @OA\Schema(
+     *             default="available",
+     *             type="string",
+     *             enum={"available", "pending", "sold"},
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="successful operation"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid status value"
+     *     ),
+     * )
+     */
     //PHIM THEO THỂ LOẠI
     public function getMoviesByCategory($category){
         $categoryName = $this->getCategoryNameBySlug($category);
