@@ -90,7 +90,7 @@ class MovieController
         try {
             //theo năm
             if ($year) {
-                $query->where('movies.year', '=', $year);
+                $query->where('year', '=', $year);
             }
 
             $result = ($limit === 'all') ? $query->get() : $query->paginate($limit);

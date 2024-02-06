@@ -12,9 +12,9 @@ use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\URL;
 
-if(App::environment('production')){
-    URL::forceScheme('https');
-}
+// if(App::environment('production')){
+//     URL::forceScheme('https');
+// }
 
 Route::prefix('admin')->group(function () {
     Route::get('general-infomation', [DashboardController::class, 'generalInformation']);
