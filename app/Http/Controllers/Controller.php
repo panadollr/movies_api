@@ -17,13 +17,11 @@ use Illuminate\Routing\Controller as BaseController;
  *      )
  * )
  * @OA\Server(
- *      url="http://localhost:8081/movie_api/public",
+ *      url="https://movies-api-amber-chi.vercel.app/api",
  *      description="Flashmov API Server",
  * )
  */
 
-//  https://movies-api-amber-chi.vercel.app/api/
-// http://localhost:8081/movie_api/public
 
 class Controller extends BaseController
 {

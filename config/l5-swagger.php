@@ -92,7 +92,9 @@ return [
             /*
              * Edit to set path where swagger ui assets should be stored
             */
-            'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH', 'vendor/swagger-api/swagger-ui/dist/'),
+            // 'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH', 'vendor/swagger-api/swagger-ui/dist/'),
+            // 'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH', 'resources/swagger-ui/dist/'),
+            'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH', 'public/swagger-ui/dist/'),
 
             /*
              * Absolute path to directories that should be excluded from scanning
@@ -288,6 +290,12 @@ return [
                     */
                     'use_pkce_with_authorization_code_grant' => false,
                 ],
+            ],
+            'cors' => [
+                'enabled' => true,
+                'allowedOrigins' => ['*'], // adjust this according to your needs
+                'allowedMethods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // adjust this according to your needs
+                'allowedHeaders' => ['Content-Type', 'Authorization', 'X-CSRF-TOKEN'], // adjust this according to your needs
             ],
         ],
         /*
