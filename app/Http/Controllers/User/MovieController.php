@@ -93,7 +93,7 @@ class MovieController
                 $query->where('movies.year', '=', $year);
             }
 
-            $result = ($limit === 'all') ? $query->select($this->selectedColumnsV2)->get() : $query->paginate($limit);
+            $result = ($limit === 'all') ? $query->get() : $query->paginate($limit);
         
             $responseData = [
                 'data' => MovieResource::collection($result),
