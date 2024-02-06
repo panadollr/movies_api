@@ -10,21 +10,6 @@ use App\Http\Resources\PaginationResource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
-/**
- * @OA\Info(
- *      version="1.0.0",
- *      title="L5 OpenApi",
- *      description="L5 Swagger OpenApi description",
- *      @OA\Contact(
- *          email="darius@matulionis.lt"
- *      ),
- *     @OA\License(
- *         name="Apache 2.0",
- *         url="https://www.apache.org/licenses/LICENSE-2.0.html"
- *     )
- * )
- */
-
 class MovieController
 {
 
@@ -129,37 +114,27 @@ class MovieController
         $categories = config('api_settings.categories');
         return $categories[$slug] ?? null;
     }
-
+    
      /**
      * @OA\Get(
-     *     path="/the-loai",
-     *     tags={"category"},
-     *     summary="Finds Pets by status",
-     *     description="Multiple status values can be provided with comma separated string",
-     *     operationId="findPetsByStatus",
-     *     deprecated=true,
+     *     path="/the-loai/{category}",
+     *     tags={"categories"},
+     *     summary="Danh sách phim theo thể loại",
      *     @OA\Parameter(
-     *         name="status",
-     *         in="query",
-     *         description="Status values that needed to be considered for filter",
+     *         name="category_slug",
+     *         in="path",
      *         required=true,
      *         explode=true,
      *         @OA\Schema(
-     *             default="available",
-     *             type="string",
-     *             enum={"available", "pending", "sold"},
+     *             type="string"
      *         )
      *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="successful operation"
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Invalid status value"
-     *     ),
+    *     @OA\Response(response="200", description="Successful response"),
      * )
      */
+
+     
+     
     //PHIM THEO THỂ LOẠI
     public function getMoviesByCategory($category){
         $categoryName = $this->getCategoryNameBySlug($category);
@@ -181,6 +156,24 @@ class MovieController
         return $countries[$slug] ?? null;
     }
 
+
+     /**
+     * @OA\Get(
+     *     path="/quoc-gia/{country_slug}",
+     *     tags={"countries"},
+     *     summary="Danh sách phim theo quốc gia",
+     *     @OA\Parameter(
+     *         name="country_slug",
+     *         in="path",
+     *         required=true,
+     *         explode=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(response="200", description="Successful response"),
+     * )
+     */
     //PHIM THEO QUỐC GIA
     public function getMoviesByCountry($country_slug){
         $countryName = $this->getCountryNameBySlug($country_slug);
@@ -207,6 +200,15 @@ class MovieController
         return $this->getMoviesByFilter($movies, 24, $title, $description);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/phim-bo",
+     *     tags={"type"},
+     *     summary="Danh sách phim bộ",
+     *     @OA\Response(response="200", description="Successful response"),
+     * )
+     */
+
     //PHIM BỘ
     public function getSeriesMovies(){
         $title = "Phim bộ \$year, Phim bộ \$year hay tuyển chọn, Phim bộ mới nhất \$year";
@@ -214,6 +216,14 @@ class MovieController
         return $this->getMoviesByType('series', $title, $description);
     }
 
+         /**
+     * @OA\Get(
+     *     path="/phim-le",
+     *     tags={"type"},
+     *     summary="Danh sách phim lẻ",
+     *     @OA\Response(response="200", description="Successful response"),
+     * )
+     */
     //PHIM LẺ
     public function getSingleMovies(){
         $title = "Phim lẻ \$year, Phim lẻ \$year hay tuyển chọn, Phim lẻ mới nhất \$year";
@@ -221,6 +231,14 @@ class MovieController
         return $this->getMoviesByType('single', $title, $description);
     }
 
+         /**
+     * @OA\Get(
+     *     path="/hoat-hinh",
+     *     tags={"type"},
+     *     summary="Danh sách phim hoạt hình",
+     *     @OA\Response(response="200", description="Successful response"),
+     * )
+     */
     //PHIM HOẠT HÌNH
     public function getCartoonMovies(){
         $title = "Phim hoạt hình, Phim hoạt hình hay tuyển chọn, Phim hoạt hình mới nhất \$year";
@@ -228,6 +246,14 @@ class MovieController
         return $this->getMoviesByType('hoathinh', $title, $description);
     }
 
+         /**
+     * @OA\Get(
+     *     path="/subteam",
+     *     tags={"type"},
+     *     summary="Danh sách phim subteam",
+     *     @OA\Response(response="200", description="Successful response"),
+     * )
+     */
     //PHIM SUBTEAM
     public function getSubTeamMovies(){
         $title = 'Flashmov Subteam - Tuyển tập phim được dịch bởi Flashmov';
@@ -239,6 +265,14 @@ class MovieController
         return $this->getMoviesByFilter($subTeamMovies, 24, $title, $description);
     }
 
+         /**
+     * @OA\Get(
+     *     path="/phim-sap-chieu",
+     *     tags={"type"},
+     *     summary="Danh sách phim sắp chiếu",
+     *     @OA\Response(response="200", description="Successful response"),
+     * )
+     */
     //PHIM SẮP CHIẾU
     public function getUpcomingMovies(){
         $title = "Phim sắp chiếu \$year";
@@ -252,6 +286,14 @@ class MovieController
         return $this->getMoviesByFilter($upcomingMovies, 24, $title, $description);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/thinh-hanh",
+     *     tags={"type"},
+     *     summary="Danh sách phim thịnh hành",
+     *     @OA\Response(response="200", description="Successful response"),
+     * )
+     */
     //PHIM ĐANG THỊNH HÀNH
     public function getTrendingMovies(Request $request){
         $title = "Xem phim mới, Phim đang thịnh hành | Flashmov | flashmov.xyz";
@@ -310,6 +352,14 @@ class MovieController
         return $this->getNewUpdatedMoviesByType('single', $title, $description);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/hom-nay-xem-gi",
+     *     tags={"type"},
+     *     summary="Danh sách phim hôm nay xem gì",
+     *     @OA\Response(response="200", description="Successful response"),
+     * )
+     */
     //HÔM NAY XEM GÌ
     public function getMoviesAirToday(){
         $title = 'Hôm nay xem gì';
@@ -327,6 +377,25 @@ class MovieController
         return $this->getMoviesByFilter($moviesAirToday, 10, $title, $description);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/tim-kiem",
+     *     tags={"search"},
+     *     summary="Tìm kiếm phim",
+     *     @OA\Parameter(
+     *         name="keyword",
+     *         description="Tên phim",
+     *         in="query",
+     *         required=true,
+     *         explode=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(response="200", description="Successful response"),
+     * ),
+     */
+    
     //TÌM KIẾM PHIM
     public function searchMovie(Request $request){
         try {
@@ -358,6 +427,8 @@ class MovieController
         
     } 
 
+
+   
     public function get18sMovies(){
         try {
             $movies = $this->moviesWithNoTrailer->take(10)->get();

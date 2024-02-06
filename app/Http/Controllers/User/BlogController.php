@@ -12,6 +12,10 @@ use App\Http\Resources\PaginationResource;
 
 use DateTime;
 
+/**
+ * Class BlogController.
+ */
+
 class BlogController
 {
 
@@ -27,6 +31,15 @@ class BlogController
         ];
     }
 
+
+    /**
+     * @OA\Get(
+     *     path="/tin-tuc",
+     *     tags={"blog"},
+     *     summary="Danh sách tin tức",
+     *     @OA\Response(response="200", description="Successful response"),
+     * )
+     */
     public function getBlogs(){
         $limit = request()->input('limit', 5);
         try {
@@ -48,6 +61,23 @@ class BlogController
         }
     }
 
+     /**
+     * @OA\Get(
+     *     path="/tin-tuc/{slug}",
+     *     tags={"blog"},
+     *     summary="Chi tiết tin tức",
+     *     @OA\Parameter(
+     *         name="slug",
+     *         in="path",
+     *         required=true,
+     *         explode=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(response="200", description="Successful response"),
+     * )
+     */
     public function blogDetail($slug){
         try {
         $blogDetail = Blog::where('slug', $slug)->first();

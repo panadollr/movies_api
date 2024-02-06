@@ -14,6 +14,11 @@ use App\Models\Movie;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 
+
+/**
+ * Class MovieDetailsController.
+ */
+
 class MovieDetailsController
 {
     protected $client;
@@ -150,6 +155,24 @@ private function getDefaultEpisode()
     //         }
     // }
 
+     /**
+     * @OA\Get(
+     *     path="/phim/{movie_slug}",
+     *     tags={"movie detail"},
+     *     summary="Thông tin phim",
+     *     @OA\Parameter(
+     *         name="movie_slug",
+     *         description="slug phim",
+     *         in="path",
+     *         required=true,
+     *         explode=true,
+     *         @OA\Schema(
+     *             type="string"
+     *         )
+     *     ),
+     *     @OA\Response(response="200", description="Successful response"),
+     * )
+     */
     //new version 3/2/2024
     public function getMovieDetail($slug, $episodeSlug = null){
         try {

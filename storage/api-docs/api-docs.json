@@ -1,0 +1,258 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Flashmov API Document",
+        "description": "flashmov.xyz Website cung cấp phim miễn phí nhanh chất lượng cao. Nguồn phim chất lượng cao cập nhật nhanh nhất.",
+        "contact": {
+            "email": "lanvkuk2@gmail.com"
+        },
+        "version": "3.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8081/movie_api/public",
+            "description": "Flashmov API Server"
+        }
+    ],
+    "paths": {
+        "/tin-tuc": {
+            "get": {
+                "tags": [
+                    "blog"
+                ],
+                "summary": "Danh sách tin tức",
+                "operationId": "b5523f942149a05adf0332036c33c5da",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/tin-tuc/{slug}": {
+            "get": {
+                "tags": [
+                    "blog"
+                ],
+                "summary": "Chi tiết tin tức",
+                "operationId": "d874546b70f1a12e05e5c67c95800749",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "explode": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/the-loai/{category}": {
+            "get": {
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Danh sách phim theo thể loại",
+                "operationId": "5f97b2d162b22f96c426137c2c33dde4",
+                "parameters": [
+                    {
+                        "name": "category_slug",
+                        "in": "path",
+                        "required": true,
+                        "explode": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/quoc-gia/{country_slug}": {
+            "get": {
+                "tags": [
+                    "countries"
+                ],
+                "summary": "Danh sách phim theo quốc gia",
+                "operationId": "3c7d484da9c5795adf3bbdabc516b6c6",
+                "parameters": [
+                    {
+                        "name": "country_slug",
+                        "in": "path",
+                        "required": true,
+                        "explode": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/phim-bo": {
+            "get": {
+                "tags": [
+                    "type"
+                ],
+                "summary": "Danh sách phim bộ",
+                "operationId": "d698814aa62da1ea91f857daa02f95dd",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/phim-le": {
+            "get": {
+                "tags": [
+                    "type"
+                ],
+                "summary": "Danh sách phim lẻ",
+                "operationId": "69f830ddaab37ee7b7ef46d1fc80b303",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/hoat-hinh": {
+            "get": {
+                "tags": [
+                    "type"
+                ],
+                "summary": "Danh sách phim hoạt hình",
+                "operationId": "617cc04f2fac46aafd154a213d06179c",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/subteam": {
+            "get": {
+                "tags": [
+                    "type"
+                ],
+                "summary": "Danh sách phim subteam",
+                "operationId": "85293d5a7a801e72011645ed07afe4c4",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/phim-sap-chieu": {
+            "get": {
+                "tags": [
+                    "type"
+                ],
+                "summary": "Danh sách phim sắp chiếu",
+                "operationId": "039a55adbfbc625048448a197e4ba11f",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/thinh-hanh": {
+            "get": {
+                "tags": [
+                    "type"
+                ],
+                "summary": "Danh sách phim thịnh hành",
+                "operationId": "742e80050f637f16a4afc65eeb9e2cbc",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/hom-nay-xem-gi": {
+            "get": {
+                "tags": [
+                    "type"
+                ],
+                "summary": "Danh sách phim hôm nay xem gì",
+                "operationId": "c5fd58f91964320b892e8203daef4d3e",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/tim-kiem": {
+            "get": {
+                "tags": [
+                    "search"
+                ],
+                "summary": "Tìm kiếm phim",
+                "operationId": "e3ec21393a807561b06f6c11e0cde270",
+                "parameters": [
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "description": "Tên phim",
+                        "required": true,
+                        "explode": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/phim/{movie_slug}": {
+            "get": {
+                "tags": [
+                    "movie detail"
+                ],
+                "summary": "Thông tin phim",
+                "operationId": "78def7b618dfc8cbb00d792e68edd906",
+                "parameters": [
+                    {
+                        "name": "movie_slug",
+                        "in": "path",
+                        "description": "slug phim",
+                        "required": true,
+                        "explode": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        }
+    }
+}
