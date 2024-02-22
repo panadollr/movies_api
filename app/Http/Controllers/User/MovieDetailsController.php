@@ -228,8 +228,7 @@ private function getDefaultEpisode()
                                 ->select('slug', 'type', 'category', 'country')
                                 ->first();
     
-            $similarMoviesQuery = $this->movieController->moviesWithNoTrailer
-                ->select($this->movieController->selectedColumnsV2);
+            $similarMoviesQuery = $this->movieController->moviesWithNoTrailer;
     
             if ($movieDetail) {
                 $similarMoviesQuery->where('movies.slug', '!=', $movieDetail->slug)
