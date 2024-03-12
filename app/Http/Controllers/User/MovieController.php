@@ -313,10 +313,10 @@ class MovieController
 
     $topTrendingMovies = $this->moviesWithNoTrailer
     ->when($time_window == "week", function ($query) {
-        $query->whereBetween('modified_time', [$this->week, $this->tomorrow]);
+        // $query->whereBetween('modified_time', [$this->week, $this->tomorrow]);
     })
     ->when($time_window == "day", function ($query) {
-        $query->whereBetween('modified_time', [$this->today, $this->tomorrow]);
+        // $query->whereBetween('modified_time', [$this->today, $this->tomorrow]);
     })->latest('view');
 
         return $this->getMoviesByFilter($topTrendingMovies, 24, $title, $description);
