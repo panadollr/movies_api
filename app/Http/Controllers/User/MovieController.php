@@ -109,6 +109,28 @@ class MovieController
         }
     }
 
+     /**
+     * @OA\Get(
+     *     path="/the-loai",
+     *     tags={"Categories"},
+     *     summary="Danh sách thể loại",
+    *     @OA\Response(response="200", description="Successful response"),
+     * )
+     */   
+    public function getCategories(){
+        $categories = config('api_settings.categories');
+        $data = ['data'=> [
+            'items' => []
+        ]];
+        foreach($categories as $category_slug => $category_name){
+            $data['data']['items'][] = [
+                    'slug' => $category_slug,
+                    'name' => $category_name
+            ];
+        }
+        return $data;
+    }
+
     //LẤY TÊN THỂ LOẠI
     protected function getCategoryNameBySlug($slug){
         $categories = config('api_settings.categories');
@@ -117,8 +139,8 @@ class MovieController
     
      /**
      * @OA\Get(
-     *     path="/the-loai/{category}",
-     *     tags={"categories"},
+     *     path="/the-loai/{category_slug}",
+     *     tags={"Categories"},
      *     summary="Danh sách phim theo thể loại",
      *     @OA\Parameter(
      *         name="category_slug",
@@ -131,10 +153,7 @@ class MovieController
      *     ),
     *     @OA\Response(response="200", description="Successful response"),
      * )
-     */
-
-     
-     
+     */    
     //PHIM THEO THỂ LOẠI
     public function getMoviesByCategory($category){
         $categoryName = $this->getCategoryNameBySlug($category);
@@ -150,17 +169,39 @@ class MovieController
         return $this->getMoviesByFilter($moviesByCategory, 24, $title, $description);
     } 
 
+    //LẤY DANH SÁCH QUỐC GIA
+    /**
+     * @OA\Get(
+     *     path="/quoc-gia",
+     *     tags={"Countries"},
+     *     summary="Danh sách quốc gia",
+     *     @OA\Response(response="200", description="Successful response"),
+     * )
+     */
+    public function getCountries(){
+        $countries = config('api_settings.countries');
+        $data = ['data'=> [
+            'items' => []
+        ]];
+        foreach($countries as $country_slug => $country_name){
+            $data['data']['items'][] = [
+                    'slug' => $country_slug,
+                    'name' => $country_name
+            ];
+        }
+        return $data;
+    }
+
     //LẤY TÊN QUỐC GIA
     protected function getCountryNameBySlug($slug){
         $countries = config('api_settings.countries');
         return $countries[$slug] ?? null;
     }
 
-
      /**
      * @OA\Get(
      *     path="/quoc-gia/{country_slug}",
-     *     tags={"countries"},
+     *     tags={"Countries"},
      *     summary="Danh sách phim theo quốc gia",
      *     @OA\Parameter(
      *         name="country_slug",
@@ -203,7 +244,7 @@ class MovieController
     /**
      * @OA\Get(
      *     path="/phim-bo",
-     *     tags={"type"},
+     *     tags={"Types"},
      *     summary="Danh sách phim bộ",
      *     @OA\Response(response="200", description="Successful response"),
      * )
@@ -219,7 +260,7 @@ class MovieController
          /**
      * @OA\Get(
      *     path="/phim-le",
-     *     tags={"type"},
+     *     tags={"Types"},
      *     summary="Danh sách phim lẻ",
      *     @OA\Response(response="200", description="Successful response"),
      * )
@@ -234,7 +275,7 @@ class MovieController
          /**
      * @OA\Get(
      *     path="/hoat-hinh",
-     *     tags={"type"},
+     *     tags={"Types"},
      *     summary="Danh sách phim hoạt hình",
      *     @OA\Response(response="200", description="Successful response"),
      * )
@@ -249,7 +290,7 @@ class MovieController
          /**
      * @OA\Get(
      *     path="/subteam",
-     *     tags={"type"},
+     *     tags={"Types"},
      *     summary="Danh sách phim subteam",
      *     @OA\Response(response="200", description="Successful response"),
      * )
@@ -268,7 +309,7 @@ class MovieController
          /**
      * @OA\Get(
      *     path="/phim-sap-chieu",
-     *     tags={"type"},
+     *     tags={"Types"},
      *     summary="Danh sách phim sắp chiếu",
      *     @OA\Response(response="200", description="Successful response"),
      * )
@@ -289,7 +330,7 @@ class MovieController
     /**
      * @OA\Get(
      *     path="/thinh-hanh",
-     *     tags={"type"},
+     *     tags={"Types"},
      *     summary="Danh sách phim thịnh hành",
      *     @OA\Response(response="200", description="Successful response"),
      * )
@@ -355,7 +396,7 @@ class MovieController
     /**
      * @OA\Get(
      *     path="/hom-nay-xem-gi",
-     *     tags={"type"},
+     *     tags={"Types"},
      *     summary="Danh sách phim hôm nay xem gì",
      *     @OA\Response(response="200", description="Successful response"),
      * )
@@ -380,7 +421,7 @@ class MovieController
     /**
      * @OA\Get(
      *     path="/tim-kiem",
-     *     tags={"search"},
+     *     tags={"Search"},
      *     summary="Tìm kiếm phim",
      *     @OA\Parameter(
      *         name="keyword",

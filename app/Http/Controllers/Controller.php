@@ -9,18 +9,19 @@ use Illuminate\Routing\Controller as BaseController;
 
 /**
  * @OA\Info(
- *      version="3.0.0",
  *      title="Flashmov API Document",
- *      description="flashmov.xyz Website cung cấp phim miễn phí nhanh chất lượng cao. Nguồn phim chất lượng cao cập nhật nhanh nhất.",
- *      @OA\Contact(
- *          email="lanvkuk2@gmail.com"
- *      )
+ *      description="flashmov.xyz Website cung cấp phim miễn phí nhanh chất lượng cao. Nguồn phim chất lượng cao cập nhật nhanh nhất.<br>
+ *      Developed by: lanvkuk2@gmail.com",
+ *      version="1.0.0",
  * )
- * @OA\Server(
- *      url="https://movies-api-amber-chi.vercel.app/api",
- *      description="Flashmov API Server",
+ * @OA\SecurityScheme(
+ *     type="http",
+ *     securityScheme="bearerAuth",
+ *     scheme="bearer",
+ *     bearerFormat="JWT"
  * )
  */
+
 
 class Controller extends BaseController
 {

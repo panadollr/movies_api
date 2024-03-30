@@ -63,7 +63,9 @@ use App\Http\Controllers\User\MovieController;
     Route::get('subteam', [MovieController::class, 'getSubTeamMovies']);
     Route::get('phim-sap-chieu', [MovieController::class, 'getUpcomingMovies']);
     
+    Route::get('the-loai', [MovieController::class, 'getCategories']);
     Route::get('the-loai/{category}', [MovieController::class, 'getMoviesByCategory']);
+    Route::get('quoc-gia', [MovieController::class, 'getCountries']);
     Route::get('quoc-gia/{country}', [MovieController::class, 'getMoviesByCountry']);
     Route::get('xu-huong', [MovieController::class, 'getTrendingMovies']);
     // Route::get('xu-huong', function(){

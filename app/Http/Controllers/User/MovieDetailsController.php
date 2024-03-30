@@ -158,7 +158,7 @@ private function getDefaultEpisode()
      /**
      * @OA\Get(
      *     path="/phim/{movie_slug}",
-     *     tags={"movie detail"},
+     *     tags={"Movie detail"},
      *     summary="Thông tin phim",
      *     @OA\Parameter(
      *         name="movie_slug",

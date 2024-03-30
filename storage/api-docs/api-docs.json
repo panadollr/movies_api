@@ -2,23 +2,14 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Flashmov API Document",
-        "description": "flashmov.xyz Website cung cấp phim miễn phí nhanh chất lượng cao. Nguồn phim chất lượng cao cập nhật nhanh nhất.",
-        "contact": {
-            "email": "lanvkuk2@gmail.com"
-        },
-        "version": "3.0.0"
+        "description": "flashmov.xyz Website cung cấp phim miễn phí nhanh chất lượng cao. Nguồn phim chất lượng cao cập nhật nhanh nhất.<br>\n *      Developed by: lanvkuk2@gmail.com",
+        "version": "1.0.0"
     },
-    "servers": [
-        {
-            "url": "https://movies-api-amber-chi.vercel.app/api",
-            "description": "Flashmov API Server"
-        }
-    ],
     "paths": {
         "/tin-tuc": {
             "get": {
                 "tags": [
-                    "blog"
+                    "Blog"
                 ],
                 "summary": "Danh sách tin tức",
                 "operationId": "b5523f942149a05adf0332036c33c5da",
@@ -32,7 +23,7 @@
         "/tin-tuc/{slug}": {
             "get": {
                 "tags": [
-                    "blog"
+                    "Blog"
                 ],
                 "summary": "Chi tiết tin tức",
                 "operationId": "d874546b70f1a12e05e5c67c95800749",
@@ -54,13 +45,27 @@
                 }
             }
         },
-        "/the-loai/{category}": {
+        "/the-loai": {
             "get": {
                 "tags": [
-                    "categories"
+                    "Categories"
+                ],
+                "summary": "Danh sách thể loại",
+                "operationId": "305c4f812fb0aab98fdf075fb511c25a",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/the-loai/{category_slug}": {
+            "get": {
+                "tags": [
+                    "Categories"
                 ],
                 "summary": "Danh sách phim theo thể loại",
-                "operationId": "5f97b2d162b22f96c426137c2c33dde4",
+                "operationId": "9c32ec08dc97ce6670efae8ea90ef07f",
                 "parameters": [
                     {
                         "name": "category_slug",
@@ -79,10 +84,24 @@
                 }
             }
         },
+        "/quoc-gia": {
+            "get": {
+                "tags": [
+                    "Countries"
+                ],
+                "summary": "Danh sách quốc gia",
+                "operationId": "24f21da7e077624bb914d01d2951b43f",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
         "/quoc-gia/{country_slug}": {
             "get": {
                 "tags": [
-                    "countries"
+                    "Countries"
                 ],
                 "summary": "Danh sách phim theo quốc gia",
                 "operationId": "3c7d484da9c5795adf3bbdabc516b6c6",
@@ -107,7 +126,7 @@
         "/phim-bo": {
             "get": {
                 "tags": [
-                    "type"
+                    "Types"
                 ],
                 "summary": "Danh sách phim bộ",
                 "operationId": "d698814aa62da1ea91f857daa02f95dd",
@@ -121,7 +140,7 @@
         "/phim-le": {
             "get": {
                 "tags": [
-                    "type"
+                    "Types"
                 ],
                 "summary": "Danh sách phim lẻ",
                 "operationId": "69f830ddaab37ee7b7ef46d1fc80b303",
@@ -135,7 +154,7 @@
         "/hoat-hinh": {
             "get": {
                 "tags": [
-                    "type"
+                    "Types"
                 ],
                 "summary": "Danh sách phim hoạt hình",
                 "operationId": "617cc04f2fac46aafd154a213d06179c",
@@ -149,7 +168,7 @@
         "/subteam": {
             "get": {
                 "tags": [
-                    "type"
+                    "Types"
                 ],
                 "summary": "Danh sách phim subteam",
                 "operationId": "85293d5a7a801e72011645ed07afe4c4",
@@ -163,7 +182,7 @@
         "/phim-sap-chieu": {
             "get": {
                 "tags": [
-                    "type"
+                    "Types"
                 ],
                 "summary": "Danh sách phim sắp chiếu",
                 "operationId": "039a55adbfbc625048448a197e4ba11f",
@@ -177,7 +196,7 @@
         "/thinh-hanh": {
             "get": {
                 "tags": [
-                    "type"
+                    "Types"
                 ],
                 "summary": "Danh sách phim thịnh hành",
                 "operationId": "742e80050f637f16a4afc65eeb9e2cbc",
@@ -191,7 +210,7 @@
         "/hom-nay-xem-gi": {
             "get": {
                 "tags": [
-                    "type"
+                    "Types"
                 ],
                 "summary": "Danh sách phim hôm nay xem gì",
                 "operationId": "c5fd58f91964320b892e8203daef4d3e",
@@ -205,7 +224,7 @@
         "/tim-kiem": {
             "get": {
                 "tags": [
-                    "search"
+                    "Search"
                 ],
                 "summary": "Tìm kiếm phim",
                 "operationId": "e3ec21393a807561b06f6c11e0cde270",
@@ -231,7 +250,7 @@
         "/phim/{movie_slug}": {
             "get": {
                 "tags": [
-                    "movie detail"
+                    "Movie detail"
                 ],
                 "summary": "Thông tin phim",
                 "operationId": "78def7b618dfc8cbb00d792e68edd906",
@@ -252,6 +271,15 @@
                         "description": "Successful response"
                     }
                 }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
             }
         }
     }

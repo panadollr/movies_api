@@ -35,7 +35,7 @@ class BlogController
     /**
      * @OA\Get(
      *     path="/tin-tuc",
-     *     tags={"blog"},
+     *     tags={"Blog"},
      *     summary="Danh sách tin tức",
      *     @OA\Response(response="200", description="Successful response"),
      * )
@@ -64,7 +64,7 @@ class BlogController
      /**
      * @OA\Get(
      *     path="/tin-tuc/{slug}",
-     *     tags={"blog"},
+     *     tags={"Blog"},
      *     summary="Chi tiết tin tức",
      *     @OA\Parameter(
      *         name="slug",

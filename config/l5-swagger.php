@@ -92,8 +92,7 @@ return [
             /*
              * Edit to set path where swagger ui assets should be stored
             */
-            'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH', 'vendor/swagger-api/swagger-ui/dist/'),    
-            // 'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH', 'public/swagger-ui/dist/'),
+            'swagger_ui_assets_path' => env('L5_SWAGGER_UI_ASSETS_PATH', 'vendor/swagger-api/swagger-ui/dist/'),
 
             /*
              * Absolute path to directories that should be excluded from scanning
@@ -121,7 +120,7 @@ return [
             /**
              * Custom query path processors classes.
              *
-             * @link https://github.com/zircote/swagger-php/tree/master/Examples/schema-query-parameter-processor
+             * @link https://github.com/zircote/swagger-php/tree/master/Examples/processors/schema-query-parameter
              * @see \OpenApi\scan
              */
             'processors' => [
@@ -264,7 +263,7 @@ return [
                  * 'full' (expands the tags and operations),
                  * 'none' (expands nothing).
                  */
-                'doc_expansion' => env('L5_SWAGGER_UI_DOC_EXPANSION', 'none'),
+                'doc_expansion' => env('L5_SWAGGER_UI_DOC_EXPANSION', 'list'),
 
                 /**
                  * If set, enables filtering. The top bar will show an edit box that
@@ -289,12 +288,6 @@ return [
                     */
                     'use_pkce_with_authorization_code_grant' => false,
                 ],
-            ],
-            'cors' => [
-                'enabled' => true,
-                'allowedOrigins' => ['*'], // adjust this according to your needs
-                'allowedMethods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // adjust this according to your needs
-                'allowedHeaders' => ['Content-Type', 'Authorization', 'X-CSRF-TOKEN'], // adjust this according to your needs
             ],
         ],
         /*
