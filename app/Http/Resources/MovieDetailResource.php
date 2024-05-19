@@ -36,8 +36,8 @@ class MovieDetailResource extends JsonResource
         'content' => $movie['content'],
         'type' => $movie['type'],
         'status' => $movie['status'],
-        'thumb_url' => $this->formatOphimImageUrl($movie['poster_url']),
-        'poster_url' => $this->formatOphimImageUrl($movie['thumb_url']),
+        'thumb_url' => $this->formatOphimImageUrl($movie['slug']),
+        'poster_url' => $this->formatOphimImageUrl($movie['slug']),
         'is_copyright' => $movie['is_copyright'],
         'sub_docquyen' => (bool) $movie['sub_docquyen'],
         'trailer_url' => $movie['trailer_url'],
@@ -87,9 +87,10 @@ class MovieDetailResource extends JsonResource
 
 
 //poster va thumbnail ophim
-protected function formatOphimImageUrl($url)
+protected function formatOphimImageUrl($slug)
 {
-        return $url ? "https://ophim10.cc/_next/image?url=http%3A%2F%2Fimg.ophim1.com%2Fuploads%2Fmovies%2F$url&w=256&q=75" : null;
+        // return $url ? "https://ophim10.cc/_next/image?url=http%3A%2F%2Fimg.ophim1.com%2Fuploads%2Fmovies%2F$url&w=256&q=75" : null;
+        return "https://img.ophim.live/uploads/movies/{$slug}-thumb.jpg";
 }
 
     protected function formatImageWithCloudinaryUrl($movie, $type)

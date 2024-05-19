@@ -93,12 +93,7 @@ class MovieResource extends JsonResource
     //poster ophim
     protected function formatImageUrl($url)
     {
-        // return $url ? $this->imageDomain . $url : null;
-        if(request()->path() == 'xu-huong'){
-            return $url ? "https://ophim10.cc/_next/image?url=http%3A%2F%2Fimg.ophim1.com%2Fuploads%2Fmovies%2F$url&w=256&q=75" : null;
-        } else {
-            return $url ? "https://ophim10.cc/_next/image?url=http%3A%2F%2Fimg.ophim1.com%2Fuploads%2Fmovies%2F$url&w=192&q=75" : null;
-        }
+        return "https://img.ophim.live/uploads/movies/{$this->slug}-thumb.jpg";
         
     }
 
