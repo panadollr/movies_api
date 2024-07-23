@@ -57,27 +57,19 @@ use App\Http\Controllers\Admin\ScheduledTasksController;
 
 //USER
 use App\Http\Controllers\User\MovieController;
-    Route::get('phim-le', [MovieController::class, 'getSingleMovies']);
-    Route::get('phim-bo', [MovieController::class, 'getSeriesMovies']);
-    Route::get('hoat-hinh', [MovieController::class, 'getCartoonMovies']);
-    Route::get('subteam', [MovieController::class, 'getSubTeamMovies']);
-    Route::get('phim-sap-chieu', [MovieController::class, 'getUpcomingMovies']);
-    
-    Route::get('the-loai', [MovieController::class, 'getCategories']);
-    Route::get('the-loai/{category}', [MovieController::class, 'getMoviesByCategory']);
-    Route::get('quoc-gia', [MovieController::class, 'getCountries']);
-    Route::get('quoc-gia/{country}', [MovieController::class, 'getMoviesByCountry']);
-    Route::get('xu-huong', [MovieController::class, 'getTrendingMovies']);
-    // Route::get('xu-huong', function(){
-    //     return 'ád';
-    // });
-    Route::get('moi-cap-nhat/phim-bo', [MovieController::class, 'getNewUpdatedSeriesMovies']);
-    Route::get('moi-cap-nhat/phim-le', [MovieController::class, 'getNewUpdatedSingleMovies']);
-    Route::get('hom-nay-xem-gi', [MovieController::class, 'getMoviesAirToday']);
-    Route::get('tim-kiem', [MovieController::class, 'searchMovie']);
-    Route::get('phim-18', [MovieController::class, 'get18sMovies']);
-    Route::get('total-movies', [MovieController::class, 'getTotalMovies']);
-    Route::middleware('cors2')->get('phim-le-2', [MovieController::class, 'getSingleMovies']);
+Route::controller(MovieController::class)->group(function () {
+    Route::get('xu-huong', 'getTrendingMovies');
+    Route::get('phim-le', 'getSingleMovies');
+    Route::get('phim-bo', 'getSeriesMovies');
+    Route::get('phim-sap-chieu', 'getUpcomingMovies');
+    Route::get('the-loai', 'getCategories');
+    Route::get('the-loai/{category}','getMoviesByCategory');
+    Route::get('moi-cap-nhat/phim-bo', 'getNewUpdatedSeriesMovies');
+    Route::get('moi-cap-nhat/phim-le', 'getNewUpdatedSingleMovies');
+    Route::get('hom-nay-xem-gi', 'getMoviesAirToday');
+    Route::get('tim-kiem', 'searchMovie');
+    Route::get('total-movies', 'getTotalMovies');
+});
 
 use App\Http\Controllers\User\MovieDetailsController;
     Route::get('phim/{slug}/{episode_slug}', [MovieDetailsController::class, 'getMovieDetail']);
