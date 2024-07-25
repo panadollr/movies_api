@@ -146,44 +146,41 @@ class MovieController
             $description = "Xem phim mới $categoryName \$year miễn phí nhanh chất lượng cao." .
             " Xem phim $categoryName \$year online Việt Sub, Thuyết minh, lồng tiếng chất lượng HD." .
             " Xem phim nhanh online chất lượng cao"; 
-    
+
+            // Define the base query
             $query = $this->moviesWithNoTrailer->whereJsonContains('category', ['slug' => $category]);
 
             if ($year) {
                 $query->where('year', '=', $year);
             }
-        
-            $upcomingTrendingMovies = $query->take(15)->get();  
-        
-            $externalRatings = $upcomingTrendingMovies->mapWithKeys(function ($movie) {
-                $response = Http::get('https://ophim1.com/phim/' . $movie->slug);
-                $rating = $response->json('movie.tmdb.vote_average', 0);
-                return [$movie->_id => $rating];
-            });
-    
-            $upcomingTrendingMovies->each(function ($movie) use ($externalRatings) {
-                $movie->rating = $externalRatings[$movie->_id] ?? 0;
-            })->sortByDesc('rating')->sortByDesc('views');
+
+            // Fetch trending movies (top 15 by view)
+            $trendingMovies = $query->where('trailer_url', '!=', '')
+                                ->orderByDesc('view')
+                                ->take(15)
+                                ->get();
         
             // Fetch regular upcoming movies with pagination
-            $limit = request()->input('limit', 24);
-            $tredingRegularMovieResult = ($limit === 'all') ? $query->get() : $query->paginate($limit);
+            $regularMoviesQuery = clone $query; // Clone the base query for regular movies
+            $regularMoviesQuery->orderByDesc('year');
+
+            $regularMovies = ($limit === 'all') ? $regularMoviesQuery->get() : $regularMoviesQuery->paginate($limit);
         
             $responseData = [
                 'data' => [
                     'trending_movies' => [
-                       'count' => $upcomingTrendingMovies->count(),
-                       'items' => MovieResource::collection($upcomingTrendingMovies),
+                       'count' => $trendingMovies->count(),
+                       'items' => MovieResource::collection($trendingMovies),
                     ],
     
                     'regular_movies' => [
-                       'count' => $tredingRegularMovieResult->count(),
-                       'items' => MovieResource::collection($tredingRegularMovieResult),
+                       'count' => $regularMovies->count(),
+                       'items' => MovieResource::collection($regularMovies),
                        'pagination' => [
-                            'totalItems' => $tredingRegularMovieResult->total(),
-                            'totalItemsPerPage' => $tredingRegularMovieResult->perPage(),
-                            'currentPage' => $tredingRegularMovieResult->currentPage(),
-                            'totalPages' => $tredingRegularMovieResult->lastPage(),
+                            'totalItems' => $regularMovies->total(),
+                            'totalItemsPerPage' => $regularMovies->perPage(),
+                            'currentPage' => $regularMovies->currentPage(),
+                            'totalPages' => $regularMovies->lastPage(),
                         ],
                     ] 
                 ],
@@ -208,46 +205,39 @@ class MovieController
         $description = $description;
 
         // Define the base query
-        $query = Movie::where('type', $type)
-            ->where('trailer_url', '!=', '')
-            ->orderByDesc('year')
-            ->select(['_id', 'name', 'view', 'slug']);
+        $query = Movie::where('type', $type);
 
         if ($year) {
             $query->where('year', '=', $year);
         }
-    
-        $upcomingTrendingMovies = $query->take(15)->get();  
-    
-        $externalRatings = $upcomingTrendingMovies->mapWithKeys(function ($movie) {
-            $response = Http::get('https://ophim1.com/phim/' . $movie->slug);
-            $rating = $response->json('movie.tmdb.vote_average', 0);
-            return [$movie->_id => $rating];
-        });
 
-        $upcomingTrendingMovies->each(function ($movie) use ($externalRatings) {
-            $movie->rating = $externalRatings[$movie->_id] ?? 0;
-        })->sortByDesc('rating')->sortByDesc('views');
+        // Fetch trending movies (top 15 by view)
+        $trendingMovies = $query->where('trailer_url', '!=', '')
+                               ->orderByDesc('view')
+                               ->take(15)
+                               ->get();
     
         // Fetch regular upcoming movies with pagination
-        $limit = request()->input('limit', 24);
-        $tredingRegularMovieResult = ($limit === 'all') ? $query->get() : $query->paginate($limit);
+        $regularMoviesQuery = clone $query; // Clone the base query for regular movies
+        $regularMoviesQuery->orderByDesc('year');
+
+        $regularMovies = ($limit === 'all') ? $regularMoviesQuery->get() : $regularMoviesQuery->paginate($limit);
     
         $responseData = [
             'data' => [
                 'trending_movies' => [
-                   'count' => $upcomingTrendingMovies->count(),
-                   'items' => MovieResource::collection($upcomingTrendingMovies),
+                   'count' => $trendingMovies->count(),
+                   'items' => MovieResource::collection($trendingMovies),
                 ],
 
                 'regular_movies' => [
-                   'count' => $tredingRegularMovieResult->count(),
-                   'items' => MovieResource::collection($tredingRegularMovieResult),
+                   'count' => $regularMovies->count(),
+                   'items' => MovieResource::collection($regularMovies),
                    'pagination' => [
-                        'totalItems' => $tredingRegularMovieResult->total(),
-                        'totalItemsPerPage' => $tredingRegularMovieResult->perPage(),
-                        'currentPage' => $tredingRegularMovieResult->currentPage(),
-                        'totalPages' => $tredingRegularMovieResult->lastPage(),
+                        'totalItems' => $regularMovies->total(),
+                        'totalItemsPerPage' => $regularMovies->perPage(),
+                        'currentPage' => $regularMovies->currentPage(),
+                        'totalPages' => $regularMovies->lastPage(),
                     ],
                 ] 
             ],
@@ -311,45 +301,42 @@ class MovieController
 
         // Define the base query
         $query = Movie::where('episode_current', 'Trailer')
-            ->where('trailer_url', '!=', '')
-            ->orderByDesc('year')
-            ->select(['_id', 'name', 'view', 'slug']);
+        ->where('trailer_url', '!=', '')
+        ->select(['_id', 'name', 'view', 'slug']);
 
         if ($year) {
             $query->where('year', '=', $year);
         }
-    
-        $upcomingTrendingMovies = $query->take(15)->get();  
-    
-        $externalRatings = $upcomingTrendingMovies->mapWithKeys(function ($movie) {
-            $response = Http::get('https://ophim1.com/phim/' . $movie->slug);
-            $rating = $response->json('movie.tmdb.vote_average', 0);
-            return [$movie->_id => $rating];
-        });
 
-        $upcomingTrendingMovies->each(function ($movie) use ($externalRatings) {
-            $movie->rating = $externalRatings[$movie->_id] ?? 0;
-        })->sortByDesc('rating')->sortByDesc('views');
+        // Fetch trending movies (top 15 by view)
+        $cacheKey = 'upcoming_trending_movies';
+        $trendingMovies = Cache::remember($cacheKey, now()->addMinutes(15), function () use ($query) {
+            return $query->orderByDesc('view')
+                         ->take(15)
+                         ->get();
+        });
     
         // Fetch regular upcoming movies with pagination
-        $limit = request()->input('limit', 24);
-        $tredingRegularMovieResult = ($limit === 'all') ? $query->get() : $query->paginate($limit);
+        $regularMoviesQuery = clone $query; // Clone the base query for regular movies
+        $regularMoviesQuery->orderByDesc('year');
+
+        $regularMovies = ($limit === 'all') ? $regularMoviesQuery->get() : $regularMoviesQuery->paginate($limit);
     
         $responseData = [
             'data' => [
                 'trending_movies' => [
-                   'count' => $upcomingTrendingMovies->count(),
-                   'items' => MovieResource::collection($upcomingTrendingMovies),
+                   'count' => $trendingMovies->count(),
+                   'items' => MovieResource::collection($trendingMovies),
                 ],
 
                 'regular_movies' => [
-                   'count' => $tredingRegularMovieResult->count(),
-                   'items' => MovieResource::collection($tredingRegularMovieResult),
+                   'count' => $regularMovies->count(),
+                   'items' => MovieResource::collection($regularMovies),
                    'pagination' => [
-                        'totalItems' => $tredingRegularMovieResult->total(),
-                        'totalItemsPerPage' => $tredingRegularMovieResult->perPage(),
-                        'currentPage' => $tredingRegularMovieResult->currentPage(),
-                        'totalPages' => $tredingRegularMovieResult->lastPage(),
+                        'totalItems' => $regularMovies->total(),
+                        'totalItemsPerPage' => $regularMovies->perPage(),
+                        'currentPage' => $regularMovies->currentPage(),
+                        'totalPages' => $regularMovies->lastPage(),
                     ],
                 ] 
             ],
@@ -374,11 +361,55 @@ class MovieController
     //PHIM THỊNH HÀNH
     public function getTrendingMovies(Request $request)
     {
-        $title = "Xem phim mới, Phim đang thịnh hành";
-        $description = "";
-        $topTrendingMovies = Movie::where('trailer_url', '!=', 'null')->orderBy('view', 'desc')->orderBy('year', 'desc');
+        try {
+            $title = "Xem phim mới, Phim đang thịnh hành";
+            $description = "";
+            
+            $limit = $request->input('limit', 15);
 
-        return $this->getMoviesByFilter($topTrendingMovies, 24, $title, $description);
+            $cacheKey = 'trending_movies_' . $limit;
+
+            $movies = Cache::remember($cacheKey, now()->addMinutes(15), function () use ($limit) {
+            return Movie::where('trailer_url', '!=', null)
+                        ->orderByDesc('view')
+                        ->orderByDesc('year')
+                        ->take($limit)
+                        ->get();
+            });
+        
+            if (!Cache::has($cacheKey . '_ratings')) {
+                $externalRatings = $movies->mapWithKeys(function ($movie) {
+                    $response = Http::get('https://ophim1.com/phim/' . $movie->slug);
+                    $rating = $response->json('movie.tmdb.vote_average', 0);
+                    return [$movie->_id => $rating];
+                });
+    
+                Cache::put($cacheKey . '_ratings', $externalRatings, now()->addMinutes(15));
+            } else {
+                $externalRatings = Cache::get($cacheKey . '_ratings');
+            }
+
+            $movies->each(function ($movie) use ($externalRatings) {
+                $movie->rating = $externalRatings[$movie->_id] ?? 0;
+            });
+
+            $sortedMovies = $movies->sortByDesc('rating')->sortByDesc('views');
+
+            $responseData = [
+                'data' => MovieResource::collection($sortedMovies),
+                'pagination' => [
+                    'totalItems' => '',
+                    'totalItemsPerPage' => '',
+                    'currentPage' => '',
+                    'totalPages' => '',
+                ],
+                'seoOnPage' => $this->generateSeoData($title, $description, null),
+            ];
+
+            return response()->json($responseData);
+        } catch (\Throwable $th) {
+            return $th->getMessage();
+        }
     }
 
     //PHIM MỚI CẬP NHẬT THEO LOẠI 
