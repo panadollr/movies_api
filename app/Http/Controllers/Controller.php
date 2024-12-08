@@ -30,7 +30,7 @@ class Controller extends BaseController
 
      public function welcome()
     {
-        $profile = DB::table('my_profiles')->first();
+        $profile = DB::table('my_profile')->first();
         $projects = DB::table('projects')->get();
         $project_categories = DB::table('project_categories')->get();
         $blogs = DB::table('blogs')->get();
