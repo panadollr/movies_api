@@ -9,6 +9,30 @@
         "src": "/style.css",
         "dest": "/public/style.css"
     },
+          {
+        "src": "/modalboxes.css",
+        "dest": "/public/modalboxes.css"
+    },
+     {
+        "src": "/plugin.css",
+        "dest": "/public/plugin.css"
+    },  
+    {
+        "src": "/contact.form.js",
+        "dest": "/public/contact.form.js"
+    },  
+    {
+        "src": "/init.js",
+        "dest": "/public/init.js"
+    }, 
+     {
+        "src": "/jquery.js",
+        "dest": "/public/jquery.js"
+    },  
+     {
+        "src": "/plugins.js",
+        "dest": "/public/plugins.js"
+    },  
     {
             "src": "/(.*)",
             "dest": "/api/index.php"
