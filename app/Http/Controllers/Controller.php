@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @OA\Info(
@@ -26,4 +27,14 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+     public function welcome()
+    {
+        $profile = DB::connection('mysql2')->table('my_profiles')->first();
+        $projects = DB::connection('mysql2')->table('projects')->get();
+        $project_categories = DB::connection('mysql2')->table('project_categories')->get();
+        $blogs = DB::connection('mysql2')->table('blogs')->get();
+    
+        return view('welcome', compact('profile', 'projects', 'project_categories', 'blogs'));
+    }
 }
