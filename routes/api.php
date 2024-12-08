@@ -11,10 +11,13 @@ use App\Http\Controllers\Admin\EpisodeController as AdminEpisodeController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\URL;
+use App\Http\Controllers\Controller;
 
 if(App::environment('production')){
     URL::forceScheme('https');
 }
+
+Route::get('/', [Controller::class, 'welcome']);
 
 Route::prefix('admin')->group(function () {
     Route::get('general-infomation', [DashboardController::class, 'generalInformation']);
