@@ -6,9 +6,9 @@
     ],
      "routes": [
      {
-            "src": "/(css|js|vendor|assets|build)/(.*)",
-            "dest": "public/$1/$2"
-        },
+        "src": "/style.css",
+        "dest": "/public/style.css"
+    },
     {
             "src": "/(.*)",
             "dest": "/api/index.php"
