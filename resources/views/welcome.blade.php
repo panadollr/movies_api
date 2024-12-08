@@ -13,9 +13,9 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
-<link rel="stylesheet" type="text/css" href="{{asset('plugins.css')}}" />
-<link rel="stylesheet" type="text/css" href="{{asset('modalboxes.css')}}" />
-<link rel="stylesheet" type="text/css" href="{{asset('style.css')}}" />
+<link rel="stylesheet" type="text/css" href="{{asset('css/plugins.css')}}" />
+<link rel="stylesheet" type="text/css" href="{{asset('css/modalboxes.css')}}" />
+<link rel="stylesheet" type="text/css" href="{{asset('css/style.css')}}" />
 <!--[if lt IE 9]> <script type="text/javascript" src="js/modernizr.custom.js"></script> <![endif]-->
 
 </head>
@@ -509,7 +509,7 @@
 </li>
 <li>
 <span class="first">Date</span>
-<span>{{ $project->created_at->format('M d, Y h:i A') }}</span>
+<span>{{ $project->created_at}}</span>
 </li>
 <li>
 <span class="first">Share</span>
@@ -551,7 +551,7 @@
 <img src="{{$blog->image}}" alt />
 <div class="main" data-img-url="{{$blog->image}}"></div>
 <a class="arlo_tm_full_link" href="#"></a>
-<div style="font-family: Berlin Sans FB Demi Bold;" class="date"><span>{{ $blog->created_at->format('M d, Y h:i A') }}</span></div>
+<div style="font-family: Berlin Sans FB Demi Bold;" class="date"><span>{{ $blog->created_at }}</span></div>
 </div>
 <div class="desc">
 <div class="meta">
@@ -671,11 +671,11 @@
 </div>
 
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="{{asset('jquery.js') }}"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/jquery.js"></script>
 <!--[if lt IE 10]> <script type="text/javascript" src="js/ie8.js"></script> <![endif]-->
-<script src="{{asset('plugins.js') }}"></script>
-<script src="{{asset('contact.form.js') }}"></script>
-<script src="{{asset('init.js') }}"></script>
+<script src="js/plugins.js"></script>
+<script src="js/contact.form.js"></script>
+<script src="js/init.js"></script>
 
 </body>
 </html>
