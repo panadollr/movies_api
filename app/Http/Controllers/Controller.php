@@ -30,10 +30,10 @@ class Controller extends BaseController
 
      public function welcome()
     {
-        $profile = DB::connection('mysql2')->table('my_profiles')->first();
-        $projects = DB::connection('mysql2')->table('projects')->get();
-        $project_categories = DB::connection('mysql2')->table('project_categories')->get();
-        $blogs = DB::connection('mysql2')->table('blogs')->get();
+        $profile = DB::table('my_profiles')->first();
+        $projects = DB::table('projects')->get();
+        $project_categories = DB::table('project_categories')->get();
+        $blogs = DB::table('blogs')->get();
         return $profile;
     
         // return view('welcome', compact('profile', 'projects', 'project_categories', 'blogs'));
