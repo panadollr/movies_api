@@ -14,8 +14,8 @@
         "dest": "/public/modalboxes.css"
     },
      {
-        "src": "/plugin.css",
-        "dest": "/public/plugin.css"
+        "src": "/plugins.css",
+        "dest": "/public/plugins.css"
     },  
     {
         "src": "/contact.form.js",
